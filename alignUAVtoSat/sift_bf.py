@@ -96,7 +96,7 @@ _pointsA = []
 _pointsB = []
 
 # Find point correspondences and put in txt file for hw2_starter.py
-print "Memoizing features"
+print "Memorizing features"
 i = 0
 for pair in matches:
     # Get the matching keypoints for each of the images
