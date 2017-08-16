@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <GroundOverlay>
+      <Icon>
+        <href>2013_08_27 18_57_56 flight 2 SUPER DEM.bil</href>
+      </Icon>
+      <LatLonBox>
+        <north>-1.4181470406732824e+001</north>
+        <south>-1.4182743845822824e+001</south>
+        <east>-1.6965780205827483e+002</east>
+        <west>-1.6965930324981483e+002</west>
+      </LatLonBox>
+      <name>2013_08_27 18_57_56 flight 2 SUPER DEM.bil</name>
+      <drawOrder>1</drawOrder>
+    </GroundOverlay>
+  </Document>
+</kml>

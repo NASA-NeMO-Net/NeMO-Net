@@ -3,60 +3,23 @@ import numpy as np
 import cv2
 import cvk2
 from matplotlib import pyplot as plt
+from osgeo import gdal,ogr,osr
+from pyproj import Proj
+import georefUtils
 import pdb
 
-if len(sys.argv) == 1:
-    raise Exception("Please pass a commandline argument for the number of point correspondences to use")
+print "Use: python ./sift_bf.py [path to blurred UAV] [path to google earth tiff w/ UTM georegistration] [# point correspondences] [# UTM zone (i.e. 2L for Ofu]"
+if len(sys.argv) != 5:
+    raise Exception("Incorrect Usage. See line above")
     
-numPointCorrespondences = int(sys.argv[1])
+numPointCorrespondences = int(sys.argv[3])
+utmZone = sys.argv[4]
 
-# method taken from rayryeng, StackOverflow
-def drawMatches(img1, kp1, img2, kp2, matches):
-    # Create a new output image that concatenates the two images together
-    rows1 = img1.shape[0]
-    cols1 = img1.shape[1]
-    rows2 = img2.shape[0]
-    cols2 = img2.shape[1]
-
-    out = np.zeros((max([rows1,rows2]),cols1+cols2,3), dtype='uint8')
-
-    # Place the first image to the left
-    out[:rows1,:cols1] = np.dstack([img1, img1, img1])
-
-    # Place the next image to the right of it
-    out[:rows2,cols1:] = np.dstack([img2, img2, img2])
-
-    # For each pair of points we have between both images
-    # draw circles, then connect a line between them
-    for mat in matches:
-
-        # Get the matching keypoints for each of the images
-        img1_idx = mat.queryIdx
-        img2_idx = mat.trainIdx
-
-        # x - columns
-        # y - rows
-        (x1,y1) = kp1[img1_idx].pt
-        (x2,y2) = kp2[img2_idx].pt
-
-        # Draw a small circle at both co-ordinates
-        cv2.circle(out, (int(x1),int(y1)), 4, (255, 0, 0), 1)   
-        cv2.circle(out, (int(x2)+cols1,int(y2)), 4, (255, 0, 0), 1)
-
-        # Draw a line in between the two points
-        cv2.line(out, (int(x1),int(y1)), (int(x2)+cols1,int(y2)), (255, 0, 0), 1)
-
-    # Also return the image if you'd like a copy
-    return out
-
+# Read images
 print "Reading images"
-img1 = cv2.imread('images/transect_highres_gEarth.jpg',0)      
-img2 = cv2.imread('images/transect_lowres_blurred.tiff',0)
-
-# Write black and white images
-#cv2.imwrite("img1.jpg", img1) 
-#cv2.imwrite("img2.jpg", img2)
-
+googleEarthPath = sys.argv[1]
+googleEarth = cv2.imread(googleEarthPath,0)      
+UAV = cv2.imread(sys.argv[2],0)
 print "Done.\n"
 
 # Feature detector
@@ -64,14 +27,15 @@ sift = cv2.SIFT()
 
 print "Finding image features"
 # Detect keypoints in both images
-(kp1,des1) = sift.detectAndCompute(img1, None)
-(kp2,des2) = sift.detectAndCompute(img2, None)
+(kp1,des1) = sift.detectAndCompute(googleEarth, None)
+(kp2,des2) = sift.detectAndCompute(UAV, None)
 print "Done.\n"
 
-
+# Match point correspondences
 print "Matching point correspondences"
 bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
-matches = bf.match(des1,des2)
+# matches = bf.match(des1,des2)
+matches = bf.match(des1, des2)
 print "Done.\n"
 
 print "Sorting matches"
@@ -82,128 +46,187 @@ print "Done.\n"
 goodPointCorrespondences = matches[:numPointCorrespondences]
 
 # Draw matches visualization
-out = drawMatches(img1, kp1, img2, kp2, goodPointCorrespondences)
-cv2.imwrite("matched_features.jpg", out)
+out = georefUtils.drawMatches(googleEarth, kp1, UAV, kp2, goodPointCorrespondences)
+cv2.imwrite("output/matched_features.jpg", out)
 
-# change pointsA/pointsB to filename later
-pointsA = open("pointsA.txt", "w")
-pointsB = open("pointsB.txt", "w")
+points_GE = open("output/points_GE.txt", "w")
+points_UAV = open("output/points_UAV.txt", "w")
 
-pointsA_all = open("pointsA_all.txt", "w")
-pointsB_all = open("pointsB_all.txt", "w")
+points_GE_all = open("output/points_GE_alll.txt", "w")
+points_UAV_all = open("output/points_UAV_all.txt", "w")
 
-_pointsA = []
-_pointsB = []
+_points_GE = []
+_points_UAV = []
 
-# Find point correspondences and put in txt file for hw2_starter.py
-print "Memorizing features"
+print "Memoizing features"
 i = 0
 for pair in matches:
     # Get the matching keypoints for each of the images
-    img1_idx = pair.queryIdx
-    img2_idx = pair.trainIdx
+    googleEarth_idx = pair.queryIdx
+    UAV_idx = pair.trainIdx
 
     # x - columns
     # y - rows
-    (x1,y1) = kp1[img1_idx].pt
-    (x2,y2) = kp2[img2_idx].pt
+    (x1,y1) = kp1[googleEarth_idx].pt
+    (x2,y2) = kp2[UAV_idx].pt
     
     if i < len(goodPointCorrespondences):
-        pointsA.write("{0} {1}\n".format(x1, y1))
-        pointsB.write("{0} {1}\n".format(x2, y2))
-        _pointsA.append((x1,y1))
-        _pointsB.append((x2,y2))
-    pointsA_all.write("{0} {1}\n".format(x1, y1))
-    pointsB_all.write("{0} {1}\n".format(x2, y2))
+        points_GE.write("{0} {1}\n".format(x1, y1))
+        points_UAV.write("{0} {1}\n".format(x2, y2))
+        _points_GE.append((x1,y1))
+        _points_UAV.append((x2,y2))
+    points_GE_all.write("{0} {1}\n".format(x1, y1))
+    points_UAV_all.write("{0} {1}\n".format(x2, y2))
     i += 1
 
-pointsA.close()
-pointsB.close()
+points_GE.close()
+points_UAV.close()
 print "Done.\n"
 
 print "Finding homography"
-_pointsA = np.asarray(_pointsA)
-_pointsB = np.asarray(_pointsB)
+_points_GE = np.asarray(_points_GE)
+_points_UAV = np.asarray(_points_UAV)
 
-# Homography code modified from hw2 of Swarthmore ENGR 27. Includes starter code from Matthew Zucker. We warp img1 into the perspective of img2
+# Homography code modified from hw2 of Swarthmore ENGR 27. Includes starter code from Matthew Zucker. We warp googleEarth into the perspective of UAV
 
-#Calculate image sizes
-h1, w1 = img1.shape
-size1 = (w1, h1)
+# Calculate image sizes
+h_GE, w_GE = googleEarth.shape
+size1 = (w_GE, h_GE)
 
-h2, w2 = img2.shape
-size2 = (w2, h2)
+h_UAV, w_UAV = UAV.shape
+size2 = (w_UAV, h_UAV)
 
 # Find a homography between the points
-getHomography = cv2.findHomography(_pointsA, _pointsB, method=cv2.RANSAC)
+getHomography = cv2.findHomography(_points_UAV, _points_GE, method=cv2.RANSAC)
 
-#coords1 array of original coordinates (image 1)
-#corner points of B
-coords1 = np.array( [ [[0, 0]],
-                [[w1, 0]],
-                [[w1, h1]],
-                [[0, h1]] ], dtype='float32' )
+# Corner indices for each image
+coords_GE = np.array( [ [[0, 0]],
+                [[w_GE, 0]],
+                [[w_GE, h_GE]],
+                [[0, h_GE]] ], dtype='float32' )
 
-#coords to transform (image 2 coordinates in the coordinate system of image 1)
-coords2 = np.array([ [[0, 0]],
-                     [[w2, 0]],
-                     [[w2, h2]],
-                     [[0, h2]] ], dtype='float32')
+coords_UAV = np.array([ [[0, 0]],
+                     [[w_UAV, 0]],
+                     [[w_UAV, h_UAV]],
+                     [[0, h_UAV]] ], dtype='float32')
 
-# Find homography mapping original to target (img2 to img1)
-coords2transformed = cv2.perspectiveTransform(coords2, np.matrix(getHomography[0]))
+# Find homography mapping UAV to GE
+coordsUAVtransformed = cv2.perspectiveTransform(coords_UAV, np.matrix(getHomography[0]))
 
 # Find a rectangle that bounds both images (size out output image where both images will be overlaid)
-pointsToEncapsulate = np.append(np.array(coords1), np.array(coords2transformed), axis=0)
-# Bounding rect is not working correctly, maybe implement by hand (min/max of each all x/y)
+pointsToEncapsulate = np.append(np.array(coords_GE), np.array(coordsUAVtransformed), axis=0)
 boundingRectangle = cv2.boundingRect(pointsToEncapsulate)
 
-#STEP 4: CALCULATE H'
-#Add translation to img1 to fit in bounding rectangle
+
+# T is the translation to get rid of negative coordinates
 T = np.array([ [1, 0, -1*boundingRectangle[0]],
     [0, 1, -1*boundingRectangle[1]],
     [0, 0, 1] ], dtype='float32')
 
+# homographyPrime is the homography with the translation factor
 homographyPrime = np.dot(T, np.matrix(getHomography[0]))
 
-#STEP 5: Warp A with H' into size (Wc, Hc)
 destSizeWH = (boundingRectangle[2], boundingRectangle[3])
 
-# Warp images using homography 
-warpedA = cv2.warpPerspective(img1, homographyPrime, destSizeWH)
-warpedB = cv2.warpPerspective(img2, T, destSizeWH) # Just a translation
-
-#todo: warp 4 corner coordinates
-
-#todo: interpolate cartesian coordinates across the entire image to georeference the entire img
-# Do we need to fully georectify the image or just mark the corners (and embed in tiff?)
-
-#something is wrong with this warpPerspective
-cv2.imwrite("overlayP1.jpg", warpedA)
-cv2.imwrite("overlayP2.jpg", warpedB)
-
-#LAST STEP: Overlay the images
-finalImage = np.zeros_like(warpedA)
-#simply add the images, leads to dark areas
-finalImage = np.add(0.5*warpedA, 0.5*warpedB)
+# Calculate the perspective transform
+warped_GE = cv2.warpPerspective(googleEarth, T, destSizeWH)
+warped_UAV = cv2.warpPerspective(UAV, homographyPrime, destSizeWH)
 
 
-# verify coordinate systems + homography mapping is valid
+# opencv window to preview tracked corners
+uavCornersPreview = np.copy(warped_GE) # Note: this is a 3 channel RGB image. Only used for UI/preview. 
+uavCornersPreview = cv2.cvtColor(uavCornersPreview, cv2.COLOR_GRAY2RGB) 
+uavCornerIndices = []  # This is passed on to linearlyInterpolateUTM
+uavCornerIndices.append(georefUtils.mapPointThroughHomography(homographyPrime, (0, 0)))
+uavCornerIndices.append(georefUtils.mapPointThroughHomography(homographyPrime, (0, h_UAV)))
+uavCornerIndices.append(georefUtils.mapPointThroughHomography(homographyPrime, (w_UAV, h_UAV)))
+uavCornerIndices.append(georefUtils.mapPointThroughHomography(homographyPrime, (w_UAV, 0)))
+
+pts = np.asarray(uavCornerIndices)
+pts = pts.reshape((-1,1,2))
+cv2.polylines(uavCornersPreview,[pts],True,(255,0,0))
+
+# Show preview window
+font = cv2.FONT_HERSHEY_SIMPLEX
+for i, point in enumerate(uavCornerIndices):
+    cv2.circle(uavCornersPreview, point, 3, 0)
+    cv2.putText(uavCornersPreview, "corner"+str(i+1), point, font, 0.5, (0,0,0), 1)
+cv2.imshow("Uav Corners Preview", uavCornersPreview)  # todo: make the image a bit more transparent
+while cv2.waitKey(5) < 0: pass
+
+cv2.imwrite("output/overlayP1.jpg", warped_GE)
+cv2.imwrite("output/overlayP2.jpg", warped_UAV)
+
+# Overlay the images. We simply add the images (leads to dark areas, but that makes for better visualization anyways)
+finalImage = np.zeros_like(warped_GE)
+finalImage = np.add(0.5*warped_GE, 0.5*warped_UAV)
 
 print "Done.\n"
 
 print "Writing output file \n"
-cv2.imwrite("aligned_image.jpg", finalImage)
+cv2.imwrite("output/aligned_image.jpg", finalImage)
 print "All done!\n"
 
+##################################################################################################################
+# Images are aligned. Now linearly interpolate UTM coordinates to find the corners of the UAV image
+##################################################################################################################
 
 
+'''
+1.) Find the location on google earth. Note the lat/long.
+2.) Jump to the lat/long in QGIS. Make sure the current coordinate system is lat/lon. Export as tiff w/ highest resolution. 
+3.) Run script on this image and high res image (after BLURRING the high res to be a similar resolution)
+
+'''
+# Get the lat/lon corner coordinates of google earth screenshot 
+gEarthScreenshot = gdal.Open(googleEarthPath, 0)
+c = gEarthScreenshot.RasterXSize # width of img (# of cols)
+r = gEarthScreenshot.RasterYSize # height of img (# of rows)
+
+# todo: convert to pairs instead of depending on ordering
+corners = georefUtils.getCorners(gEarthScreenshot, r, c)
+
+# Needed because QGIS doens't support UTM zone 2L (Ofu/American Samoa). So we take in QGIS lat/lon data and covert it to UTM ourselves. 
+cornersUTM = georefUtils.latlongListToUTM(corners, utmZone)
+
+print "Google Maps Corners (lat/lon)"
+georefUtils.printCoordList(corners) # todo: is corners being rounded? 
+print "UAV Corners (UTM)" 
+georefUtils.printCoordList(cornersUTM) 
+
+# We assume the google earth image was not translated (bad assumption, should change). 
+# This does hold true is most cases though (if the UAV image is 100% encapsulated by the google earth image)
+# todo: fix this assumption
+indices = [] # Unfortunately for now, the order here matters. todo. 
+indices.append((0, 0))
+indices.append((h_GE, 0))
+indices.append((w_GE, 0))
+indices.append((h_GE, w_GE))
+indices = np.asarray(indices)
+
+uavCornersUTM = georefUtils.linearlyInterpolateUTM((h_GE,w_GE), cornersUTM,indices, (destSizeWH[1], destSizeWH[0]), uavCornerIndices)
+
+finalPreview = np.copy(warped_GE) # Note: this is a 3 channel RGB image. Only used for UI/preview.
+finalPreview = cv2.cvtColor(finalPreview, cv2.COLOR_GRAY2RGB)
 
 
+# Connect the corners
+cv2.polylines(finalPreview,[pts],True,(255,0,0))
 
+# Not sure why this is necessary
+uavCornersUTM = np.asarray(uavCornersUTM)
 
+# Show labeled coordinates. 
+font = cv2.FONT_HERSHEY_SIMPLEX
+for i, point in enumerate(uavCornerIndices):
+    cv2.circle(finalPreview, point, 3, 0)
+    cv2.putText(finalPreview, "corner"+str(i+1) + ": ({0},{1})".format(int(uavCornersUTM[i][0]), int(uavCornersUTM[i][1])), point, font, 0.5, (0,0,0), 1)
+cv2.imshow("Overview", finalPreview)  # todo: make the image a bit more transparent
+while cv2.waitKey(5) < 0: pass
 
-
-
-
-
+# todo: encapsulate drawing chunks in functions? 
+# todo: export UAV tiff with embedded Geo info. 
+# todo: read from file if it exists
+# todo: how many point correspondences to use? 
+# todo: do we want to return the coordinates in lat/lon? 
+# todo: get rid of order dependency
