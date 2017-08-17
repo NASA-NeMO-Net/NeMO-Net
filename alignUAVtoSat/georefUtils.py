@@ -58,7 +58,38 @@ def getCorners(gdalImage, r, c):
             retval.append([y,x])        
     return retval
 
-# Todo: pass in UTM zone (and return)
+#todo: the camel caps convetion here is so irregular, fix 
+'''
+Input:
+    utmCoord: utmCoordinate we want to convert (Easting, Northing). Numpy array or python list. 
+    UTM_zone: string containing UTM zone we're working in (e.g. "2L" for Ofu)
+Output: 
+    retval: (lat, lon) pair. 
+'''
+def utmCoordinateToLatLong(utmCoord, UTM_zone):
+    UTMx = utmCoord[0]
+    UTMy = utmCoord[1] 
+    # myProj is thee function mapping WGS84 to UTM
+    projOptions = "+proj=utm +zone={0}, +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs".format(UTM_zone)
+    myProj = Proj(projOptions)
+    
+    # Reverse transformation is currently untested
+    # UTM to lat/long
+    lon, lat = myProj(UTMx, UTMy, inverse=True)
+    
+    retval = (lon,lat)
+    return retval
+
+# todo: what does coords look like? need to convert to 
+# todo: does this preserve order? 
+def utmListToLatLong(coords, UTM_zone):
+    retval = []
+    for coord in coords:
+        latLongCoord = utmCoordinateToLatLong(coord, UTM_zone)
+        retval.append(latLongCoord)
+    return np.asarray(retval)
+
+
 def latlongCoordinateToUTM(latlongCoord, UTM_zone):
     lat = latlongCoord[0]
     lon = latlongCoord[1]
@@ -71,11 +102,6 @@ def latlongCoordinateToUTM(latlongCoord, UTM_zone):
     # UTMx: Easting
     UTMy, UTMx= myProj(lon, lat)
     
-    # Reverse transformation is currently untested
-    # UTM to lat/long
-    # lat, lon = myProj(UTMx, UTMy, inverse=True)
-
-
     return np.asarray((UTMy, UTMx))
 
 # Convert a list of latlong/Global Geodetic System to UTM
@@ -129,28 +155,29 @@ def linearlyInterpolateUTM(size_GE, coords, indices, imgSize, UAV_indices): # in
     referencePointIdx = upperLeftIdx
 
     # todo: check these indices
-    uav0_idx = UAV_indices[0]
+    uav0_idx = UAV_indices[0] # HAVE BEEN FLIPPED TODO
     uav1_idx = UAV_indices[1]
     uav2_idx = UAV_indices[2] 
     uav3_idx = UAV_indices[3]
 
     # maybe encapsulate all this into a function? 
+    # todo: flipped indices
+    # tood: drawing in wrong order in preview window
     uav0_distance = uav0_idx - referencePointIdx
-    uav0_UTM = referencePointUTM + np.dot(uav0_distance[0], dR_gradient) + np.dot(uav0_distance[1], dC_gradient)
-
+    uav0_UTM = referencePointUTM + uav0_distance[1]*dR_gradient + uav0_distance[0]*dC_gradient
+    
     uav1_distance = uav1_idx - referencePointIdx
-    uav1_UTM = referencePointUTM + np.dot(uav1_distance[0], dR_gradient) + np.dot(uav1_distance[1], dC_gradient)
+    uav1_UTM = referencePointUTM + uav1_distance[1]*dR_gradient + uav1_distance[0]*dC_gradient
 
+    # the problem
     uav2_distance = uav2_idx - referencePointIdx
-    uav2_UTM = referencePointUTM + np.dot(uav2_distance[0], dR_gradient) + np.dot(uav2_distance[1], dC_gradient)
+    uav2_UTM = referencePointUTM + uav2_distance[1]*dR_gradient + uav2_distance[0]*dC_gradient
 
     uav3_distance = uav3_idx - referencePointIdx
-    uav3_UTM = referencePointUTM + np.dot(uav3_distance[0], dR_gradient) + np.dot(uav3_distance[1], dC_gradient)
+    uav3_UTM = referencePointUTM + uav3_distance[1]*dR_gradient + uav3_distance[0]*dC_gradient
 
-    # Add to retval in the same order
-    # Upper Left, Lower Left, Upper Right, Lower Right
 
-    # TODO: also label image corners 
+
     # TODO: Convert to latlong again before returning
     retval = [] # for some reason we have to flip the coodinates here
     retval.append(uav3_UTM)
@@ -158,6 +185,8 @@ def linearlyInterpolateUTM(size_GE, coords, indices, imgSize, UAV_indices): # in
     retval.append(uav1_UTM)
     retval.append(uav0_UTM)
     
+    # pdb.set_trace()
+
     return retval
 
 # Follow a point through the homography transform (point in (r,c) form)
@@ -178,18 +207,9 @@ def printCoordList(coords):
     prefix.append("Upper Right: ")
     prefix.append("Lower Right: ")
     for idx,coord in enumerate(coords):
-        print "{0} ({1}, {2}) \n".format(prefix[idx],round(coord[0],3), round(coord[1],3))
+        print "{0} ({1}, {2}) \n".format(prefix[idx],coord[0], coord[1])
     
-'''
-tiff = "latlong.tiff"
-img = gdal.Open(tiff)
-c = img.RasterXSize
-r = img.RasterYSize
-corners  = getCorners(img, r, c)
-cornersUTM = latlongListToUTM(corners, "2L")
-printCoordList(corners)
-printCoordList(cornersUTM)
-'''
+
 
 
 

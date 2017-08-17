@@ -2,7 +2,6 @@ import sys
 import numpy as np
 import cv2
 import cvk2
-from matplotlib import pyplot as plt
 from osgeo import gdal,ogr,osr
 from pyproj import Proj
 import georefUtils
@@ -151,6 +150,7 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 for i, point in enumerate(uavCornerIndices):
     cv2.circle(uavCornersPreview, point, 3, 0)
     cv2.putText(uavCornersPreview, "corner"+str(i+1), point, font, 0.5, (0,0,0), 1)
+
 cv2.imshow("Uav Corners Preview", uavCornersPreview)  # todo: make the image a bit more transparent
 while cv2.waitKey(5) < 0: pass
 
@@ -189,11 +189,6 @@ corners = georefUtils.getCorners(gEarthScreenshot, r, c)
 # Needed because QGIS doens't support UTM zone 2L (Ofu/American Samoa). So we take in QGIS lat/lon data and covert it to UTM ourselves. 
 cornersUTM = georefUtils.latlongListToUTM(corners, utmZone)
 
-print "Google Maps Corners (lat/lon)"
-georefUtils.printCoordList(corners) # todo: is corners being rounded? 
-print "UAV Corners (UTM)" 
-georefUtils.printCoordList(cornersUTM) 
-
 # We assume the google earth image was not translated (bad assumption, should change). 
 # This does hold true is most cases though (if the UAV image is 100% encapsulated by the google earth image)
 # todo: fix this assumption
@@ -204,7 +199,7 @@ indices.append((w_GE, 0))
 indices.append((h_GE, w_GE))
 indices = np.asarray(indices)
 
-uavCornersUTM = georefUtils.linearlyInterpolateUTM((h_GE,w_GE), cornersUTM,indices, (destSizeWH[1], destSizeWH[0]), uavCornerIndices)
+uavCornersUTM = georefUtils.linearlyInterpolateUTM((h_GE,w_GE), cornersUTM, indices, (destSizeWH[1], destSizeWH[0]), uavCornerIndices)
 
 finalPreview = np.copy(warped_GE) # Note: this is a 3 channel RGB image. Only used for UI/preview.
 finalPreview = cv2.cvtColor(finalPreview, cv2.COLOR_GRAY2RGB)
@@ -216,11 +211,28 @@ cv2.polylines(finalPreview,[pts],True,(255,0,0))
 # Not sure why this is necessary
 uavCornersUTM = np.asarray(uavCornersUTM)
 
+# show output as lat/lon
+uavCornersLatLon = georefUtils.utmListToLatLong(uavCornersUTM, "2L")
+uavCornersLatLon = np.asarray(uavCornersLatLon)
+
+print "UAV Corners (UTM)" 
+georefUtils.printCoordList(uavCornersUTM) 
+
+uavCornersUTM = uavCornersLatLon
+
+# at this point, uavCornersUTM and uavCornersLatLon are correct and in the right order
+
+print "gEarth Corners (UTM)"
+georefUtils.printCoordList(cornersUTM)
+
+print "UAV Corners (lat/lon)"
+georefUtils.printCoordList(uavCornersLatLon)
+
 # Show labeled coordinates. 
 font = cv2.FONT_HERSHEY_SIMPLEX
 for i, point in enumerate(uavCornerIndices):
     cv2.circle(finalPreview, point, 3, 0)
-    cv2.putText(finalPreview, "corner"+str(i+1) + ": ({0},{1})".format(int(uavCornersUTM[i][0]), int(uavCornersUTM[i][1])), point, font, 0.5, (0,0,0), 1)
+    cv2.putText(finalPreview, "corner"+str(i+1) + ": ({0},{1})".format(round(uavCornersUTM[i][0],7), round(uavCornersUTM[i][1],7)), point, font, 0.5, (0,0,0), 1)
 cv2.imshow("Overview", finalPreview)  # todo: make the image a bit more transparent
 while cv2.waitKey(5) < 0: pass
 
