@@ -10,29 +10,41 @@ read in files that start with the actual data with no
 junk above it 
  
 '''
-# OPEN CV
-fileVideo = input("Enter Name of Video: ");                                                                   
-print("Exporting Frames from: ", fileVideo)
-vidcap = cv2.VideoCapture(fileVideo)
-success,image = vidcap.read()
-count = 0
-success = True
-while success:
-  success,image = vidcap.read()
-  #count = str(count)
-  cv2.imwrite("images/frame-%d.jpg" % count, image)
-  count = int(count)
-  if cv2.waitKey(10) == 27:                     # exit if Escape is hit
-      break
-  count += 1
-count = count - 2
-print("Number of frames generated: ", count)
-imageMatch = "frame-"+str(count)+".jpg"
 
+'''
+Get video file from user use cv2 to: 
+    1.) Write frames as jpgs in ./images/
+    2.) Get the number of frames in the video (stored in count)
+'''
+pathToVideo = input("Enter Path to Video: ");
+print("Exporting Frames from: ", pathToVideo)
+print("\nFrames written: ")
+
+vidcap = cv2.VideoCapture(pathToVideo)
+count = 0
+
+success, frame = vidcap.read()
+while success:
+  cv2.imwrite("frames/frame-%d.jpg" % count, frame)
+  success, frame = vidcap.read()
+  if count % 25 == 0:
+    print(count)
+  count += 1
+
+print("Number of frames generated: ", count)
+imageMatch = "frame-"+str(count)+".jpg" # TODO: what is imageMatch
+
+
+'''
+Status. 
+    - count has the total number of frames
+    - imageMatch is a mystery
+    - continue to investigate this tmrw 
+'''
+pdb.set_trace()
 
 # USER IO AND DATA CLEANING
-fileInput = input("Enter Name of Telemetry Input: ");                                                         
-fileOutput = input("Enter Name of Telemetry Output: ");                                                       
+fileInput = input("Enter Name of Telemetry Input: ");                                               fileOutput = input("Enter Name of Telemetry Output: ");                                                       
 fileIn = open(fileInput, "r")
 fileOut = open(fileOutput, "w")
 match = input("Enter the elapsed start time: ");                                                              
@@ -66,54 +78,34 @@ for i, row in enumerate(data):
 
 # deltaTime[index] is the time difference between index and index+1
 
-fps = 29.97 # change this to read from Dalton's code later
+fps = 29.97 #TODO: change this to read from Dalton's code later.
 framesPerBlock = []
 for i, dTime in enumerate(deltaTime):
     frames = deltaTime[i] / (1/fps)  
     framesPerBlock.append(frames)
 
+# Round frames to int. TODO. Must replace with roundingError.py when it is finished.
 roundedFramesPerBlock = framesPerBlock[:]
-
 for i in range(0, len(roundedFramesPerBlock)):
     roundedFramesPerBlock[i] = int(round(roundedFramesPerBlock[i], 0))
-
-
-
-
 
 # need some of Dalton's code here:
 image = ""
 imageName = "frame-"
 imageNum = "0"
 imageType = ".jpg"
-col = []
-col.append(0) # todo change this
-col.append(0)
-col.append(0)
-col.append(0)
-
+col = [0] * 4 # List with 4 0's 
 
 j = 0
 currentBlockNum = 0
-for i,lines in enumerate(fileIn):
-
-    #col = line.strip().split()
-    
+for i,lines in enumerate(fileIn):    
     col[1] = data[currentBlockNum][1]
     col[2] = data[currentBlockNum][2]
     col[3] = data[currentBlockNum][3]
     numFramesInCurrentBlock = roundedFramesPerBlock[currentBlockNum]
-    #while j <= numFramesInCurrentBlock: 
     imageNum = str(imageNum)
     image = imageName + imageNum + imageType
-    fileOut.write(image)
-    fileOut.write(" ")
-    fileOut.write(str(col[1]))
-    fileOut.write(" ")
-    fileOut.write(str(col[2]))
-    fileOut.write(" ")
-    fileOut.write(str(col[3]))
-    fileOut.write("\n")
+    fileOut.write(image + " {0} {1} {2}\n".format(str(col[1]), str(col[2]), str(col[3])))
     imageNum = int(imageNum) + 1
     j += 1
 
