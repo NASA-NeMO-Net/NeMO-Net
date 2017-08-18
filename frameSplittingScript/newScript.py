@@ -44,40 +44,41 @@ Status.
 pdb.set_trace()
 
 # USER IO AND DATA CLEANING
-fileInput = input("Enter Name of Telemetry Input: ");                                               fileOutput = input("Enter Name of Telemetry Output: ");                                                       
-fileIn = open(fileInput, "r")
-fileOut = open(fileOutput, "w")
-match = input("Enter the elapsed start time: ");                                                              
-line = ""
+telemetryInputPath = input("Enter Path to Telemetry File: ");
+telemetryOutputPath = input("Enter Path to Telemetry File: ");                                                       
+telemetryInputFile = open(telemetryInputPath, "r")
+telemetryOutputFile = open(telemetryOutputPath, "w")
+match = input("Enter the elapsed start time: "); # Why is this called match
+
+# This might be useful later
 #found = False
 #while found != True: #Loop searches for the elapsed time you want to start export at
-#    col = fileIn.readline().split()
+#    col = telemetryInputFile.readline().split()
 #    if col[0] == match:
 #        found = True
 
 
-# CALCULATE A BLOCKS
-data = pd.read_csv(fileInput, header=None)
-data = data.values
-temp = round((data[1][0]-data[0][0])/0.03337,1)
-print(temp)
+# Store telemetry input in a numpy array called telemetryInput
+telemetryInput_pandas = pd.read_csv(telemetryInputPath, header=None)
+telemetryInput = telemetryInput_pandas.values
 
+
+# Compute the deltaTime array. Stores the elapsed time between each telemetry log entry.
+# deltaTime[index] is the time difference between index and index+1
 deltaTime = []
-
 prevRow = []
-for i, row in enumerate(data):
+for i, row in enumerate(telemetryInput):
     if i == 0:
         prevRow = row
         continue;
 
     dTime = row[0] - prevRow[0]
-    # a_value = int(round(a_value, 1))
     deltaTime.append(dTime)
     prevRow = row
     
-
-# deltaTime[index] is the time difference between index and index+1
-
+# Using the time between each log, compute how many frames were drawn in that time.
+# Assign all of those frames in the range [currentTime, currentTime + deltaTime[log+1]]
+# to the previous telemetry file. 
 fps = 29.97 #TODO: change this to read from Dalton's code later.
 framesPerBlock = []
 for i, dTime in enumerate(deltaTime):
@@ -91,31 +92,36 @@ for i in range(0, len(roundedFramesPerBlock)):
 
 # need some of Dalton's code here:
 image = ""
-imageName = "frame-"
 imageNum = "0"
-imageType = ".jpg"
+imageType = ".jpg" # todo: this should be user input?
 col = [0] * 4 # List with 4 0's 
 
 j = 0
 currentBlockNum = 0
-for i,lines in enumerate(fileIn):    
-    col[1] = data[currentBlockNum][1]
-    col[2] = data[currentBlockNum][2]
-    col[3] = data[currentBlockNum][3]
-    numFramesInCurrentBlock = roundedFramesPerBlock[currentBlockNum]
+for i,lines in enumerate(telemetryInputFile):    
+    col[1] = telemetryInput[currentBlockNum][1]
+    col[2] = telemetryInput[currentBlockNum][2]
+    col[3] = telemetryInput[currentBlockNum][3]
+    numFramesInCurrentBlock = roundedFramesPerBlock[currentBlockNum] # this doesn't need to be computed every time todo
     imageNum = str(imageNum)
-    image = imageName + imageNum + imageType
-    fileOut.write(image + " {0} {1} {2}\n".format(str(col[1]), str(col[2]), str(col[3])))
+    image = "frame-" + imageNum + imageType
+    telemetryOutputFile.write(image + " {0} {1} {2}\n".format(str(col[1]), str(col[2]), str(col[3])))
     imageNum = int(imageNum) + 1
     j += 1
 
     if j == numFramesInCurrentBlock:
         currentBlockNum += 1
         j = 0
-            
+
+
+    '''
+    Better way: delete image, imageMatch. Replace with: 
+    
+    if i+1 == count:    
+    '''  
     if image == imageMatch:
         print("<Final Frame Reached>")
         print("<Telemetry Export Complete>")
-        fileIn.close()
-        fileOut.close()
+        telemetryInputFile.close()
+        telemetryOutputFile.close()
         quit()
