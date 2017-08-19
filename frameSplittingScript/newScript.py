@@ -37,7 +37,6 @@ while success:
 print("Number of frames generated: ", count)
 imageMatch = "frame-"+str(count)+".jpg" # TODO: what is imageMatch
 
-
 '''
 Status. 
     - count has the total number of frames
@@ -47,10 +46,12 @@ Status.
 
 # USER IO AND DATA CLEANING
 telemetryInputPath = input("Enter Path to Telemetry Input File: ");
-telemetryOutputPath = input("Enter Path to Telemetry Output File: ");                                                       
+telemetryOutputPath = input("Enter Path to Telemetry Output File: ");
+
 telemetryInputFile = open(telemetryInputPath, "r")
 telemetryOutputFile = open(telemetryOutputPath, "w")
-match = input("Enter the elapsed start time: "); # Why is this called match
+# match = input("Enter the elapsed start time: "); # Why is this called match
+match = 82.804
 
 # This might be useful later
 #found = False
@@ -77,11 +78,12 @@ col = [0] * 4 # List with 4 0's
 
 j = 0
 currentBlockNum = 0
-for i,lines in enumerate(telemetryInputFile):
+for i in range(0, count):
+    # pdb.set_trace()
     col[1] = telemetryInput[alignedPairs[i]][1]
     col[2] = telemetryInput[alignedPairs[i]][2]
     col[3] = telemetryInput[alignedPairs[i]][3]
-    print(i)
+    print("Aligning frame {0}".format(i))
 
     imageNum = str(imageNum)
     image = "frame-" + imageNum + imageType
@@ -91,7 +93,7 @@ for i,lines in enumerate(telemetryInputFile):
 
 
     '''
-    Better way: delete image, imageMatch. Replace with: 
+    Better way: delete image, imageMatch Replace with: 
     
     if i+1 == count:    
     '''  
@@ -101,3 +103,5 @@ for i,lines in enumerate(telemetryInputFile):
         telemetryInputFile.close()
         telemetryOutputFile.close()
         quit()
+
+print("All done!")
