@@ -44,8 +44,8 @@ Status.
 pdb.set_trace()
 
 # USER IO AND DATA CLEANING
-telemetryInputPath = input("Enter Path to Telemetry File: ");
-telemetryOutputPath = input("Enter Path to Telemetry File: ");                                                       
+telemetryInputPath = input("Enter Path to Telemetry Input File: ");
+telemetryOutputPath = input("Enter Path to Telemetry Output File: ");                                                       
 telemetryInputFile = open(telemetryInputPath, "r")
 telemetryOutputFile = open(telemetryOutputPath, "w")
 match = input("Enter the elapsed start time: "); # Why is this called match
