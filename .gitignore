@@ -6,6 +6,6 @@
 *.out
 # TensorFlow  save files #
 ###############
-*.met
+*.meta
 *.index
 *.data*
