@@ -4,3 +4,8 @@
 *.tiff
 *.png
 *.out
+# TensorFlow  save files #
+###############
+*.met
+*.index
+*.data*
