@@ -17,8 +17,7 @@ Get video file from user use cv2 to:
     1.) Write frames as jpgs in ./frames
     2.) Get the number of frames in the video (stored in frameCount)
 '''
-'''
-fast: new comment block
+
 fps = 29.97 # TODO: take this as user input
 pathToVideo = input("Enter Path to Video: ");
 print("Exporting Frames from: ", pathToVideo)
@@ -37,11 +36,6 @@ while success:
 
 print("Number of frames generated: ", frameCount)
 imageMatch = "frame-"+str(frameCount)+".jpg" # TODO: what is imageMatch
-'''
-frameCount = 10920
-fps = 29.97
-
-
 
 
 '''
@@ -51,19 +45,15 @@ Status.
     - continue to investigate this tmrw 
 '''
 
-# fast: commented out inputs
-# USER IO AND DATA CLEANING
-#telemetryInputPath = input("Enter Path to Telemetry Input File: ");
-#telemetryOutputPath = input("Enter Path to Telemetry Output File: ");
 
-telemetryInputPath = "flight2.csv"
-telemetryOutputPath = "flight2_output.csv"
+# USER IO AND DATA CLEANING
+telemetryInputPath = input("Enter Path to Telemetry Input File: ");
+telemetryOutputPath = input("Enter Path to Telemetry Output File: ");
 
 telemetryInputFile = open(telemetryInputPath, "r")
 telemetryOutputFile = open(telemetryOutputPath, "w")
-#fast: 
-#droneStartTime = input("Enter the elapsed drone start time: ");
-droneStartTime = 646.075
+
+droneStartTime = input("Enter the elapsed drone start time: ");
 
 # Store telemetry input in a numpy array called telemetryInput
 telemetryInput_pandas = pd.read_csv(telemetryInputPath, header=None)
@@ -74,7 +64,6 @@ logFileTimes = newScript_utils.scaleLogFileTimes(logFileTimes, frameCount, fps)
 frameTimes = newScript_utils.getFrameTimes(frameCount, fps)
 alignedPairs = newScript_utils.alignLogAndFrames(frameTimes, logFileTimes, frameCount)
 
-# need some of Dalton's code here:
 image = ""
 imageNum = "0"
 imageType = ".jpg" # todo: this should be user input?
