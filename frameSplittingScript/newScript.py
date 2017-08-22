@@ -75,14 +75,16 @@ for i in range(0, frameCount):
     col[1] = telemetryInput[alignedPairs[i]][1]
     col[2] = telemetryInput[alignedPairs[i]][2]
     col[3] = telemetryInput[alignedPairs[i]][3]
-    print("Aligning frame {0}".format(i))
+    print("Aligning frame {0} with logfile: {1}".format(i, alignedPairs[i]))
+
 
     image = "frame-" + str(i) + imageType
     telemetryOutputFile.write(image + " {0} {1} {2}\n".format(str(col[1]), str(col[2]), str(col[3])))
 
-    if i == frameCount:
+    if i+1 == frameCount:
         print("<Final Frame Reached>")
         print("<Telemetry Export Complete>")
+        telemetryOutputFile.flush()
         telemetryInputFile.close()
         telemetryOutputFile.close()
         quit()
