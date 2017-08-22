@@ -20,18 +20,9 @@ def scaleLogFileTimes(logfile, count, fps):
     
     logFileTimes = logfile[:] # get copy since Python passes lists by ref
     time_start = logFileTimes[0]
-    time_end = logFileTimes[len(logFileTimes)-1]
-    length = time_end - time_start
 
-    actualDuration = count / fps # actual duration in seconds
-
-    # Scale UAV logfiles to match fps timeline (and shift by offset to align since UAV timeline)
-    # may not start at t = 0.
-    scaleFactor = actualDuration / length
-    offset = logFileTimes[0] * scaleFactor
     for i in range(0,len(logFileTimes)):
-        logFileTimes[i] *= scaleFactor
-        logFileTimes[i] -= offset 
+        logFileTimes[i] -= time_start
     return logFileTimes
 
 # Get an array that has a timestamp corresponding to each frame

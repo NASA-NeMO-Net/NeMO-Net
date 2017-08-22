@@ -17,7 +17,8 @@ Get video file from user use cv2 to:
     1.) Write frames as jpgs in ./frames
     2.) Get the number of frames in the video (stored in frameCount)
 '''
-
+'''
+fast: new comment block
 fps = 29.97 # TODO: take this as user input
 pathToVideo = input("Enter Path to Video: ");
 print("Exporting Frames from: ", pathToVideo)
@@ -36,6 +37,12 @@ while success:
 
 print("Number of frames generated: ", frameCount)
 imageMatch = "frame-"+str(frameCount)+".jpg" # TODO: what is imageMatch
+'''
+frameCount = 10920
+fps = 29.97
+
+
+
 
 '''
 Status. 
@@ -44,22 +51,19 @@ Status.
     - continue to investigate this tmrw 
 '''
 
+# fast: commented out inputs
 # USER IO AND DATA CLEANING
-telemetryInputPath = input("Enter Path to Telemetry Input File: ");
-telemetryOutputPath = input("Enter Path to Telemetry Output File: ");
+#telemetryInputPath = input("Enter Path to Telemetry Input File: ");
+#telemetryOutputPath = input("Enter Path to Telemetry Output File: ");
+
+telemetryInputPath = "flight2.csv"
+telemetryOutputPath = "flight2_output.csv"
 
 telemetryInputFile = open(telemetryInputPath, "r")
 telemetryOutputFile = open(telemetryOutputPath, "w")
-droneStartTime = input("Enter the elapsed drone start time: "); 
-droneStartTime = 82.804
-
-# This might be useful later
-#found = False
-#while found != True: #Loop searches for the elapsed time you want to start export at
-#    col = telemetryInputFile.readline().split()
-#    if col[0] == droneStartTime:
-#        found = True
-
+#fast: 
+#droneStartTime = input("Enter the elapsed drone start time: ");
+droneStartTime = 646.075
 
 # Store telemetry input in a numpy array called telemetryInput
 telemetryInput_pandas = pd.read_csv(telemetryInputPath, header=None)
@@ -76,7 +80,6 @@ imageNum = "0"
 imageType = ".jpg" # todo: this should be user input?
 col = [0] * 4 # List with 4 0's 
 
-j = 0
 currentBlockNum = 0
 for i in range(0, frameCount):
     # pdb.set_trace()
@@ -85,19 +88,10 @@ for i in range(0, frameCount):
     col[3] = telemetryInput[alignedPairs[i]][3]
     print("Aligning frame {0}".format(i))
 
-    imageNum = str(imageNum)
-    image = "frame-" + imageNum + imageType
+    image = "frame-" + str(i) + imageType
     telemetryOutputFile.write(image + " {0} {1} {2}\n".format(str(col[1]), str(col[2]), str(col[3])))
-    imageNum = int(imageNum) + 1
-    j += 1
 
-
-    '''
-    Better way: delete image, imageMatch Replace with: 
-    
-    if i+1 == frameCount:    
-    '''  
-    if image == imageMatch:
+    if i == frameCount:
         print("<Final Frame Reached>")
         print("<Telemetry Export Complete>")
         telemetryInputFile.close()
