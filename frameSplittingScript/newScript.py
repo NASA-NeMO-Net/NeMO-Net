@@ -19,29 +19,32 @@ Get video file from user use cv2 to:
 '''
 
 fps = 29.97 # TODO: take this as user input
-pathToVideo = input("Enter Path to Video: ");
-print("Exporting Frames from: ", pathToVideo)
-print("\nFrames written: ")
 
-vidcap = cv2.VideoCapture(pathToVideo)
-frameCount = 0
+skip = input("Skip frame splitting? (y/n): ")
+if skip == "n":
+  pathToVideo = input("Enter Path to Video: ");
+  print("Exporting Frames from: ", pathToVideo)
+  print("\nFrames written: ")
+  vidcap = cv2.VideoCapture(pathToVideo)
+  frameCount = 0
 
-success, frame = vidcap.read()
-while success:
-  cv2.imwrite("frames/frame-%d.jpg" % frameCount, frame)
   success, frame = vidcap.read()
-  if frameCount % 25 == 0:
-    print(frameCount)
-  frameCount += 1
+  while success:
+    cv2.imwrite("frames/frame-%d.jpg" % frameCount, frame)
+    success, frame = vidcap.read()
+    if frameCount % 25 == 0:
+      print(frameCount)
+    frameCount += 1
 
-print("Number of frames generated: ", frameCount)
-imageMatch = "frame-"+str(frameCount)+".jpg" # TODO: what is imageMatch
+    print("Number of frames generated: ", frameCount)
+else:
+  frameCount = int(input("Enter the number of frames in the video: "))
+
 
 
 '''
 Status. 
     - frameCount has the total number of frames
-    - imageMatch is a mystery
     - continue to investigate this tmrw 
 '''
 
@@ -76,7 +79,6 @@ for i in range(0, frameCount):
     col[2] = telemetryInput[alignedPairs[i]][2]
     col[3] = telemetryInput[alignedPairs[i]][3]
     print("Aligning frame {0} with logfile: {1}".format(i, alignedPairs[i]))
-
 
     image = "frame-" + str(i) + imageType
     telemetryOutputFile.write(image + " {0} {1} {2}\n".format(str(col[1]), str(col[2]), str(col[3])))
