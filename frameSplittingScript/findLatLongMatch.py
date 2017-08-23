@@ -3,12 +3,12 @@ import Queue
 import glob, os
 import pdb
 
-# Returns km distance between two lat/lon point using the optimized Haversine formula
+# Returns meters distance between two lat/lon point using the optimized Haversine formula
 # https://en.wikipedia.org/wiki/Haversine_formula
 def getDistance(lat1, lon1, lat2, lon2):
     p = 0.017453292519943295     #Pi/180
     a = 0.5 - cos((lat2 - lat1) * p)/2 + cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2
-    return 12742 * asin(sqrt(a)) #2*R*asin...
+    return 1000 * 12742 * asin(sqrt(a)) #2*R*asin...   added *1000 to return meters, not km
 
 
 print("Enter the path to your folder containing PREPROCESSED telemetry files.")
@@ -25,12 +25,18 @@ targetLon = input("Enter Long: ")
 
 topFive = [""] * 5
 
+for fileName in glob.glob("*.csv"):
+    print fileName
+
 minDistances = []
-for fileName in glob.glob("*.txt"):
+for fileName in glob.glob("*.csv"):
     telemetryFile = open(fileName, "r")
-    for idx,line in telemetryFile:
-        lat = line[1]
-        lon = line[2]
+    for line in telemetryFile:
+        # Dalton's script read in space separated values but prints out with both with spaces and commas. Should stick with just space separated but sticking with the status quo for now. 
+        line = line.strip().split(',')            
+
+        lat = float(line[1])
+        lon = float(line[2])
         distance = getDistance(targetLat, targetLon, lat, lon)
 
         temp = {}
@@ -54,10 +60,10 @@ for fileName in glob.glob("*.txt"):
             continue                   
     telemetryFile.close()
 
-print "Top Five matches"
-print topFive
-    
+print "Our target coordinate is ({0},{1})".format(targetLat, targetLon)
+for match in topFive:
+    if match["distance"] == 0:
+        print "PERFECT MATCH: ",
+    print "({0},{1}) is {2} meters away from our target coordinate".format(match["lat"], match["lon"], match["distance"])
         
-        
-
 
