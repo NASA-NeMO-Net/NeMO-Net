@@ -18,5 +18,18 @@ Note: The reason we're building everything on our system version of python is be
   * You can double check that the .tiff image has lat/lon data by doing "gdalinfo [image]." Make sure the corner coordinates are in lat/lon, not pixels or UTM
   * 75 is a good starting point for the number of point correspondences to use.
 
+# Output
+The coordinates should be printed to console in UTM and lat/lon WGS84.
+To overlay this image in QGIS, we need to create a worldfile (.tfw) for the raster image.
+
+gdal_translate -of GTiff -a_srs EPSG:4326 -gcp 0 0 -169.658707539 -14.1814672057 -gcp 0 4999 -169.657979775 -14.1821169937 -gcp 1104 4999 -169.657797838 -14.1819480485 georefpls.tiff pls.tif
+
+gdalwarp -s_srs EPSG:4326 -t_srs EPSG:4326 pls.tif plswork.tif
+
+listgeo -tfw  plswork.tif
+
+  * Maybe try manually set extents of all 4 corners of the raster image and force write a worldfile using "listgeo -tfw  sift_bf_output_with_extents.tif"
 
 
+# Debugging Bad Alignment
+If you're getting bad results, try changing the number of point correspondences used. You can see the point correspondences in output/matched_features.jpg. Other images useful for debugging can be found in the output folder. 
