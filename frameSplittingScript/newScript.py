@@ -18,7 +18,7 @@ Get video file from user use cv2 to:
     2.) Get the number of frames in the video (stored in frameCount)
 '''
 
-fps = 29.97 # TODO: take this as user input
+fps = float(input("Input the UAV fps: "))
 
 skip = input("Skip frame splitting? (y/n): ")
 if skip == "n":
