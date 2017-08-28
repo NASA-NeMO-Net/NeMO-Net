@@ -7,7 +7,7 @@ Follow the instructions here to install QGIS: https://arset.gsfc.nasa.gov/sites/
 3. Get the QGIS Plugin Reloader. Plugins -> Manage and Install Plugins -> Search "Plugin Reloader" and install.
 4. Use the Plugin Builder. Plugins -> Plugin Builder -> Plugin Builder. Complete the dialog that comes up, making sure to remember what you put for "plugin class" and "plugin name." Save in /Users/[username]/.qgis2/python/plugins. 
   * NOTE: to access .qgis2 on OSC in the finder save dialog, use "command + shift + ." to show all files (i.e. dotfiles)
-5. Download pyrcc4 tools (brew install pyqt doesn't work. As of Aug 2017, use "brew install cartr/qt4/pyqt" to get the correct version of pyqt <--- *very* important
+5. Download pyrcc4 tools (brew install pyqt doesn't work. As of Aug 2017, use "brew install cartr/qt4/pyqt" to get the correct version of pyqt <--- **very** important
 6. Run the makefile in your plugin directory (e.g. cd /Users/[username]/.qgis2/python/plugins/[plugin name], then "make")
 7. Go to plugins -> Manage and Install Plugins -> Search [your plugin name] -> Hit the checkbox next to your plugin name  (might have to restart QGIS)
 8. All the heavy lifting will be done in test_class.py in 
