@@ -4,7 +4,7 @@ import cv2
 import cvk2
 from osgeo import gdal,ogr,osr
 from pyproj import Proj
-import georefUtils
+import georefUtils_py3
 import pdb
 
 numPointCorrespondences = int(raw_input("Enter the number of point correspondences to use: "))
