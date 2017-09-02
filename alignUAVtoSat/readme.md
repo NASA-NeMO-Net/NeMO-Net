@@ -6,6 +6,7 @@
   * Make sure to run "sudo make install" to also install on your system's version of python.
 
 Note: The reason we're building everything on your system's version of python is because the osgeo library is difficult to get into a virtualenv (AFAIK).
+Note: QGIS installs on your system's version of python 2. sift_bf_py3.py is python 3 compatible but the osgeo library is needed and not installed on python 3 by QGIS.  
 
 ### Usage
 1. Find the UAV flight location in google earth. Write down the lat/long.
