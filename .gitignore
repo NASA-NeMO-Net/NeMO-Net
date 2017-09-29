@@ -4,6 +4,7 @@
 *.tiff
 *.png
 *.out
+*.jpg
 # TensorFlow  save files #
 ###############
 *.meta

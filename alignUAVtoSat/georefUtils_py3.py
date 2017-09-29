@@ -91,18 +91,21 @@ def utmListToLatLong(coords, UTM_zone):
 
 
 def latlongCoordinateToUTM(latlongCoord, UTM_zone):
-    lat = latlongCoord[0]
-    lon = latlongCoord[1]
+    retval = []
+    for coord in latlongCoord:
+        lat = coord[0]
+        lon = coord[1]
     # myProj is thee function mapping WGS84 to UTM
-    projOptions = "+proj=utm +zone={0}, +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs".format(UTM_zone)
-    myProj = Proj(projOptions)
+        projOptions = "+proj=utm +zone={0}, +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs".format(UTM_zone)
+        myProj = Proj(projOptions)
+        retval.append(myProj(lon,lat))
 
     # lon/lat to UTM
     # UTMy: Northing
     # UTMx: Easting
-    UTMy, UTMx= myProj(lon, lat)
+    # UTMy, UTMx= myProj(lon, lat)
     
-    return np.asarray((UTMy, UTMx))
+    return np.asarray(retval)
 
 # Convert a list of latlong/Global Geodetic System to UTM
 def latlongListToUTM(coords, UTM_zone):    
