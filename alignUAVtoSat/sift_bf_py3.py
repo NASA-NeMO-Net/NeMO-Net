@@ -7,24 +7,21 @@ from pyproj import Proj
 import georefUtils_py3
 import pdb
 
-print("Use: python ./sift_bf.py [path to blurred UAV] [path to google earth tiff w/ UTM georegistration] [# point correspondences] [# UTM zone (i.e. 2L for Ofu]")
-if len(sys.argv) != 5:
-    raise Exception("Incorrect Usage. See line above")
-    
-numPointCorrespondences = int(sys.argv[3])
-utmZone = sys.argv[4]
+numPointCorrespondences = int(raw_input("Enter the number of point correspondences to use: "))
+print("\nYou can find your UTM zone here: http://www.latlong.net/lat-long-utm.html")
+utmZone = raw_input("Enter the UTM Zone (2L for Ofu): ")
 
 # Read images
-print("Reading images")
-googleEarthPath = sys.argv[1]
-googleEarth = cv2.imread(googleEarthPath,0)      
-UAV = cv2.imread(sys.argv[2],0)
-print("Done.\n")
+googleEarthPath = raw_input("\nEnter the path to the QGIS Google Earth image: ")
+googleEarth = cv2.imread(googleEarthPath,0)
+UavPath = raw_input("\nEnter the path to the UAV image: ")
+UAV = cv2.imread(UavPath,0)
 
 # Feature detector
-sift = cv2.SIFT() 
+# sift = cv2.SIFT()
+sift = cv2.xfeatures2d.SIFT_create()
 
-print("Finding image features")
+print("\nFinding image features")
 # Detect keypoints in both images
 (kp1,des1) = sift.detectAndCompute(googleEarth, None)
 (kp2,des2) = sift.detectAndCompute(UAV, None)
@@ -45,7 +42,7 @@ print("Done.\n")
 goodPointCorrespondences = matches[:numPointCorrespondences]
 
 # Draw matches visualization
-out = georefUtils_py3.drawMatches(googleEarth, kp1, UAV, kp2, goodPointCorrespondences)
+out = georefUtils.drawMatches(googleEarth, kp1, UAV, kp2, goodPointCorrespondences)
 cv2.imwrite("output/matched_features.jpg", out)
 
 points_GE = open("output/points_GE.txt", "w")
@@ -134,20 +131,28 @@ warped_UAV = cv2.warpPerspective(UAV, homographyPrime, destSizeWH)
 
 # opencv window to preview tracked corners
 uavCornersPreview = np.copy(warped_GE) # Note: this is a 3 channel RGB image. Only used for UI/preview. 
-uavCornersPreview = cv2.cvtColor(uavCornersPreview, cv2.COLOR_GRAY2RGB) 
-uavCornerIndices = []  # This is passed on to linearlyInterpolateUTM
-uavCornerIndices.append(georefUtils_py3.mapPointThroughHomography(homographyPrime, (0, 0)))
-uavCornerIndices.append(georefUtils_py3.mapPointThroughHomography(homographyPrime, (0, h_UAV)))
-uavCornerIndices.append(georefUtils_py3.mapPointThroughHomography(homographyPrime, (w_UAV, h_UAV)))
-uavCornerIndices.append(georefUtils_py3.mapPointThroughHomography(homographyPrime, (w_UAV, 0)))
+uavCornersPreview = cv2.cvtColor(uavCornersPreview, cv2.COLOR_GRAY2RGB)
 
-pts = np.asarray(uavCornerIndices)
+uavCornerIndices = {}
+uavCornerIndices["upperLeft"] = georefUtils.mapPointThroughHomography(homographyPrime, (0, 0))
+uavCornerIndices["lowerLeft"] = georefUtils.mapPointThroughHomography(homographyPrime, (0, h_UAV))
+uavCornerIndices["lowerRight"] = georefUtils.mapPointThroughHomography(homographyPrime, (w_UAV, h_UAV))
+uavCornerIndices["upperRight"] = georefUtils.mapPointThroughHomography(homographyPrime, (w_UAV, 0))
+
+# To convert to np array 
+drawPts = [] 
+drawPts.append(uavCornerIndices["upperLeft"])
+drawPts.append(uavCornerIndices["lowerLeft"])
+drawPts.append(uavCornerIndices["lowerRight"])
+drawPts.append(uavCornerIndices["upperRight"])
+
+pts = np.asarray(drawPts)
 pts = pts.reshape((-1,1,2))
 cv2.polylines(uavCornersPreview,[pts],True,(255,0,0))
 
 # Show preview window
 font = cv2.FONT_HERSHEY_SIMPLEX
-for i, point in enumerate(uavCornerIndices):
+for i, point in enumerate(drawPts):
     cv2.circle(uavCornersPreview, point, 3, 0)
     cv2.putText(uavCornersPreview, "corner"+str(i+1), point, font, 0.5, (0,0,0), 1)
 
@@ -183,62 +188,90 @@ gEarthScreenshot = gdal.Open(googleEarthPath, 0)
 c = gEarthScreenshot.RasterXSize # width of img (# of cols)
 r = gEarthScreenshot.RasterYSize # height of img (# of rows)
 
-# todo: convert to pairs instead of depending on ordering
-corners = georefUtils_py3.getCorners(gEarthScreenshot, r, c)
+# lat/lon coordinates of corners of the google earth screenshot
+GE_cornersLatLong = georefUtils.getCorners(gEarthScreenshot, r, c)
 
-# Needed because QGIS doens't support UTM zone 2L (Ofu/American Samoa). So we take in QGIS lat/lon data and covert it to UTM ourselves. 
-cornersUTM = georefUtils_py3.latlongListToUTM(corners, utmZone)
+# The reason we convert lat/lon to UTM is because QGIS doens't support UTM zone 2L (Ofu/American Samoa).
+# So we take in lat/lon data and covert it to UTM ourselves. 
+GE_cornersUTM = georefUtils.latLongDictionaryToUtm(GE_cornersLatLong, utmZone)
 
-# We assume the google earth image was not translated (bad assumption, should change). 
+# We assume the google earth image was not translated/rotated (bad assumption, should change). 
 # This does hold true is most cases though (if the UAV image is 100% encapsulated by the google earth image)
-# todo: fix this assumption
-indices = [] # Unfortunately for now, the order here matters. todo. 
-indices.append((0, 0))
-indices.append((h_GE, 0))
-indices.append((w_GE, 0))
-indices.append((h_GE, w_GE))
-indices = np.asarray(indices)
 
-uavCornersUTM = georefUtils_py3.linearlyInterpolateUTM((h_GE,w_GE), cornersUTM, indices, (destSizeWH[1], destSizeWH[0]), uavCornerIndices)
+GE_indices = {}
+GE_indices["upperLeft"] = np.asarray((0,0))
+GE_indices["lowerLeft"] = np.asarray((h_GE, 0))
+GE_indices["lowerRight"] = np.asarray((h_GE, w_GE))
+GE_indices["upperRight"] = np.asarray((0, w_GE))
+
+uavCornersUTM_dict = georefUtils.linearlyInterpolateUTM((h_GE,w_GE), GE_cornersUTM, GE_indices, (destSizeWH[1], destSizeWH[0]), uavCornerIndices)
 
 finalPreview = np.copy(warped_GE) # Note: this is a 3 channel RGB image. Only used for UI/preview.
 finalPreview = cv2.cvtColor(finalPreview, cv2.COLOR_GRAY2RGB)
 
-
 # Connect the corners
 cv2.polylines(finalPreview,[pts],True,(255,0,0))
 
-# Not sure why this is necessary
-uavCornersUTM = np.asarray(uavCornersUTM)
+# convert cornersDict to np array
+uavCornersUTM = georefUtils.cornersDictToNumpyArray(uavCornersUTM_dict)
 
 # show output as lat/lon
-uavCornersLatLon = georefUtils_py3.utmListToLatLong(uavCornersUTM, "2L")
-uavCornersLatLon = np.asarray(uavCornersLatLon)
+uavCornersLatLon_dict = georefUtils.utmDictionaryToLatLong(uavCornersUTM_dict, "2L") 
+uavCornersLatLon = georefUtils.cornersDictToNumpyArray(uavCornersLatLon_dict)
 
 print("UAV Corners (UTM)")
-georefUtils_py3.printCoordList(uavCornersUTM) 
+georefUtils.printCoordDictionary(uavCornersUTM_dict) 
 
-uavCornersUTM = uavCornersLatLon
-
-# at this point, uavCornersUTM and uavCornersLatLon are correct and in the right order
+uavCornersUTM = uavCornersLatLon # just do everything past here with uavCornersLatLon
 
 print("gEarth Corners (UTM)")
-georefUtils_py3.printCoordList(cornersUTM)
+georefUtils.printCoordDictionary(GE_cornersUTM)
 
 print("UAV Corners (lat/lon)")
-georefUtils_py3.printCoordList(uavCornersLatLon)
+georefUtils.printCoordDictionary(uavCornersLatLon_dict)
 
 # Show labeled coordinates. 
 font = cv2.FONT_HERSHEY_SIMPLEX
-for i, point in enumerate(uavCornerIndices):
-    cv2.circle(finalPreview, point, 3, 0)
-    cv2.putText(finalPreview, "corner"+str(i+1) + ": ({0},{1})".format(round(uavCornersUTM[i][0],7), round(uavCornersUTM[i][1],7)), point, font, 0.5, (0,0,0), 1)
-cv2.imshow("Overview", finalPreview)  # todo: make the image a bit more transparent
+# todonow: convert uavCornerIndices to numpy array so we can iterate over it
+uavCornerIndicesArray = georefUtils.cornersDictToNumpyArray(uavCornerIndices)
+for i, point in enumerate(uavCornerIndicesArray):
+    point_tuple = (point[0], point[1])
+    cv2.circle(finalPreview, point_tuple, 3, 0)
+    cv2.putText(finalPreview, "corner"+str(i+1) + ": ({0},{1})".format(round(uavCornersUTM[i][0],7), round(uavCornersUTM[i][1],7)), point_tuple, font, 0.5, (0,0,0), 1)
+cv2.imshow("Overview", finalPreview) 
 while cv2.waitKey(5) < 0: pass
+
+print("NEXT STEPS:")
+print("\nWith the lat/lon corners of the UAV image (printed above), you can create a warped image that QGIS can import using GDAL")
+
+print("\nFirst, in the commandline:")
+print("gdal_translate -of GTiff -a_srs EPSG:4326 -gcp 0 0 [upperLeft Lon] [upperLeft lat] -gcp 0 [height of image] [lowerLeft lon] [lowerLeft lat] -gcp [width of image] [height of image] [lowerRight lon] [lower\
+Right lat] uav_highres.tiff warped_uav_highres.tif ")
+
+print("\nSecond,")
+print("gdalwarp -s_srs EPSG:4326 -t_srs EPSG:4326 warped_uav_highres.tif output.tif")
+
+print("\nFinally,")
+print("listgeo -tfw  output.tif")
+
+print("\nYou can also do this through QGIS' GUI (Raster -> Projections -> Warp)")
+
+
 
 # todo: encapsulate drawing chunks in functions? 
 # todo: export UAV tiff with embedded Geo info. 
 # todo: read from file if it exists
-# todo: how many point correspondences to use? 
-# todo: do we want to return the coordinates in lat/lon? 
-# todo: get rid of order dependency
+
+
+# Take uavCornersLatLon and generate .tfw file. Written to current directory.
+# georefUtils.createUavCornersTfwFile(uavCornersUTM)
+# TODO: write blurred image as UAV.tiff so they can just use that pair of images
+
+
+
+
+
+
+
+
+
