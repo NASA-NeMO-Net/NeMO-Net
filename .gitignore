@@ -10,3 +10,6 @@
 *.meta
 *.index
 *.data*
+# Keras save files #
+###############
+*.h5
