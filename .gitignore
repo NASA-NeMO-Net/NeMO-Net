@@ -13,3 +13,4 @@
 # Keras save files #
 ###############
 *.h5
+*.npy
