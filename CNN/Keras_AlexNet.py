@@ -22,6 +22,25 @@ from keras.layers.convolutional import ZeroPadding2D
 from keras.layers.normalization import BatchNormalization
 from keras.utils import np_utils
 from keras import optimizers
+from keras.callbacks import Callback
+
+class WeightsSaver(Callback):
+    def __init__(self, filepath, N):
+    	super(WeightsSaver, self).__init__()
+    	self.N = N
+    	self.batch = 0
+    	self.epoch = 0
+    	self.filepath = filepath
+
+    def on_batch_end(self, batch, logs={}):
+    	if self.batch % self.N == 0:
+    		name = 'weights_epoch%02d_batch%08d.hdf5' % (self.epoch, self.batch)
+    		savestr = self.filepath+name
+    		self.model.save_weights(savestr, overwrite=True)
+    	self.batch += 1
+
+    def on_epoch_end(self, epoch, logs=None):
+    	self.epoch += 1
 
 transect1_path = '../Images/Transect 1 Hi-Res.tiff'
 transect1_truth_path = '../Images/Transect 1 Truth data.tif'
@@ -29,9 +48,9 @@ transect1_truth_path = '../Images/Transect 1 Truth data.tif'
 image_size = 25
 
 Transect1 = coralutils.CoralData(transect1_path, Truthpath=transect1_truth_path, truth_key=[16,160,198,38])
-Transect1.generate_trainingset(image_size=image_size, N_train=20000, toremove = 3, figureson = False)
-Transect1.generate_validset(image_size=image_size, N_valid=2500, toremove = 3, figureson = False)
-Transect1.generate_testset(image_size=image_size, N_test=2500, toremove = 3, figureson = False)
+Transect1.generate_trainingset(image_size=image_size, N_train=20000, idxremove = 3, figureson = False)
+Transect1.generate_validset(image_size=image_size, N_valid=2500, idxremove= 3, figureson = False)
+Transect1.generate_testset(image_size=image_size, N_test=2500, idxremove = 3, figureson = False)
 
 if Transect1.train_labels.shape[-1] != Transect1.num_classes:
     Transect1.train_labels = keras.utils.to_categorical(Transect1.train_labels, Transect1.num_classes)
@@ -46,7 +65,6 @@ DROPOUT = 0.5
 WEIGHT_DECAY = 0.005
 MOMENTUM = 0.9
 LEARNING_RATE = 0.001
-BATCH_SIZE = 128
 model_input = Input(shape = (image_size, image_size, 3))
 
 # Model parameters
@@ -102,16 +120,21 @@ model = Model(model_input, model_output)
 model.summary()
 
 batch_size = 64
-epochs = 10
+epochs = 2
 
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=optimizers.SGD(lr=LEARNING_RATE, momentum = MOMENTUM, decay = WEIGHT_DECAY),
               metrics=['accuracy'])
+
+SaveWeights = WeightsSaver(filepath='./models/', N=50)
 model.fit(Transect1.train_datasets, Transect1.train_labels,
           batch_size=batch_size,
           epochs=epochs,
           verbose=1,
-          validation_data=(Transect1.valid_datasets, Transect1.valid_labels))
+          validation_data=(Transect1.valid_datasets, Transect1.valid_labels),
+          callbacks=[SaveWeights])
 score = model.evaluate(Transect1.test_datasets, Transect1.test_labels, verbose=0)
+
+model.save('./models/AlexNetLike.h5')
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])

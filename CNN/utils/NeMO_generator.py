@@ -13,7 +13,7 @@ from keras.preprocessing.image import (
     array_to_img)
 
 
-class NeMOVocGenerator(ImageDataGenerator):
+class NeMOImageGenerator(ImageDataGenerator):
     """A real-time data augmentation generator for NeMO-Net Images"""
 
     def __init__(self,
@@ -48,7 +48,7 @@ class NeMOVocGenerator(ImageDataGenerator):
         self.pixel_mean = np.array(pixel_mean)
         self.pixelwise_std_normalization = pixelwise_std_normalization
         self.pixel_std = np.array(pixel_std)
-        super(NeMOVocGenerator, self).__init__()
+        super(NeMOImageGenerator, self).__init__()
 
     def standardize(self, x):
         """Standardize image."""
@@ -56,12 +56,12 @@ class NeMOVocGenerator(ImageDataGenerator):
             x -= self.pixel_mean
         if self.pixelwise_std_normalization:
             x /= self.pixel_std
-        return super(NeMOVocGenerator, self).standardize(x)
+        return super(NeMOImageGenerator, self).standardize(x) # If there are any other operations that needs to be performed on x in superclass
 
     def flow_from_imageset(self, image_set_loader,
                            class_mode='categorical', classes=None,
                            batch_size=1, shuffle=True, seed=None):
-        """NeMOVocGenerator."""
+        """NeMOImageGenerator."""
         return IndexIterator(
             image_set_loader, self,
             class_mode=class_mode,
@@ -97,7 +97,7 @@ class IndexIterator(Iterator):
         super(IndexIterator, self).__init__(len(self.filenames), batch_size,
                                             shuffle, seed)
 
-    def next(self):
+    def next(self,labelkey=None):
         """Next batch."""
         with self.lock:
             index_array, current_index, current_batch_size = next(
@@ -115,7 +115,7 @@ class IndexIterator(Iterator):
             x = self.image_set_loader.load_img(fn)
             x = self.image_data_generator.standardize(x)
             batch_x[i] = x
-            y = self.image_set_loader.load_seg(fn)
+            y = self.image_set_loader.load_seg(fn,labelkey=labelkey)
             y = to_categorical(y, self.classes).reshape(self.label_shape)
             #y = np.reshape(y, (-1, self.classes))
             batch_y[i] = y
@@ -138,7 +138,7 @@ class IndexIterator(Iterator):
 class ImageSetLoader(object):
     """Helper class to load image data into numpy arrays."""
 
-    def __init__(self, image_set, image_dir, label_dir, target_size=(500, 500),
+    def __init__(self, image_set, image_dir, label_dir, target_size=(100, 100),
                  image_format='jpg', color_mode='rgb', label_format='png',
                  data_format=None,
                  save_to_dir=None, save_prefix='', save_format='jpg'):
@@ -214,7 +214,7 @@ class ImageSetLoader(object):
 
         return x
 
-    def load_seg(self, fn):
+    def load_seg(self, fn, labelkey=None):
         """Segmentation load method.
 
         # Arguments
@@ -230,7 +230,13 @@ class ImageSetLoader(object):
         if img.size != wh_tuple:
             img = img.resize(wh_tuple)
         y = img_to_array(img, self.data_format)
-        y[y == 255] = 0
+ #       y[y == 255] = 0
+
+        if labelkey is not None:
+            item_counter = 0
+            for item in labelkey:
+                y[y == item ] = item_counter 
+                item_counter+=1
 
         return y
 
