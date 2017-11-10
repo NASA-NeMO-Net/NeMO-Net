@@ -50,15 +50,20 @@ def getCorners(gdalImage, r, c):
     xarr=[0,c]
     yarr=[0,r]
 
-    retval = []
+    temp = []
     for px in xarr:
         for py in yarr:
             x=gt[0]+(px*gt[1])+(py*gt[2])
             y=gt[3]+(px*gt[4])+(py*gt[5])
-            retval.append([y,x])        
+            temp.append([y,x])
+    retval = {}
+    retval["upperLeft"] = temp[0]
+    retval["lowerLeft"] = temp[1]
+    retval["upperRight"] = temp[2]
+    retval["lowerRight"] = temp[3]
+
     return retval
 
-#todo: the camel caps convetion here is so irregular, fix 
 '''
 Input:
     utmCoord: utmCoordinate we want to convert (Easting, Northing). Numpy array or python list. 
@@ -77,24 +82,35 @@ def utmCoordinateToLatLong(utmCoord, UTM_zone):
     # UTM to lat/long
     lon, lat = myProj(UTMx, UTMy, inverse=True)
     
-    retval = (lon,lat)
+    retval = (lat,lon)
     return retval
 
 # todo: what does coords look like? need to convert to 
 # todo: does this preserve order? 
-def utmListToLatLong(coords, UTM_zone):
-    retval = []
-    for coord in coords:
-        latLongCoord = utmCoordinateToLatLong(coord, UTM_zone)
-        retval.append(latLongCoord)
-    return np.asarray(retval)
+def utmDictionaryToLatLong(coords, UTM_zone):
+    retval = {}
+    retval["upperLeft"] = utmCoordinateToLatLong(coords["upperLeft"], UTM_zone)
+    retval["lowerLeft"] = utmCoordinateToLatLong(coords["lowerLeft"], UTM_zone)
+    retval["lowerRight"] = utmCoordinateToLatLong(coords["lowerRight"], UTM_zone)
+    retval["upperRight"] = utmCoordinateToLatLong(coords["upperRight"], UTM_zone)
 
+    return retval
 
+<<<<<<< HEAD
 def latlongCoordinateToUTM(latlongCoord, UTM_zone):
     retval = []
     for coord in latlongCoord:
         lat = coord[0]
         lon = coord[1]
+||||||| merged common ancestors
+def latlongCoordinateToUTM(latlongCoord, UTM_zone):
+    lat = latlongCoord[0]
+    lon = latlongCoord[1]
+=======
+def latLongCoordinateToUtm(latlongCoord, UTM_zone):
+    lat = latlongCoord[0]
+    lon = latlongCoord[1]
+>>>>>>> 53d5efae5c1bce1bc9dbb7d61689f5d1df891d37
     # myProj is thee function mapping WGS84 to UTM
         projOptions = "+proj=utm +zone={0}, +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs".format(UTM_zone)
         myProj = Proj(projOptions)
@@ -108,12 +124,14 @@ def latlongCoordinateToUTM(latlongCoord, UTM_zone):
     return np.asarray(retval)
 
 # Convert a list of latlong/Global Geodetic System to UTM
-def latlongListToUTM(coords, UTM_zone):    
-    retval = [] # List to store coordinates in UTM
-    for coord in coords:
-        UTMcoord = latlongCoordinateToUTM(coord, UTM_zone)
-        retval.append(UTMcoord)
-    return np.asarray(retval)
+def latLongDictionaryToUtm(coords, UTM_zone):    
+    retval = {} # List to store coordinates in UTM
+    retval["upperLeft"] = latLongCoordinateToUtm(coords["upperLeft"], UTM_zone)
+    retval["lowerLeft"] = latLongCoordinateToUtm(coords["lowerLeft"], UTM_zone)
+    retval["lowerRight"] = latLongCoordinateToUtm(coords["lowerRight"], UTM_zone)
+    retval["upperRight"] = latLongCoordinateToUtm(coords["upperRight"], UTM_zone)
+
+    return retval
 
 
 # Upper Left, Lower Left, Upper Right, Lower Right
@@ -124,17 +142,17 @@ def linearlyInterpolateUTM(size_GE, coords, indices, imgSize, UAV_indices): # in
 
     # refactor coords as coords_GE and indices as indices_GE todo
     # Corner coordinates of googleEarth in UTM coordinates
-    upperLeftUTM = coords[0]
-    upperLeftIdx = indices[0]
+    upperLeftUTM = coords["upperLeft"]
+    upperLeftIdx = indices["upperLeft"]
 
-    lowerLeftUTM = coords[1]
-    lowerLeftIdx = indices[1]
+    lowerLeftUTM = coords["lowerLeft"]
+    lowerLeftIdx = indices["lowerLeft"]
 
-    upperRightUTM = coords[2]
-    upperRightIdx = indices[2]
+    lowerRightUTM = coords["lowerRight"]
+    lowerRightIdx = indices["lowerRight"]
 
-    lowerRightUTM = coords[3]
-    lowerRightIdx = indices[3]
+    upperRightUTM = coords["upperRight"]
+    upperRightIdx = indices["upperRight"]
 
     # Refer to picture
     # TODO: add picture
@@ -158,37 +176,32 @@ def linearlyInterpolateUTM(size_GE, coords, indices, imgSize, UAV_indices): # in
     referencePointIdx = upperLeftIdx
 
     # todo: check these indices
-    uav0_idx = UAV_indices[0] # HAVE BEEN FLIPPED TODO
-    uav1_idx = UAV_indices[1]
-    uav2_idx = UAV_indices[2] 
-    uav3_idx = UAV_indices[3]
+    uav_upperLeft_idx = UAV_indices["upperLeft"] # HAVE BEEN FLIPPED TODO
+    uav_lowerLeft_idx = UAV_indices["lowerLeft"]
+    uav_lowerRight_idx = UAV_indices["lowerRight"] 
+    uav_upperRight_idx = UAV_indices["upperRight"]
 
     # maybe encapsulate all this into a function? 
     # todo: flipped indices
     # tood: drawing in wrong order in preview window
-    uav0_distance = uav0_idx - referencePointIdx
-    uav0_UTM = referencePointUTM + uav0_distance[1]*dR_gradient + uav0_distance[0]*dC_gradient
+    uav_upperLeft_distance = uav_upperLeft_idx - referencePointIdx
+    uav_upperLeft_UTM = referencePointUTM + uav_upperLeft_distance[1]*dR_gradient + uav_upperLeft_distance[0]*dC_gradient
     
-    uav1_distance = uav1_idx - referencePointIdx
-    uav1_UTM = referencePointUTM + uav1_distance[1]*dR_gradient + uav1_distance[0]*dC_gradient
+    uav_lowerLeft_distance = uav_lowerLeft_idx - referencePointIdx
+    uav_lowerLeft_UTM = referencePointUTM + uav_lowerLeft_distance[1]*dR_gradient + uav_lowerLeft_distance[0]*dC_gradient
 
     # the problem
-    uav2_distance = uav2_idx - referencePointIdx
-    uav2_UTM = referencePointUTM + uav2_distance[1]*dR_gradient + uav2_distance[0]*dC_gradient
+    uav_lowerRight_distance = uav_lowerRight_idx - referencePointIdx
+    uav_lowerRight_UTM = referencePointUTM + uav_lowerRight_distance[1]*dR_gradient + uav_lowerRight_distance[0]*dC_gradient
 
-    uav3_distance = uav3_idx - referencePointIdx
-    uav3_UTM = referencePointUTM + uav3_distance[1]*dR_gradient + uav3_distance[0]*dC_gradient
+    uav_upperRight_distance = uav_upperRight_idx - referencePointIdx
+    uav_upperRight_UTM = referencePointUTM + uav_upperRight_distance[1]*dR_gradient + uav_upperRight_distance[0]*dC_gradient
 
-
-
-    # TODO: Convert to latlong again before returning
-    retval = [] # for some reason we have to flip the coodinates here
-    retval.append(uav3_UTM)
-    retval.append(uav2_UTM)
-    retval.append(uav1_UTM)
-    retval.append(uav0_UTM)
-    
-    # pdb.set_trace()
+    retval = {}
+    retval["upperLeft"] = uav_upperLeft_UTM
+    retval["lowerLeft"] = uav_lowerLeft_UTM
+    retval["lowerRight"] = uav_lowerRight_UTM
+    retval["upperRight"] = uav_upperRight_UTM
 
     return retval
 
@@ -199,25 +212,28 @@ def mapPointThroughHomography(homography, point):
     warped_point = np.asarray(warped_point) # Not sure why this is necessary
 
     return (int(warped_point[0][0]), int(warped_point[0][1]))
-    
 
-def printCoordList(coords):
-    print("\n")
-    print("Warning: Coordinate prefixes/labels assume coordinate ordering in the list has not been changed and is the same as displayed by gdalinfo [imageName]")
-    prefix = []
-    prefix.append("Upper Left: ")
-    prefix.append("Lower Left: ")
-    prefix.append("Upper Right: ")
-    prefix.append("Lower Right: ")
-    for idx,coord in enumerate(coords):
-        print("{0} ({1}, {2}) \n".format(prefix[idx],coord[0], coord[1]))
-    
+'''
+Input: 
+    - dict: Takes a dictionary holding the for corners of an image. The corners should
+      be named upperLeft, lowerLeft, lowerRight, and upperRight
+Output:
+    - retval: np array containing the corners in the order upperLeft, lowerLeft, 
+      lowerRight, and upperRight
+'''
+def cornersDictToNumpyArray(dict):
+    retval = []
+    retval.append(dict["upperLeft"])
+    retval.append(dict["lowerLeft"])
+    retval.append(dict["lowerRight"])
+    retval.append(dict["upperRight"])
 
+    retval = np.asarray(retval)
+    return retval
 
-
-
-# Check lat, lon ordering
-# Interpolate
-
-# Potentially convert back to lat lon
-# Embed in tiff geo info and load in qgis
+def printCoordDictionary(coords):
+    print("upperLeft: {0}".format(coords["upperLeft"]))
+    print("lowerLeft: {0}".format(coords["lowerLeft"]))
+    print("lowerRight: {0}".format(coords["lowerRight"]))
+    print("upperRight: {0}\n".format(coords["upperRight"]))
+        
