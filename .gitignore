@@ -9,3 +9,7 @@
 *.meta
 *.index
 *.data*
+# Keras saved files #
+###################
+*.h5
+*.json
