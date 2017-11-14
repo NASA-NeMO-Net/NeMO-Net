@@ -75,7 +75,7 @@ fcn_vgg16.fit_generator(
         shuffle=True,
         image_set_loader=train_loader),
     steps_per_epoch=20,
-    epochs=100,
+    epochs=50,
     validation_data=datagen.flow_from_imageset(
         class_mode='categorical',
         classes=4,

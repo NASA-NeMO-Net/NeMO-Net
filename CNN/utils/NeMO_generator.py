@@ -76,13 +76,14 @@ class IndexIterator(Iterator):
 
     def __init__(self, image_set_loader, image_data_generator,
                  class_mode='categorical', classes=None,
-                 batch_size=1, shuffle=False, seed=None):
+                 batch_size=1, shuffle=False, seed=None, labelkey=[0,63,127,191]):
         """Init."""
         self.image_set_loader = image_set_loader
         self.image_data_generator = image_data_generator
 
         self.filenames = image_set_loader.filenames
         self.image_shape = image_set_loader.image_shape
+        self.labelkey = labelkey
 
         self.classes = classes
         if class_mode == 'binary':
@@ -97,16 +98,12 @@ class IndexIterator(Iterator):
         super(IndexIterator, self).__init__(len(self.filenames), batch_size,
                                             shuffle, seed)
 
-    def next(self,labelkey=[0,63,127,191]):
-        """Next batch."""
-        with self.lock:
-            index_array, current_index, current_batch_size = next(
-                self.index_generator)
+    def _get_batches_of_transformed_samples(self, index_array):
         batch_x = np.zeros(
-            (current_batch_size,) + self.image_shape,
+            (self.batch_size,) + self.image_shape,
             dtype=K.floatx())
         batch_y = np.zeros(
-            (current_batch_size,) + self.label_shape,
+            (self.batch_size,) + self.label_shape,
             dtype=np.int8)
         #batch_y = np.reshape(batch_y, (current_batch_size, -1, self.classes))
 
@@ -115,24 +112,51 @@ class IndexIterator(Iterator):
             x = self.image_set_loader.load_img(fn)
             x = self.image_data_generator.standardize(x)
             batch_x[i] = x
-            y = self.image_set_loader.load_seg(fn,labelkey=labelkey)
+            y = self.image_set_loader.load_seg(fn,labelkey=self.labelkey)
             y = to_categorical(y, self.classes).reshape(self.label_shape)
             #y = np.reshape(y, (-1, self.classes))
             batch_y[i] = y
 
-        # save augmented images to disk for debugging
-        #if self.image_set_loader.save_to_dir:
-        #    for i in range(current_batch_size):
-        #        x = batch_x[i]
-        #        y = batch_y[i].argmax(
-        #            self.image_data_generator.channel_axis - 1)
-        #        if self.image_data_generator.data_format == 'channels_first':
-        #            y = y[np.newaxis, ...]
-        #        else:
-        #            y = y[..., np.newaxis]
-        #        self.image_set_loader.save(x, y, current_index + i)
-
         return batch_x, batch_y
+
+    def next(self):
+        """Next batch."""
+        with self.lock:
+            index_array, current_index, current_batch_size = next(
+                self.index_generator)
+
+        return self._get_batches_of_transformed_samples(index_array)
+        # batch_x = np.zeros(
+        #     (current_batch_size,) + self.image_shape,
+        #     dtype=K.floatx())
+        # batch_y = np.zeros(
+        #     (current_batch_size,) + self.label_shape,
+        #     dtype=np.int8)
+        # #batch_y = np.reshape(batch_y, (current_batch_size, -1, self.classes))
+
+        # for i, j in enumerate(index_array):
+        #     fn = self.filenames[j]
+        #     x = self.image_set_loader.load_img(fn)
+        #     x = self.image_data_generator.standardize(x)
+        #     batch_x[i] = x
+        #     y = self.image_set_loader.load_seg(fn,labelkey=labelkey)
+        #     y = to_categorical(y, self.classes).reshape(self.label_shape)
+        #     #y = np.reshape(y, (-1, self.classes))
+        #     batch_y[i] = y
+
+        # # save augmented images to disk for debugging
+        # #if self.image_set_loader.save_to_dir:
+        # #    for i in range(current_batch_size):
+        # #        x = batch_x[i]
+        # #        y = batch_y[i].argmax(
+        # #            self.image_data_generator.channel_axis - 1)
+        # #        if self.image_data_generator.data_format == 'channels_first':
+        # #            y = y[np.newaxis, ...]
+        # #        else:
+        # #            y = y[..., np.newaxis]
+        # #        self.image_set_loader.save(x, y, current_index + i)
+
+        # return batch_x, batch_y
 
 
 class ImageSetLoader(object):
