@@ -7,6 +7,7 @@ import keras.backend as K
 import tensorflow as tf
 import sys
 sys.path.append("./utils/") # Adds higher directory to python modules path.
+#sys.path.append("./tmp/")
 from NeMO_models import FCN
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 from keras.callbacks import (
@@ -33,7 +34,7 @@ with open("init_args.yml", 'r') as stream:
     except yaml.YAMLError as exc:
         print(exc)
 
-checkpointer = ModelCheckpoint(filepath="./tmp/fcn_vgg16_weights.h5", verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="tmp/fcn_vgg16_weights.h5", verbose=1, save_best_only=True)
 lr_reducer = ReduceLROnPlateau(monitor='val_loss',
                                factor=np.sqrt(0.1),
                                cooldown=0,
@@ -52,9 +53,9 @@ nan_terminator = TerminateOnNaN()
 datagen = NeMOImageGenerator(image_shape=[100, 100, 3],
                                     image_resample=True,
                                     pixelwise_center=True,
-                                    pixel_mean=[127, 127, 127],
+                                    pixel_mean=[127.5, 127.5, 127.5],
                                     pixelwise_std_normalization=True,
-                                    pixel_std=[127, 127, 127])
+                                    pixel_std=[127.5, 127.5, 127.5])
 
 train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
 val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
@@ -71,11 +72,11 @@ fcn_vgg16.fit_generator(
     datagen.flow_from_imageset(
         class_mode='categorical',
         classes=4,
-        batch_size=40,
+        batch_size=10,
         shuffle=True,
         image_set_loader=train_loader),
-    steps_per_epoch=20,
-    epochs=50,
+    steps_per_epoch=80,
+    epochs=5,
     validation_data=datagen.flow_from_imageset(
         class_mode='categorical',
         classes=4,
@@ -84,6 +85,6 @@ fcn_vgg16.fit_generator(
         image_set_loader=val_loader),
     validation_steps=20,
     verbose=1,
-    callbacks=[lr_reducer, early_stopper, nan_terminator])
+    callbacks=[lr_reducer, early_stopper, nan_terminator,checkpointer])
 
 #fcn_vgg16.save('output/fcn_vgg16.h5')
