@@ -16,7 +16,7 @@ from keras.callbacks import (
     EarlyStopping,
     ModelCheckpoint,
     TerminateOnNaN)
-from NeMO_callbacks import CheckNumericsOps
+from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -34,7 +34,7 @@ with open("init_args.yml", 'r') as stream:
     except yaml.YAMLError as exc:
         print(exc)
 
-checkpointer = ModelCheckpoint(filepath="tmp/fcn_vgg16_weights.h5", verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="./tmp/fcn_vgg16_weights.h5", verbose=1, save_best_only=True)
 lr_reducer = ReduceLROnPlateau(monitor='val_loss',
                                factor=np.sqrt(0.1),
                                cooldown=0,
@@ -43,12 +43,15 @@ early_stopper = EarlyStopping(monitor='val_loss',
                               min_delta=0.001,
                               patience=30)
 nan_terminator = TerminateOnNaN()
+SaveWeights = WeightsSaver(filepath='./weights/', N=10)
 #csv_logger = CSVLogger('output/tmp_fcn_vgg16.csv')
     #'output/{}_fcn_vgg16.csv'.format(datetime.datetime.now().isoformat()))
 
 #check_num = CheckNumericsOps(validation_data=[np.random.random((1, 224, 224, 3)), 1],
 #                             histogram_freq=100)
 
+# log history during model fit
+csv_logger = CSVLogger('output/log.csv', append=True, separator=';')
 
 datagen = NeMOImageGenerator(image_shape=[100, 100, 3],
                                     image_resample=True,
@@ -85,6 +88,6 @@ fcn_vgg16.fit_generator(
         image_set_loader=val_loader),
     validation_steps=20,
     verbose=1,
-    callbacks=[lr_reducer, early_stopper, nan_terminator,checkpointer])
+    callbacks=[lr_reducer, early_stopper, nan_terminator,checkpointer, csv_logger, SaveWeights])
 
 #fcn_vgg16.save('output/fcn_vgg16.h5')
