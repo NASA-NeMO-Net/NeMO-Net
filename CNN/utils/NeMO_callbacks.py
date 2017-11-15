@@ -34,8 +34,8 @@ class CheckNumericsOps(Callback):
 						
 
 class WeightsSaver(Callback):
-	"""Callback that saves weights on either epoch end or batch end."""
-	
+    """Callback that saves weights on either epoch end or batch end."""
+    
     def __init__(self, filepath, N):
     	super(WeightsSaver, self).__init__()
     	self.N = N
@@ -52,5 +52,5 @@ class WeightsSaver(Callback):
 
     def on_epoch_end(self, epoch, logs=None):
     	self.epoch += 1
-
-
+		
+		
