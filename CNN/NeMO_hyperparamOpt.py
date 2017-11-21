@@ -1,26 +1,43 @@
+# import hyperparam optimization scheme
 from __future__ import print_function
 from hyperopt import Trials, STATUS_OK, tpe
 from hyperas import optim
 from hyperas.distributions import choice, uniform
+# import other moduls
+import os
+import yaml
+import datetime
+import numpy as np
+import keras
+import keras.backend as K
+import tensorflow as tf
+import sys
+sys.path.append("./utils/") # Adds higher directory to python modules path.
+#sys.path.append("./tmp/")
+from NeMO_models import FCN
+from NeMO_generator import NeMOImageGenerator, ImageSetLoader
+from keras.callbacks import (
+    ReduceLROnPlateau,
+    CSVLogger,
+    EarlyStopping,
+    ModelCheckpoint,
+    TerminateOnNaN)
+from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
-from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation
-from keras.optimizers import RMSprop
 
-from keras.datasets import mnist
-from keras.utils import np_utils
+# define GPU environment
+#-----------------------
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-import matplotlib.pyplot as plt
-def visualization_mnist(x_data,n=10):
-    plt.figure(figsize=(20, 4))
-    for i in range(n):
-        # display digit
-        ax = plt.subplot(1, n, i+1)
-        plt.imshow(x_data[i].reshape(28, 28))
-        plt.gray()
-        ax.get_xaxis().set_visible(False)
-        ax.get_yaxis().set_visible(False)
-    plt.show()
+global _SESSION
+config = tf.ConfigProto(allow_soft_placement=True)
+config.gpu_options.allow_growth = True
+_SESSION = tf.Session(config=config)
+K.set_session(_SESSION)
+
+
+# generate run data
+#------------------
 
 
 def data():
@@ -61,14 +78,14 @@ def model(X_train, Y_train, X_test, Y_test):
     model.add(Dense(512, input_shape=(784,)))
     model.add(Activation('relu'))
     model.add(Dropout({{uniform(0, 1)}}))
-    model.add(Dense({{choice([256, 512, 1024])}}))
+    model.add(Dense({{choice([256, 512])}}))
     model.add(Activation('relu'))
     model.add(Dropout({{uniform(0, 1)}}))
     model.add(Dense(10))
     model.add(Activation('softmax'))
 
-    rms = RMSprop()
-    model.compile(loss='categorical_crossentropy', optimizer=rms, metrics=['accuracy'])
+    optimizer = {{choice(['rmsprop', 'adam', 'sgd'])}}
+    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     model.fit(X_train, Y_train,
               batch_size={{choice([64, 128])}},
