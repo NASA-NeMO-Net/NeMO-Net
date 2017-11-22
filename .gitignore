@@ -5,6 +5,7 @@
 *.png
 *.out
 *.jpg
+*.kmz
 # TensorFlow  save files #
 ###############
 *.meta
