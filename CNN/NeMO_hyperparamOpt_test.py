@@ -60,15 +60,18 @@ def model(X_train, Y_train, X_test, Y_test):
     model = Sequential()
     model.add(Dense(512, input_shape=(784,)))
     model.add(Activation('relu'))
-    model.add(Dropout({{uniform(0, 1)}}))
+    #model.add(Dropout({{uniform(0, 1)}}))
+    model.add(Dropout({{choice([0, 0.5])}}))
     model.add(Dense({{choice([256, 512])}}))
     model.add(Activation('relu'))
-    model.add(Dropout({{uniform(0, 1)}}))
+    #model.add(Dropout({{uniform(0, 1)}}))
+    model.add(Dropout({{choice([0, 0.5])}}))
     model.add(Dense(10))
     model.add(Activation('softmax'))
-
-    rms = RMSprop()
-    model.compile(loss='categorical_crossentropy', optimizer=rms, metrics=['accuracy'])
+    print(model.summarry())
+    #rms = RMSprop()
+    optimizer={{choice(['rmsprop', 'adam', 'sgd'])}}
+    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     model.fit(X_train, Y_train,
               batch_size={{choice([64, 128])}},

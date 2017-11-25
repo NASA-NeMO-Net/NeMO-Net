@@ -36,8 +36,8 @@ _SESSION = tf.Session(config=config)
 K.set_session(_SESSION)
 
 
-# generate run data
-#------------------
+# generate data
+#--------------
 
 
 def data():
