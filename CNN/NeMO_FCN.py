@@ -26,6 +26,7 @@ config.gpu_options.allow_growth = True
 _SESSION = tf.Session(config=config)
 K.set_session(_SESSION)
 
+image_size = 150
 
 with open("init_args.yml", 'r') as stream:
     try:
@@ -49,7 +50,7 @@ nan_terminator = TerminateOnNaN()
 #                             histogram_freq=100)
 
 
-datagen = NeMOImageGenerator(image_shape=[100, 100, 3],
+datagen = NeMOImageGenerator(image_shape=[image_size, image_size, 3],
                                     image_resample=True,
                                     pixelwise_center=True,
                                     pixel_mean=[127, 127, 127],
@@ -59,7 +60,7 @@ datagen = NeMOImageGenerator(image_shape=[100, 100, 3],
 train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
 val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
 
-fcn_vgg16 = FCN(input_shape=(100, 100, 3), classes=4, weight_decay=3e-3,
+fcn_vgg16 = FCN(input_shape=(image_size, image_size, 3), classes=4, weight_decay=3e-3,
                 weights='imagenet', trainable_encoder=True)
 optimizer = keras.optimizers.Adam(1e-4)
 
@@ -71,19 +72,19 @@ fcn_vgg16.fit_generator(
     datagen.flow_from_imageset(
         class_mode='categorical',
         classes=4,
-        batch_size=40,
+        batch_size=20,
         shuffle=True,
         image_set_loader=train_loader),
-    steps_per_epoch=20,
+    steps_per_epoch=50,
     epochs=100,
     validation_data=datagen.flow_from_imageset(
         class_mode='categorical',
         classes=4,
-        batch_size=4,
+        batch_size=20,
         shuffle=True,
         image_set_loader=val_loader),
-    validation_steps=20,
+    validation_steps=5,
     verbose=1,
-    callbacks=[lr_reducer, early_stopper, nan_terminator])
+    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 
-#fcn_vgg16.save('output/fcn_vgg16.h5')
+fcn_vgg16.save('./tmp/fcn_vgg16_model.h5')

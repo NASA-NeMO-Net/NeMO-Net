@@ -4,8 +4,8 @@ image_set_loader:
     image_dir: ../Images/Training_Patches/
     label_dir: ../Images/TrainingRef_Patches/
     target_size:
-      - 100
-      - 100
+      - 150
+      - 150
     image_format: 'png'
     color_mode: 'rgb'
     label_format: 'png'
@@ -14,8 +14,8 @@ image_set_loader:
     image_dir: ../Images/Valid_Patches/
     label_dir: ../Images/ValidRef_Patches/
     target_size:
-      - 100
-      - 100
+      - 150
+      - 150
     image_format: 'png'
     color_mode: 'rgb'
     label_format: 'png'

@@ -1,7 +1,8 @@
 import keras.backend as K
 from keras.layers import (
     Dropout,
-    Lambda
+    Lambda,
+    Activation
 )
 from keras.layers.convolutional import (
     Conv2D,
@@ -10,6 +11,7 @@ from keras.layers.convolutional import (
     ZeroPadding2D
 )
 from keras.layers.merge import add
+from keras.layers.normalization import BatchNormalization
 from keras.regularizers import l2
 from NeMO_layers import CroppingLike2D, BilinearUpSampling2D
 
@@ -72,6 +74,63 @@ def vgg_fc(filters, weight_decay=0., block_name='block5'):
         drop7 = Dropout(0.5)(fc7)
         return drop7
     return f
+
+def res_basicconv(filters, convs=2, init_strides=(1,1), weight_decya=0., block_name='blockx'):
+    """ Basic 3 X 3 convolution blocks for use in resnets with layers <= 34.
+    Follows improved proposed scheme in hhttp://arxiv.org/pdf/1603.05027v2.pdf
+    """
+    def f(input):
+      for i in range(convs):
+        if block_name =='block1' and i==0:
+          x = Conv2D(filters, (3,3), strides=init_strides, padding='same',
+            kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay),
+            name='{}_conv{}'.format(block_name, int(i+1)))(input)   # linear activation for very first conv of first block
+        else:
+          x = BatchNormalization()(x)
+          x = Activation('relu')(x)
+          if i==0:
+            x = Conv2D(filters, (3,3), strides=init_strides, padding='same',
+              kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay),
+              name='{}_conv{}'.format(block_name, int(i+1)))(x)
+          else:
+            x = Conv2D(filters, (3,3), padding='same',
+              kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay),
+              name='{}_conv{}'.format(block_name, int(i+1)))(x)
+      return x
+    return f
+
+
+# def vgg_conv(filters, convs, padding=False, weight_decay=0., block_name='blockx'):
+#     """A VGG convolutional block for encoding.
+#     # NOTE: All kernels are 3x3 hard-coded!
+
+#     :param filters: Integer, number of filters per conv layer
+#     :param convs: Integer, number of conv layers in the block
+#     :param block_name: String, the name of the block, e.g., block1
+
+#     >>> from keras_fcn.blocks import vgg_conv
+#     >>> x = vgg_conv(filters=64, convs=2, block_name='block1')(x)
+
+#     """
+#     def f(x):
+#         for i in range(convs):
+#             if block_name == 'block1' and i == 0:
+#                 if padding is True:
+#                     x = ZeroPadding2D(padding=(100, 100))(x)
+#                 x = Conv2D(filters, (3, 3), activation='relu', padding='same',
+#                            kernel_initializer='he_normal',
+#                            kernel_regularizer=l2(weight_decay),
+#                            name='{}_conv{}'.format(block_name, int(i + 1)))(x)
+#             else:
+#                 x = Conv2D(filters, (3, 3), activation='relu', padding='same',
+#                            kernel_initializer='he_normal',
+#                            kernel_regularizer=l2(weight_decay),
+#                            name='{}_conv{}'.format(block_name, int(i + 1)))(x)
+
+#         pool = MaxPooling2D((2, 2), strides=(2, 2), padding='same',
+#                             name='{}_pool'.format(block_name))(x)
+#         return pool
+#     return f
 
 
 def vgg_deconv(classes, scale=1, kernel_size=(4, 4), strides=(2, 2),

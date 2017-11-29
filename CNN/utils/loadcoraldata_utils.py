@@ -2,12 +2,14 @@ import numpy as np
 import cv2
 import random
 from matplotlib import pyplot as plt
+from PIL import Image as pil_image
 
 # Class of coral data, consisting of an image and possibly a corresponding truth map
 class CoralData:
 	image = None
 	num_classes = 0
 	truthimage = None
+	testimage = None
 	train_datasets = None
 	train_labels = None
 	valid_datasets = None
@@ -16,11 +18,13 @@ class CoralData:
 	test_labels = None
 	depth = 255
 
-	def __init__(self, Imagepath, Truthpath=None, truth_key=None):
+	def __init__(self, Imagepath, Truthpath=None, Testpath = None, truth_key=None):
 		# Load images
 	    self.image = cv2.imread(Imagepath,cv2.IMREAD_UNCHANGED)
 	    if Truthpath is not None:
 	    	self.truthimage = cv2.imread(Truthpath,cv2.IMREAD_UNCHANGED)
+	    if Testpath is not None:
+	    	self.testimage = cv2.imread(Testpath, cv2.IMREAD_UNCHANGED)
 	    # Set labels from 0 to item_counter based upon input truth_key
 	    if truth_key is not None:
 	    	item_counter = 0
@@ -32,8 +36,11 @@ class CoralData:
 #### Load Image
 # Input:
 # 	Imagepath: Path to Image
-	def load_image(self, Imagepath):
-		self.image = cv2.imread(Imagepath,cv2.IMREAD_UNCHANGED)
+	def load_image(self, Imagepath, PILflag = False):
+		if PILflag:
+			self.image = pil_image.open(Imagepath)
+		else:
+			self.image = cv2.imread(Imagepath,cv2.IMREAD_UNCHANGED)
 
 #### Load Reference/Truth Image
 # Input:
@@ -63,6 +70,14 @@ class CoralData:
 # 	Set of vectorized normalized images, N_images x nrow x ncol x n_channels
 	def _rescale(self, dataset):
 		return (dataset.astype(np.float32) - self.depth/2)/(self.depth/2)
+
+#### Classify from categorical array to label
+# Input:
+# 	predictions: Array of vectorized categorical predictions, nrow x ncol x n_categories
+# Output:
+# 	Array of label predictions, nrow x ncol
+	def _classifyback(self, predictions):
+		return np.argmax(predictions,-1)
 
 #### Randomize a set of images
 # Input:
@@ -184,3 +199,69 @@ class CoralData:
 				cv2.imwrite(exportlabelpath+truthstr, templabel)
 				print(str(k*N+nn+1) + '/ ' + str(self.num_classes*N) +' patches exported', end='\r')
 		f.close()
+
+#### Load entire line(s) of patches from testimage
+# Input:
+#	image_size: size of image patch
+# 	crop_len: sides to crop (if predicting upon middle pixel)
+# 	offset: offset from top of image
+# 	lines: Number of lines of patches to output
+# 	toremove: Remove last channel or not
+# Output:
+# 	whole_dataset: Entire line(s) of patches from testimage
+	def _load_whole_data(self, image_size, crop_len, offset=0, yoffset = 0, cols = 1, lines=None, toremove=False):
+		if lines is None:
+			lines = self.testimage.shape[0] - 2*crop_len
+
+		if offset+lines+2*crop_len > self.testimage.shape[0]:
+			print("Too many lines specified, reverting to maximum possible")
+			lines = self.testimage.shape[0] - offset - 2*crop_len
+
+		whole_datasets = []
+		for i in range(offset+crop_len, lines+offset+crop_len):
+			#for j in range(crop_len, self.testimage.shape[1] - crop_len):
+			for j in range(yoffset+crop_len, yoffset+crop_len+cols):
+				whole_datasets.append(self.testimage[i-crop_len:i+crop_len, j-crop_len:j+crop_len,:])
+
+		whole_datasets = np.asarray(whole_datasets)
+
+		if toremove is not None:
+			whole_datasets = np.delete(whole_datasets, toremove, -1)
+		whole_dataset = self._rescale(whole_datasets)
+		return whole_dataset
+
+	def predict_on_whole_image(self, model, image_size, num_lines = None, spacing = 1, crop = False, lastchannelremove = True):
+		offstart = 0
+		crop_len = int(np.floor(image_size/2)) 	# crop_len is NOT currently used to crop the image!!! 
+
+		if num_lines is None:
+			num_lines = self.testimage.shape[0] - 2*crop_len
+		whole_predict = np.zeros((spacing*(num_lines-1)+image_size,self.testimage.shape[1]))
+		num_predict = np.zeros((spacing*(num_lines-1)+image_size,self.testimage.shape[1]))
+
+		truth_predict = self.truthimage[offstart:offstart+whole_predict.shape[0], 0:whole_predict.shape[1]]
+
+		for offset in range(offstart, offstart+spacing*num_lines, spacing):
+			counter = 0
+			for cols in range(0, whole_predict.shape[1]-image_size+1):
+				if lastchannelremove:
+					temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = counter, cols=1, lines=1, toremove=3)
+				else:
+					temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = counter, cols=1, lines=1)
+				temp_predict = model.predict_on_batch(temp_dataset)
+				temp_predict = self._classifyback(temp_predict)
+				
+				for predict_mat in temp_predict:
+					whole_predict[offset:offset+image_size, counter:counter+image_size] = whole_predict[offset:offset+image_size, counter:counter+image_size] + predict_mat
+					num_predict[offset:offset+image_size, counter:counter+image_size] = num_predict[offset:offset+image_size, counter:counter+image_size] + np.ones(predict_mat.shape)
+					counter += 1
+				print(str(counter) + '/ ' + str(self.testimage.shape[1]-image_size) + ' completed', end='\r')
+
+			print('\n')
+			print(str(offset/spacing+1) + '/ ' + str(num_lines) + ' completed', end='\r')
+		whole_predict = np.round(whole_predict.astype(np.float)/num_predict.astype(np.float)).astype(np.uint8)
+		accuracy = 100*np.asarray((whole_predict == truth_predict)).astype(np.float32).sum()/(whole_predict.shape[0]*whole_predict.shape[1])
+
+		return whole_predict, num_predict, truth_predict, accuracy
+
+
