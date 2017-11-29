@@ -21,7 +21,7 @@ aerial_gtif = gdal.Open(largeAerialPath)
 aerial_T = aerial_gtif.GetGeoTransform() # Transform to turn pixels to UTM
 aerial_Tinv = gdal.InvGeoTransform(aerial_T) # Transform to turn UTM to pixels
 
-Transect1Path = "../Images/July26_Priority1_flight_1_1_30frames_FL_2D.tif"
+Transect1Path = "../Images/July29_High_res_flight_2_60frames_FL_2D.tif"
 transect1_gtif = gdal.Open(Transect1Path)
 print("Size of Transect1 {} x {} x {}".format(transect1_gtif.RasterXSize,
                                      transect1_gtif.RasterYSize,
@@ -82,14 +82,14 @@ r = ((height*width)/(transect1_gtif.RasterXSize*transect1_gtif.RasterYSize))*15
 dim = (int(Transect1_HiRes.shape[1]*r),int(Transect1_HiRes.shape[0]*r))
 Transect1_resize = cv2.resize(Transect1_HiRes, dim, interpolation=cv2.INTER_AREA )
 
-# plt.figure(1)
-# plt.subplot(1,2,1)
-# plt.imshow(air_capture.astype(np.uint8))
-# plt.axis('off')
-# plt.subplot(1,2,2)
-# plt.imshow(Transect1_resize.astype(np.uint8))
-# plt.axis('off')
-# plt.show(block=True)
+plt.figure(1)
+plt.subplot(1,2,1)
+plt.imshow(air_capture.astype(np.uint8))
+plt.axis('off')
+plt.subplot(1,2,2)
+plt.imshow(Transect1_resize.astype(np.uint8))
+plt.axis('off')
+plt.show(block=True)
 
 print("Size of localized Aerial: ", air_capture.shape)
 print("Size of localized Hi-Res Transect: ", Transect1_resize.shape)
@@ -109,6 +109,7 @@ print("Done.\n")
 print("Matching point correspondences...")
 bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
 matches = bf.match(des1, des2)
+
 
 print("Done.\n")
 
@@ -214,6 +215,7 @@ print(boundingRectangle)
 T = np.array([ [1, 0, -1*boundingRectangle[0]],
 	[0, 1, -1*boundingRectangle[1]],
 	[0, 0, 1] ], dtype='float32')
+print("Translation hi2lo: ", T)
 
 # homographyPrime is the homography with the translation factor
 homographyPrime = np.dot(T, np.matrix(H)) 	# Just the matrix product
@@ -229,6 +231,7 @@ boundingRectangle2 = cv2.boundingRect(pointsToEncapsulate2)
 T2 = np.array([ [1, 0, -1*boundingRectangle2[0]],
 	[0, 1, -1*boundingRectangle2[1]],
 	[0, 0, 1] ], dtype='float32')
+print("Translation lo2hi: ", T2)
 homographyPrime2 = np.dot(T2, np.matrix(H_inv))
 destSizeWH2 = (boundingRectangle2[2], boundingRectangle2[3])
 warped_lo2 = cv2.warpPerspective(image_lo, homographyPrime2, destSizeWH2)
