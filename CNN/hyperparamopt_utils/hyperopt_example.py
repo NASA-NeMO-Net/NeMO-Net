@@ -64,3 +64,26 @@ trials = Trials()
 best = fmin(f_nn, space, algo=tpe.suggest, max_evals=50, trials=trials)
 print 'best: '
 print best
+
+
+
+## with hyperopt need to define space:
+def space():
+    space = {'num_layer' : hp.choice('num_layer',[{'layers':'add1'},{'layers':'add2'},
+    {'layers':'add3'},{'layers':'add4'}]),
+
+         'activation' : hp.choice('activation',['ELU(alpha=1.0)','Activation(tanh)']),
+         'optimizer' : hp.choice('optimizer',['SGD(lr=0.03, decay=1e-7, momentum=0.15, nesterov=True)','RMSprop','Adadelta','Adam']),
+         'dropout1' : hp.uniform('dropout1',0.25,0.75),
+         'dropout2' : hp.uniform('dropout2',0.05, 0.5),
+         'nb_epochs' :  150,
+         #'units' : hp.quniform('units', 800,1400,2),
+         'units' : hp.choice('units', [1024,1512,2048,2560]),
+         'regularizer' : hp.choice('regularizer',['l2','activity_l2']),           
+         }
+
+# and then run the model with space:
+def model(space,X_train,Y_train,X_test,Y_test):
+    model = Sequential()
+    model.add(Dense(output_dim=space['units'], input_dim=X_train.shape[1], init='he_uniform', W_regularizer=l2(l=0.0001)))
+    print('it is ok add layer')

@@ -68,7 +68,7 @@ def model(X_train, Y_train, X_test, Y_test):
     model.add(Dropout({{choice([0, 0.5])}}))
     model.add(Dense(10))
     model.add(Activation('softmax'))
-    print(model.summarry())
+    #print(model.summary())
     #rms = RMSprop()
     optimizer={{choice(['rmsprop', 'adam', 'sgd'])}}
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])

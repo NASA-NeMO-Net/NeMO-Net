@@ -13,6 +13,8 @@ from keras.layers.merge import add
 from keras.regularizers import l2
 from NeMO_layers import CroppingLike2D, BilinearUpSampling2D
 
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
+
 
 def vgg_conv(filters, convs, padding=False, weight_decay=0., block_name='blockx'):
     """A VGG convolutional block for encoding.

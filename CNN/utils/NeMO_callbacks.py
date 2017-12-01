@@ -3,6 +3,7 @@ import tensorflow as tf
 import keras.backend as K
 from keras.callbacks import Callback
 
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
 class CheckNumericsOps(Callback):
     """Callback that terminates training when a NaN loss is encountered."""

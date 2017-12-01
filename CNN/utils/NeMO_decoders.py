@@ -16,7 +16,7 @@ from NeMO_blocks import (
     vgg_score,
     vgg_upsampling
 )
-
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
 def Decoder(pyramid, blocks):
     """A Functional decoder.

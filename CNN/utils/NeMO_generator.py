@@ -12,6 +12,7 @@ from keras.preprocessing.image import (
     pil_image,
     array_to_img)
 
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
 class NeMOImageGenerator(ImageDataGenerator):
     """A real-time data augmentation generator for NeMO-Net Images"""

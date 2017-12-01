@@ -13,6 +13,8 @@ from keras.layers import Input, Flatten, Activation, Reshape
 from NeMO_encoders import VGG16, VGG19
 from NeMO_decoders import VGGDecoder, VGGUpsampler
 
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
+
 
 def FCN(*args, **kwargs):
     """Fully Convolutional Networks for semantic segmentation with VGG16.

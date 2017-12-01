@@ -13,7 +13,7 @@ from NeMO_models import FCN
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping, ModelCheckpoint, TerminateOnNaN
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
-from hyperopt import Trials, STATUS_OK, tpe, hp
+from hyperopt import Trials, STATUS_OK, tpe
 from hyperas.distributions import choice, uniform, conditional
 
 
@@ -104,7 +104,6 @@ class TrainOptimizer:
 #   valid_label_path = folder path to save labeled validation images
 #   valid_out_file   = .txt file that will contain a list of the valiation images
 #   trainSample, validSample, testSample; number of samples per class to generate per each set
-#   labelkey: Naming convention of class labels (NOTE: must be same # as the # of classes) (string names of classes)
     def gen_img_set(self):
         # generate train set
         if self.train_image_path is not None:
@@ -214,7 +213,7 @@ class TrainOptimizer:
 #### generate the model with hyperparam space using hyperopt dict method
 # Input (defined at TrainOptimizer):
 #       
-    def gen_param_space(self):
+    def param_space(self):
 
     # space = {'choice': hp.choice('num_layers',
     #                 [ {'layers':'two', },
@@ -236,35 +235,32 @@ class TrainOptimizer:
     #         'activation': 'relu'
     #     }
 
-        param_space = {
+        self.param_space = {
 
-                'weight_decay' : 3e-3,
-                'batch_size'   : hp.uniform('batch_size', 16,32),
-                'epochs'       : hp.uniform('epochs', 2,10),
-                'lr'           : hp.choice('lr',[0.01, 0.001, 0.0001])
+                'batch_size' : hp.uniform('batch_size', 16,32),
+                'epochs'     : hp.uniform('epochs', 2,10),
+                'optimizer': hp.choice('optimizer',['adadelta','adam','rmsprop'])
             }
-        # need to add steps_per_epoch based on number of training samples and batch size
-        return param_space
+        return self.param_space
 
 
 #### generate the model with hyperparam space as params
 # Input (params defined by space):
 #       
-    def model2opt(self, param_space):
-
-        print ('Params testing: ', param_space)
+    def model2opt(self):
+        
         # define aux params
-        steps_per_epoch = (self.trainSample*self.num_classes)//np.array(self.batch_size)
-        #self.val_batch_size  = list(np.array(self.batch_size)//4)
-        #print("val_batch_size",self.val_batch_size)
-        #validation_steps= list(((self.trainSample//10)*self.num_classes)//np.array(self.val_batch_size))
+        steps_per_epoch = list((self.trainSample*self.num_classes)//np.array(self.batch_size))
+        self.val_batch_size  = list(np.array(self.batch_size)//4)
+        print("val_batch_size",self.val_batch_size)
+        validation_steps= list(((self.trainSample//10)*self.num_classes)//np.array(self.val_batch_size))
 
         # define model to train
         #-----------------------
 
         if self.model is not None:
             imported_model = self.model(input_shape=self.input_shape, classes=self.num_classes, 
-                                    weight_decay = param_space['weight_decay'],
+                                    weight_decay = 3e-3,
                                     weights='imagenet', trainable_encoder=True)
             print(imported_model.summary())
 
@@ -284,11 +280,10 @@ class TrainOptimizer:
 
             # using Adam optimizer with multiple lr
             #opt=keras.optimizers.Adam(lr={{choice(self.lr)}})
-            #opt=keras.optimizers.Adam(lr=1e-6)
-            opt = keras.optimizers.Adam(lr=param_space['lr'])
+            opt=keras.optimizers.Adam(lr=1e-6)
             imported_model.compile(optimizer=opt,
-                                    loss='categorical_crossentropy',
-                                    metrics=['accuracy'])
+                                    loss={{choice(self.loss)}},
+                                    metrics={{choice(self.metrics)}})
 
 
             # fit model using fit_generator
@@ -301,14 +296,14 @@ class TrainOptimizer:
             train_generator = datagen.flow_from_imageset(
                     class_mode='categorical',
                     classes=self.num_classes,
-                    batch_size=param_space['batch_size'],
+                    batch_size={{choice(self.batch_size)}},
                     shuffle=True,
                     image_set_loader=train_loader)
 
             validation_generator = datagen.flow_from_imageset(
                     class_mode='categorical',
                     classes=self.num_classes,
-                    batch_size=param_space['batch_size'],
+                    batch_size={{choice(self.val_batch_size)}},
                     shuffle=True,
                     image_set_loader=val_loader)
 
@@ -318,10 +313,10 @@ class TrainOptimizer:
             # fit model
             imported_model.fit_generator(
                 train_generator,
-                steps_per_epoch=steps_per_epoch,
-                epochs=param_space['epochs'],
+                steps_per_epoch={{choice(steps_per_epoch)}},
+                epochs={{choice(self.epochs)}},
                 validation_data=validation_generator,
-                validation_steps=steps_per_epoch,
+                validation_steps={{choice(validation_steps)}},
                 verbose=1,
                 callbacks=model_callbacks)
 
@@ -329,7 +324,7 @@ class TrainOptimizer:
             #-------------------------------------
 
             score, acc = imported_model.evaluate_generator(generator=validation_generator, 
-                                                           steps=steps_per_epoch)
+                                                  steps={{choice(validation_steps)}})
 
             return {'loss': -acc, 'status': STATUS_OK, 'model': imported_model}
 
