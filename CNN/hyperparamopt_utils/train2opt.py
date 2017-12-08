@@ -39,10 +39,11 @@ class TrainOptimizer:
                  test_label_path= None,
                  test_out_file  = None,
                  model          = None,
+                 model_name     = None,
                  num_classes    = 1,
-                 batch_size     = [32],
-                 weight_decay   =  3e-3,
-                 lr             = [1e-4],
+                 batch_size     = 32,
+                 weight_decay   = 3e-3,
+                 lr             = 1e-4,
                  optimizer      = ['adam'],
                  loss           = ['categorical_crossentropy'],
                  metrics        = ['accuracy'],
@@ -73,7 +74,8 @@ class TrainOptimizer:
         self.test_out_file   = test_out_file
         #self.testSample      = trainSample//10
         self.labelkey        = labelkey
-        self.model           = model
+        self.model           = model # this is model function
+        self.model_name      = model_name # this is model name string
         # model params dictionary
         self.num_classes     = num_classes
         # hyperparameters are needed as list in hyperopt/hyperas search
@@ -154,7 +156,8 @@ class TrainOptimizer:
         self.model_callbacks = []
 
         if self.checkpoint is True:
-            checkpointer = ModelCheckpoint(filepath="./tmp/" + str(self.model) + "_weights.h5", 
+            print(self.model_name)
+            checkpointer = ModelCheckpoint(filepath="./tmp/" + self.model_name + "_weights.h5", 
                                            verbose=1, save_best_only=True)
             self.model_callbacks.append(checkpointer)
 
@@ -176,7 +179,7 @@ class TrainOptimizer:
             self.model_callbacks.append(nan_terminator)
 
         if self.save_weights is True:
-            SaveWeights = WeightsSaver(filepath='./weights/', N=self.batch_size[0])
+            SaveWeights = WeightsSaver(filepath='./weights/', N=10)
             self.model_callbacks.append(SaveWeights)
         
         # log history during model fit
@@ -196,7 +199,7 @@ class TrainOptimizer:
     def gen_data(self):
 
         # upload init_args parameters for dataset loader:
-        init_args = init_args_dict()
+        init_args = self.init_args_dict()
 
         # generate datasets for train/validation
         self.datagen = NeMOImageGenerator(image_shape = self.input_shape,
@@ -328,6 +331,60 @@ class TrainOptimizer:
             #using fit_generator to evaluate model
             #-------------------------------------
 
+            score, acc = imported_model.evaluate_generator(generator=validation_generator, 
+                                                           steps=steps_per_epoch)
+
+            return {'loss': -acc, 'status': STATUS_OK, 'model': imported_model}
+
+
+#### generate the model with hyperparam space as params
+# Input (params defined by space):
+#       
+    def model2opt_test(self,param_space):
+
+        
+        steps_per_epoch = (self.trainSample*self.num_classes)//np.array(self.batch_size)
+        
+        if self.model is not None:
+            imported_model = self.model(input_shape=self.input_shape, classes=self.num_classes, 
+                                    weight_decay = self.weight_decay,
+                                    weights='imagenet', trainable_encoder=True)
+            
+            opt = keras.optimizers.Adam(lr=param_space['lr'])
+            imported_model.compile(optimizer=opt,
+                                    loss='categorical_crossentropy',
+                                    metrics=['accuracy'])
+
+
+           
+            datagen, train_loader, val_loader = self.gen_data()
+
+            train_generator = datagen.flow_from_imageset(
+                    class_mode='categorical',
+                    classes=self.num_classes,
+                    batch_size=self.batch_size,
+                    shuffle=True,
+                    image_set_loader=train_loader)
+
+            validation_generator = datagen.flow_from_imageset(
+                    class_mode='categorical',
+                    classes=self.num_classes,
+                    batch_size=self.batch_size,
+                    shuffle=True,
+                    image_set_loader=val_loader)
+
+            model_callbacks = self.model_callbacks_list()
+
+            imported_model.fit_generator(
+                train_generator,
+                steps_per_epoch=steps_per_epoch,
+                epochs=2,
+                validation_data=validation_generator,
+                validation_steps=steps_per_epoch,
+                verbose=1,
+                callbacks=model_callbacks)
+
+           
             score, acc = imported_model.evaluate_generator(generator=validation_generator, 
                                                            steps=steps_per_epoch)
 
