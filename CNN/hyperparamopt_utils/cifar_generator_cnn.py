@@ -80,6 +80,7 @@ def model(datagen, X_train, Y_train, X_test, Y_test):
     model.add(Dropout(0.5))
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
+    print(model.summary())
 
     # let's train the model using SGD + momentum (how original).
     sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)

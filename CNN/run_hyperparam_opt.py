@@ -1,4 +1,6 @@
 import os
+import pickle
+import time
 import datetime
 import numpy as np
 import keras
@@ -20,6 +22,8 @@ from keras.callbacks import (
     TerminateOnNaN)
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
+from hyperas.distributions import choice, uniform, conditional
+from hyperas import optim
 
 optModel = TrainOptimizer(labelkey=('Sand', 'Branching', 'Mounding', 'Rock'), train_image_path='../Images/Training_Patches/',
               train_label_path = '../Images/TrainingRef_Patches/', train_out_file = 'NeMO_train.txt',
@@ -37,4 +41,30 @@ config.gpu_options.allow_growth = True
 _SESSION = tf.Session(config=config)
 K.set_session(_SESSION)
 
-test_model = optModel.model2opt_test(param_space)
+
+datagen, train_loader, val_loader = optModel.gen_data()
+
+train_generator = datagen.flow_from_imageset(
+                    class_mode='categorical',
+                    classes=optModel.num_classes,
+                    batch_size=32,
+                    shuffle=True,
+                    image_set_loader=train_loader)
+
+
+validation_generator = datagen.flow_from_imageset(
+                    class_mode='categorical',
+                    classes=optModel.num_classes,
+                    batch_size=32,
+                    shuffle=True,
+                    image_set_loader=val_loader)
+
+
+best_run, best_model = optim.minimize(model=optModel.model2opt(param_space),
+                                          algo=tpe.suggest,
+                                          max_evals=5,
+                                          trials=Trials())
+
+print("Evaluation of best performing model:")
+
+print(best_model.evaluate(validation_generator))

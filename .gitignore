@@ -17,3 +17,6 @@
 *.hdf5
 *.npy
 *.json
+# folders
+##########
+C:/Users/msegalro/NeMO_NET/NeMO-NET/CNN/logs/

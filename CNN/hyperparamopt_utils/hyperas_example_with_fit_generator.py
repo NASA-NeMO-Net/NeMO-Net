@@ -87,6 +87,15 @@ def data():
 
 if __name__ == '__main__':
 
+	os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+	global _SESSION
+	config = tf.ConfigProto(allow_soft_placement=True)
+	config.gpu_options.allow_growth = True
+	_SESSION = tf.Session(config=config)
+	K.set_session(_SESSION)
+
+
     train_generator, validation_generator = data()
 
     best_run, best_model = optim.minimize(model=model,

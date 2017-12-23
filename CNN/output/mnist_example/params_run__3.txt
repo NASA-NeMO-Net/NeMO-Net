@@ -1,0 +1,9 @@
+Run,3
+optimizer,rmsprop
+learning_rate,0.0001
+decay,0.0001
+train_accuracy,0.839833333333
+train_loss,0.528586953163
+val_accuracy,0.9159
+val_loss,0.28805358125
+test_accuracy,0.9159

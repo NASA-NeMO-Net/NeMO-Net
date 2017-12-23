@@ -1,5 +1,7 @@
 import os
 import yaml
+import pickle
+import time
 import datetime
 import numpy as np
 import keras
@@ -41,7 +43,7 @@ class TrainOptimizer:
                  model          = None,
                  model_name     = None,
                  num_classes    = 1,
-                 batch_size     = 32,
+                 batch_size     = 10,
                  weight_decay   = 3e-3,
                  lr             = 1e-4,
                  optimizer      = ['adam'],
@@ -199,20 +201,40 @@ class TrainOptimizer:
     def gen_data(self):
 
         # upload init_args parameters for dataset loader:
-        init_args = self.init_args_dict()
+        init_args  = self.init_args_dict()
+
+        batch_size = self.batch_size
 
         # generate datasets for train/validation
-        self.datagen = NeMOImageGenerator(image_shape = self.input_shape,
+        datagen = NeMOImageGenerator(image_shape = self.input_shape,
                                      image_resample=True,
                                      pixelwise_center=True,
                                      pixel_mean=self.pixel_mean,
                                      pixelwise_std_normalization=True,
                                      pixel_std=self.pixel_std)
 
-        self.train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
-        self.val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
+        train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
+        val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
 
-        return self.datagen, self.train_loader, self.val_loader
+
+        # generate model data
+
+        self.train_generator = datagen.flow_from_imageset(
+                    class_mode='categorical',
+                    classes=self.num_classes,
+                    batch_size=batch_size,
+                    shuffle=True,
+                    image_set_loader=train_loader)
+
+        self.validation_generator = datagen.flow_from_imageset(
+                    class_mode='categorical',
+                    classes=self.num_classes,
+                    batch_size=batch_size,
+                    shuffle=True,
+                    image_set_loader=val_loader)
+
+
+        return self.train_generator, self.validation_generator
 
 #### generate the model with hyperparam space using hyperopt dict method
 # Input (defined at TrainOptimizer):
@@ -238,12 +260,16 @@ class TrainOptimizer:
     #         'optimizer': hp.choice('optimizer',['adadelta','adam','rmsprop']),
     #         'activation': 'relu'
     #     }
+        # space = hp.choice('a',
+        # [
+        #     ('case 1', 1 + hp.lognormal('c1', 0, 1)),
+        #     ('case 2', hp.uniform('c2', -10, 10))
+        # ])
 
         param_space = {
 
-                'weight_decay' : 3e-3,
-                'batch_size'   : hp.uniform('batch_size', 16,32),
-                'epochs'       : hp.uniform('epochs', 2,10),
+                'batch_size'   : hp.choice('batch_size', [16,32]),
+                'epochs'       : hp.choice('epochs', [2,10]),
                 'lr'           : hp.choice('lr',[0.01, 0.001, 0.0001])
             }
         # need to add steps_per_epoch based on number of training samples and batch size
@@ -252,12 +278,13 @@ class TrainOptimizer:
 
 #### generate the model with hyperparam space as params
 # Input (params defined by space):
-#       
-    def model2opt(self, param_space):
+#    to run from script: test_model = optModel.model2opt(param_space) (optModel is a class of TrainOptimizer)
+#   
+    def model2opt(self):
 
-        print ('Params testing: ', param_space)
+        #print ('Params testing: ', param_space)
         # define aux params
-        steps_per_epoch = (self.trainSample*self.num_classes)//np.array(self.batch_size)
+        #steps_per_epoch = (self.trainSample*self.num_classes)//np.array(self.batch_size)
         #self.val_batch_size  = list(np.array(self.batch_size)//4)
         #print("val_batch_size",self.val_batch_size)
         #validation_steps= list(((self.trainSample//10)*self.num_classes)//np.array(self.val_batch_size))
@@ -266,128 +293,31 @@ class TrainOptimizer:
         #-----------------------
 
         if self.model is not None:
-            imported_model = self.model(input_shape=self.input_shape, classes=self.num_classes, 
-                                    weight_decay = param_space['weight_decay'],
+            self.imported_model = self.model(input_shape=self.input_shape, classes=self.num_classes, 
+                                    weight_decay = 3e-3,
                                     weights='imagenet', trainable_encoder=True)
-            print(imported_model.summary())
+            #print(self.imported_model.summary())
 
-            # define optimizers (still TBD for multiple)
-            # optimizer = keras.optimizers.Adam(self.lr)
-            # adam=keras.optimizers.Adam(lr={{uniform(0,1)}})
-            # model.compile(loss='mean_squared_error', optimizer=adam ,metrics=['mean_squared_error'])
-            # or:
-            #adam = Adam(lr={{uniform(0,1)}})
-            #model.compile(loss='binary_crossentropy', metrics=['accuracy'],
-            #      optimizer={{choice([adam])}})
-            # from hyperopt: 'optimizer' : hp.choice('optimizer',['SGD(lr=0.03, decay=1e-7, momentum=0.15, nesterov=True)','RMSprop','Adadelta','Adam']),
-
-            # imported_model.compile(optimizer={{choice(self.optimizer)}},
-            #                         loss={{choice(self.loss)}},
-            #                         metrics={{choice(self.metrics)}})
-
-            # using Adam optimizer with multiple lr
-            #opt=keras.optimizers.Adam(lr={{choice(self.lr)}})
-            #opt=keras.optimizers.Adam(lr=1e-6)
-            opt = keras.optimizers.Adam(lr=param_space['lr'])
-            imported_model.compile(optimizer=opt,
-                                    loss='categorical_crossentropy',
-                                    metrics=['accuracy'])
-
-
-            # fit model using fit_generator
-            #-------------------------------
-
-            # generate model data
-
-            datagen, train_loader, val_loader = gen_data()
-
-            train_generator = datagen.flow_from_imageset(
-                    class_mode='categorical',
-                    classes=self.num_classes,
-                    batch_size=param_space['batch_size'],
-                    shuffle=True,
-                    image_set_loader=train_loader)
-
-            validation_generator = datagen.flow_from_imageset(
-                    class_mode='categorical',
-                    classes=self.num_classes,
-                    batch_size=param_space['batch_size'],
-                    shuffle=True,
-                    image_set_loader=val_loader)
-
-            # define callbacks
-            model_callbacks = model_callbacks_list()
-
-            # fit model
-            imported_model.fit_generator(
-                train_generator,
-                steps_per_epoch=steps_per_epoch,
-                epochs=param_space['epochs'],
-                validation_data=validation_generator,
-                validation_steps=steps_per_epoch,
-                verbose=1,
-                callbacks=model_callbacks)
-
-            #using fit_generator to evaluate model
-            #-------------------------------------
-
-            score, acc = imported_model.evaluate_generator(generator=validation_generator, 
-                                                           steps=steps_per_epoch)
-
-            return {'loss': -acc, 'status': STATUS_OK, 'model': imported_model}
-
-
-#### generate the model with hyperparam space as params
-# Input (params defined by space):
-#       
-    def model2opt_test(self,param_space):
-
-        
-        steps_per_epoch = (self.trainSample*self.num_classes)//np.array(self.batch_size)
-        
-        if self.model is not None:
-            imported_model = self.model(input_shape=self.input_shape, classes=self.num_classes, 
-                                    weight_decay = self.weight_decay,
-                                    weights='imagenet', trainable_encoder=True)
             
-            opt = keras.optimizers.Adam(lr=param_space['lr'])
-            imported_model.compile(optimizer=opt,
-                                    loss='categorical_crossentropy',
-                                    metrics=['accuracy'])
+            # # define callbacks
+            # model_callbacks = model_callbacks_list()
 
+            # # fit model
+            # imported_model.fit_generator(
+            #     train_generator,
+            #     steps_per_epoch=steps_per_epoch,
+            #     epochs=param_space['epochs'],
+            #     validation_data=validation_generator,
+            #     validation_steps=steps_per_epoch,
+            #     verbose=1,
+            #     callbacks=model_callbacks)
 
-           
-            datagen, train_loader, val_loader = self.gen_data()
+            # #using fit_generator to evaluate model
+            # #-------------------------------------
 
-            train_generator = datagen.flow_from_imageset(
-                    class_mode='categorical',
-                    classes=self.num_classes,
-                    batch_size=self.batch_size,
-                    shuffle=True,
-                    image_set_loader=train_loader)
+            # score, acc = imported_model.evaluate_generator(generator=validation_generator, 
+            #                                                steps=steps_per_epoch)
 
-            validation_generator = datagen.flow_from_imageset(
-                    class_mode='categorical',
-                    classes=self.num_classes,
-                    batch_size=self.batch_size,
-                    shuffle=True,
-                    image_set_loader=val_loader)
-
-            model_callbacks = self.model_callbacks_list()
-
-            imported_model.fit_generator(
-                train_generator,
-                steps_per_epoch=steps_per_epoch,
-                epochs=2,
-                validation_data=validation_generator,
-                validation_steps=steps_per_epoch,
-                verbose=1,
-                callbacks=model_callbacks)
-
-           
-            score, acc = imported_model.evaluate_generator(generator=validation_generator, 
-                                                           steps=steps_per_epoch)
-
-            return {'loss': -acc, 'status': STATUS_OK, 'model': imported_model}
+            return  self.imported_model #{'loss': -acc, 'status': STATUS_OK, 'model': imported_model}
 
 
