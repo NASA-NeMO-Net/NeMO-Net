@@ -100,25 +100,15 @@ def model(train_generator, validation_generator):
     tensor_board = TensorBoard(log_dir=tensor_board_logfile, histogram_freq=0, write_graph=True)
 
 
-    if 'results' not in globals():
-        global results
-        results = []
-
-    
-    steps_per_epoch = (optModel.trainSample*optModel.num_classes)//np.array(optModel.batch_size)
-
     history = model.fit_generator(
                 train_generator,
                 steps_per_epoch=80,
                 epochs=3,
                 validation_data=validation_generator,
                 validation_steps=20,
-                verbose=2,
+                verbose=0,
                 callbacks=[checkpoint,csv_logger,tensor_board])
 
-
-
-    print(history.history.keys())
     
 
     h1   = history.history
@@ -138,7 +128,6 @@ def model(train_generator, validation_generator):
       lr         = numpy.asarray(parameters["lr_2"])
       decay      = numpy.asarray(parameters["decay_2"])
 
-    results.append(parameters)
 
 
     acc_plot = './plots/accuracy_run_' + str(globalvars.globalVar) + ".png"
@@ -178,7 +167,7 @@ def model(train_generator, validation_generator):
 
 
     score, acc = model.evaluate_generator(generator=validation_generator, 
-                                                  steps=20, verbose=1)
+                                                  steps=20, verbose=0)
     print('Test accuracy:', acc)
 
     save_file_params = './output/params_run_' + '_' + str(globalvars.globalVar) + '.txt'
