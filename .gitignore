@@ -5,6 +5,11 @@
 *.png
 *.out
 *.jpg
+*.shp
+*.shx
+*.tfw
+*.prj
+*.dbf
 # TensorFlow  save files #
 ###############
 *.meta

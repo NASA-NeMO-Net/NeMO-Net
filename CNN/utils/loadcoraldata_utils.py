@@ -1,8 +1,12 @@
 import numpy as np
 import cv2
 import random
+import os
+import glob
+from osgeo import gdal, ogr, osr
 from matplotlib import pyplot as plt
 from PIL import Image as pil_image
+from keras.preprocessing.image import img_to_array
 
 # Class of coral data, consisting of an image and possibly a corresponding truth map
 class CoralData:
@@ -16,31 +20,111 @@ class CoralData:
 	valid_labels = None
 	test_datasets = None
 	test_labels = None
+	load_type = None
+	projection = None
 	depth = 255
 
-	def __init__(self, Imagepath, Truthpath=None, Testpath = None, truth_key=None):
+	def __init__(self, Imagepath, Truthpath=None, Testpath = None, truth_key=None, load_type="cv2", tfwpath=None):
 		# Load images
-	    self.image = cv2.imread(Imagepath,cv2.IMREAD_UNCHANGED)
-	    if Truthpath is not None:
-	    	self.truthimage = cv2.imread(Truthpath,cv2.IMREAD_UNCHANGED)
-	    if Testpath is not None:
-	    	self.testimage = cv2.imread(Testpath, cv2.IMREAD_UNCHANGED)
+		self.load_type = load_type
+		if load_type == "PIL":
+			self.image = img_to_array(pil_image.open(Imagepath))
+			if Truthpath is not None:
+				self.truthimage = cv2.imread(Truthpath, cv2.IMREAD_UNCHANGED)
+			if Testpath is not None:
+				self.testimage = img_to_array(pil_image.open(Testpath))
+		elif load_type == "cv2":
+			self.image = cv2.imread(Imagepath,cv2.IMREAD_UNCHANGED)
+			if Truthpath is not None:
+				self.truthimage = cv2.imread(Truthpath,cv2.IMREAD_UNCHANGED)
+			if Testpath is not None:
+				self.testimage = cv2.imread(Testpath, cv2.IMREAD_UNCHANGED)
+		elif load_type == "raster":
+			img = gdal.Open(Imagepath)
+			try:
+				self.projection = img.GetProjection()
+			except Exception:
+				pass
+			xsize = img.RasterXSize
+			ysize = img.RasterYSize
+
+			if tfwpath is not None:
+				tfw_info = np.asarray([float(line.rstrip('\n')) for line in open(tfwpath)]).astype(np.float32)
+				# top left x, w-e pixel resolution, 0, top left y, 0, n-s pixel resolution (negative)
+				self.geotransform = np.asarray([tfw_info[4], tfw_info[0], tfw_info[1], tfw_info[5], tfw_info[2], tfw_info[3]])
+			self.image = np.zeros((ysize,xsize,img.RasterCount))
+
+			for band in range(img.RasterCount):
+				band += 1
+				imgband = img.GetRasterBand(band)
+				self.image[:,:,band-1] = imgband.ReadAsArray()
+
+			if Truthpath is not None:
+				counter = 1
+				self.class_labels = ['NoData']
+				raster_fn = 'temp.tif'
+				NoData_value = -1
+
+				for file in glob.glob(Truthpath + '*.shp'):
+					vector_fn = file
+					underscore_pos = vector_fn.find('_')
+					period_pos = -4
+					self.class_labels.append(file[underscore_pos+1:period_pos])
+					print("Class loaded: " + file[underscore_pos+1:period_pos] + "\n")
+
+					source_ds = ogr.Open(vector_fn)
+					source_layer = source_ds.GetLayer()
+					x_min, x_max, y_min, y_max = source_layer.GetExtent()
+					pixel_size = self.geotransform[1]
+					x_res = int((x_max - x_min) / pixel_size)
+					y_res = int((y_max - y_min) / pixel_size)
+
+					target_ds = gdal.GetDriverByName('GTiff').Create(raster_fn, x_res, y_res, 1, gdal.GDT_Int32)
+					target_ds.SetGeoTransform(self.geotransform)
+					band = target_ds.GetRasterBand(1)
+					band.SetNoDataValue(NoData_value)
+					gdal.RasterizeLayer(target_ds, [1], source_layer, None, None, [1], ['ALL_TOUCHED=TRUE'])
+
+					tempband = target_ds.GetRasterBand(1)
+					temparray = tempband.ReadAsArray()
+					temparray[temparray == -1] = 0
+					temparray[temparray == 1] = counter
+
+					if self.truthimage is None:
+						self.truthimage = np.copy(temparray)
+					else:
+						temparray2 = temparray + self.truthimage
+						temparray[temparray2 > counter] = 0
+						self.truthimage = self.truthimage + temparray
+
+					target_ds = None
+					counter +=1
+				self.truthimage = self.truthimage.astype(np.uint8)
+
+		else:
+			print("Load type error: specify either PIL, cv2, or raster")
+			return None
+
 	    # Set labels from 0 to item_counter based upon input truth_key
-	    if truth_key is not None:
-	    	item_counter = 0
-	    	for item in truth_key:
-	    		self.truthimage[self.truthimage == item] = item_counter
-	    		item_counter+=1
-	    	self.num_classes = len(np.unique(self.truthimage))
+		if truth_key is not None:
+			item_counter = 0
+			for item in truth_key:
+				self.truthimage[self.truthimage == item] = item_counter
+				item_counter+=1
+			self.num_classes = len(np.unique(self.truthimage))
+		else:
+			self.num_classes = len(np.unique(self.truthimage))
 
 #### Load Image
 # Input:
 # 	Imagepath: Path to Image
-	def load_image(self, Imagepath, PILflag = False):
-		if PILflag:
-			self.image = pil_image.open(Imagepath)
-		else:
+	def load_image(self, Imagepath, load_type="cv2"):
+		if load_type == "PIL":
+			self.image = pil_image.open(img_to_array(Imagepath))
+		elif load_type == "cv2":
 			self.image = cv2.imread(Imagepath,cv2.IMREAD_UNCHANGED)
+		else:
+			print("Load type error: specify either PIL, cv2, or raster")
 
 #### Load Reference/Truth Image
 # Input:
@@ -63,6 +147,11 @@ class CoralData:
 	def set_depth(self, depth):
 		self.depth = depth
 
+
+	def _calculate_corner(self, geotransform, column, row):
+		x = geotransform[1]*column + geotransform[2]*row + geotransform[0]
+		y = geotransform[5]*row + geotransform[4]*column + geotransform[3]
+		return x, y
 #### Normalize Image
 # Input:
 # 	dataset: set of vectorized images, N_images x nrow x ncol x n_channels
@@ -166,7 +255,8 @@ class CoralData:
 # 	N: Number of images per class (NOTE: because these are segmented maps, the class is only affiliated with the center pixel)
 # 	lastchannelremove: Remove last channel or not
 # 	labelkey: Naming convention of class labels (NOTE: must be same # as the # of classes)
-	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, lastchannelremove = True, labelkey = None):
+# 	subdir: Create subdirectories for each class
+	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, lastchannelremove = True, labelkey = None, subdir=False):
 		crop_len = int(np.floor(image_size/2))
 		try:
 			# Crop the image so that border areas are not considered
@@ -181,6 +271,7 @@ class CoralData:
 			[i,j] = np.where(truthcrop == k)
 			idx = np.asarray(random.sample(range(len(i)), N)).astype(int)
 			for nn in range(len(idx)):
+				# Note: i,j are off of truthcrop, and hence when taken against image needs only +image_size to be centered
 				tempimage = self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :]
 				templabel = np.asarray(self.truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]*(self.depth/self.num_classes)).astype(np.uint8)
 
@@ -188,15 +279,50 @@ class CoralData:
 					tempimage = np.delete(tempimage, -1,-1) # Remove last dimension of array
 
 				if labelkey is not None:
-					trainstr = labelkey[k] + '_' + str(nn).zfill(8) + '.png'
-					truthstr = labelkey[k] + '_' + str(nn).zfill(8) + '.png'
+					if self.load_type == "raster":
+						trainstr = labelkey[k] + '_' + str(nn).zfill(8) + '.tif'
+						truthstr = labelkey[k] + '_' + str(nn).zfill(8) + '.tif'
+					else:
+						trainstr = labelkey[k] + '_' + str(nn).zfill(8) + '.png'
+						truthstr = labelkey[k] + '_' + str(nn).zfill(8) + '.png'
 				else:
-					trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
-					truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
+					if self.load_type == "raster":
+						trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.tif'
+						truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.tif'
+					else:
+						trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
+						truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
 					f.write('class'+str(k)+'_'+str(nn).zfill(8)+'\n')
 
-				cv2.imwrite(exporttrainpath+trainstr, tempimage)
-				cv2.imwrite(exportlabelpath+truthstr, templabel)
+				if subdir:
+					if labelkey is not None:
+						subdirpath = '{}/'.format(labelkey[k])
+					else:
+						subdirpath = 'class' + str(k) + '/'
+
+					if not os.path.exists(exporttrainpath+subdirpath):
+						os.makedirs(exporttrainpath+subdirpath)
+					if not os.path.exists(exportlabelpath+subdirpath):
+						os.makedirs(exportlabelpath+subdirpath)
+
+					if self.load_type == "raster":
+						driver = gdal.GetDriverByName('GTiff')
+						dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, self.image.shape[2], gdal.GDT_Int32)
+						x, y = self._calculate_corner(self.geotransform, j[idx[nn]]-crop_len, i[idx[nn]]-crop_len)
+						# print(x, self.geotransform[1], y, self.geotransform[5])
+						dataset.SetGeoTransform((x, self.geotransform[1], 0, y, 0, self.geotransform[5]))
+						dataset.SetProjection(self.projection)
+
+						for chan in range(self.image.shape[2]):
+							dataset.GetRasterBand(chan+1).WriteArray(tempimage[:,:,chan])
+							dataset.FlushCache()
+						cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+					else:
+						cv2.imwrite(exporttrainpath+subdirpath+trainstr, tempimage)
+						cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+				else:
+					cv2.imwrite(exporttrainpath+trainstr, tempimage)
+					cv2.imwrite(exportlabelpath+truthstr, templabel)
 				print(str(k*N+nn+1) + '/ ' + str(self.num_classes*N) +' patches exported', end='\r')
 		f.close()
 
@@ -230,35 +356,68 @@ class CoralData:
 		whole_dataset = self._rescale(whole_datasets)
 		return whole_dataset
 
-	def predict_on_whole_image(self, model, image_size, num_lines = None, spacing = 1, crop = False, lastchannelremove = True):
+	def predict_on_whole_image(self, model, image_size, num_lines = None, spacing = (1,1), crop = False, lastchannelremove = True):
 		offstart = 0
 		crop_len = int(np.floor(image_size/2)) 	# crop_len is NOT currently used to crop the image!!! 
 
 		if num_lines is None:
-			num_lines = self.testimage.shape[0] - 2*crop_len
-		whole_predict = np.zeros((spacing*(num_lines-1)+image_size,self.testimage.shape[1]))
-		num_predict = np.zeros((spacing*(num_lines-1)+image_size,self.testimage.shape[1]))
+			num_lines = int(np.floor((self.testimage.shape[0] - 2*crop_len)/spacing[0]))
+
+		if num_lines*spacing[0]+image_size == int(np.floor((self.testimage.shape[0]-image_size)/spacing[0])): # If predict on whole image
+			whole_predict = np.zeros(self.testimage.shape)
+			num_predict = np.zeros(self.testimage.shape)
+		else:
+			whole_predict = np.zeros((spacing[0]*(num_lines-1)+image_size,self.testimage.shape[1]))
+			num_predict = np.zeros((spacing[0]*(num_lines-1)+image_size,self.testimage.shape[1]))
 
 		truth_predict = self.truthimage[offstart:offstart+whole_predict.shape[0], 0:whole_predict.shape[1]]
 
-		for offset in range(offstart, offstart+spacing*num_lines, spacing):
-			counter = 0
-			for cols in range(0, whole_predict.shape[1]-image_size+1):
+		for offset in range(offstart, offstart+spacing[0]*num_lines, spacing[0]):
+			for cols in range(0, whole_predict.shape[1]-image_size+1, spacing[1]):
 				if lastchannelremove:
-					temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = counter, cols=1, lines=1, toremove=3)
+					temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1, toremove=3)
 				else:
-					temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = counter, cols=1, lines=1)
+					temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1)
 				temp_predict = model.predict_on_batch(temp_dataset)
 				temp_predict = self._classifyback(temp_predict)
 				
 				for predict_mat in temp_predict:
-					whole_predict[offset:offset+image_size, counter:counter+image_size] = whole_predict[offset:offset+image_size, counter:counter+image_size] + predict_mat
-					num_predict[offset:offset+image_size, counter:counter+image_size] = num_predict[offset:offset+image_size, counter:counter+image_size] + np.ones(predict_mat.shape)
-					counter += 1
-				print(str(counter) + '/ ' + str(self.testimage.shape[1]-image_size) + ' completed', end='\r')
+					whole_predict[offset:offset+image_size, cols:cols+image_size] = whole_predict[offset:offset+image_size, cols:cols+image_size] + predict_mat
+					num_predict[offset:offset+image_size, cols:cols+image_size] = num_predict[offset:offset+image_size, cols:cols+image_size] + np.ones(predict_mat.shape)
+				print("Line: " + str(offset) + " Col: " + str(cols) + '/ ' + str(whole_predict.shape[1]-image_size+1) + ' completed', end='\r')
 
-			print('\n')
-			print(str(offset/spacing+1) + '/ ' + str(num_lines) + ' completed', end='\r')
+			# Classify last column of row
+			tempcol = whole_predict.shape[1]-image_size
+			temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = tempcol, cols=1, lines=1, toremove = 3)
+			temp_predict = model.predict_on_batch(temp_dataset)
+			temp_predict = self._classifyback(temp_predict)
+			whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] = whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] + predict_mat
+			num_predict[offset:offset+image_size, tempcol:tempcol+image_size] = num_predict[offset:offset+image_size, tempcol:tempcol+image_size] + np.ones(predict_mat.shape)
+		
+		# Predict on last rows
+		if num_lines*spacing[0]+image_size == int(np.floor((self.testimage.shape[0]-image_size)/spacing[0])):
+			offset = self.testimage.shape[0]-image_size
+			for cols in range(0, whole_predict.shape[1]-image_size+1, spacing[1]):
+				if lastchannelremove:
+					temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1, toremove=3)
+				else:
+					temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1)
+				temp_predict = model.predict_on_batch(temp_dataset)
+				temp_predict = self._classifyback(temp_predict)
+				
+				for predict_mat in temp_predict:
+					whole_predict[offset:offset+image_size, cols:cols+image_size] = whole_predict[offset:offset+image_size, cols:cols+image_size] + predict_mat
+					num_predict[offset:offset+image_size, cols:cols+image_size] = num_predict[offset:offset+image_size, cols:cols+image_size] + np.ones(predict_mat.shape)
+				print("Line: " + str(offset) + " Col: " + str(cols) + '/ ' + str(whole_predict.shape[1]-image_size+1) + ' completed', end='\r')
+
+			# Classify last column of row
+			tempcol = whole_predict.shape[1]-image_size
+			temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = tempcol, cols=1, lines=1, toremove = 3)
+			temp_predict = model.predict_on_batch(temp_dataset)
+			temp_predict = self._classifyback(temp_predict)
+			whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] = whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] + predict_mat
+			num_predict[offset:offset+image_size, tempcol:tempcol+image_size] = num_predict[offset:offset+image_size, tempcol:tempcol+image_size] + np.ones(predict_mat.shape)
+		
 		whole_predict = np.round(whole_predict.astype(np.float)/num_predict.astype(np.float)).astype(np.uint8)
 		accuracy = 100*np.asarray((whole_predict == truth_predict)).astype(np.float32).sum()/(whole_predict.shape[0]*whole_predict.shape[1])
 

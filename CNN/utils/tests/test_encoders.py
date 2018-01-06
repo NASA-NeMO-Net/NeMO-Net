@@ -4,11 +4,38 @@ from keras.layers import Input
 import sys
 sys.path.append("..") # Adds higher directory to python modules path.
 from NeMO_encoders import (
+    Res34_Encoder,
     VGG16,
     VGG19)
 
 from keras.utils.test_utils import keras_test
 
+@keras_test
+def test_Res34():
+    x = Input(shape=(224, 224, 3))
+    classes =4
+    initconv_shape = (None, 56, 56, 64)
+    megaconv1_shape = (None, 56, 56, 64)
+    megaconv2_shape = (None, 28, 28, 128)
+    megaconv3_shape = (None, 14, 14, 256)
+    megaconv4_shape = (None, 7, 7, 512)
+    conv1b1_shape = (None, 7, 7, 512)
+    fc_shape = (None,classes)
+
+    encoder = Res34_Encoder(x, classes, weights=None, trainable=True, fcflag=False)
+    feat_pyramid = encoder.outputs
+
+    assert len(feat_pyramid) == 6
+    assert K.int_shape(feat_pyramid[0]) == conv1b1_shape
+    assert K.int_shape(feat_pyramid[1]) == megaconv4_shape
+    assert K.int_shape(feat_pyramid[2]) == megaconv3_shape
+    assert K.int_shape(feat_pyramid[3]) == megaconv2_shape
+    assert K.int_shape(feat_pyramid[4]) == megaconv1_shape
+    assert K.int_shape(feat_pyramid[5]) == initconv_shape
+
+    encoder2 = Res34_Encoder(x, classes, weights=None, trainable=True, fcflag=True)
+    feat_pyramid2 = encoder2.outputs
+    assert K.int_shape(feat_pyramid2[0]) == fc_shape
 
 @keras_test
 def test_vgg16():
