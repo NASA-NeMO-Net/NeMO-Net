@@ -10,6 +10,13 @@ from keras.utils.data_utils import get_file
 from keras.utils import layer_utils
 
 from NeMO_blocks import (
+    alex_conv,
+    alex_fc,
+    res_initialconv,
+    res_basicconv,
+    res_megaconv,
+    res_1b1conv,
+    res_fc,
     vgg_conv,
     vgg_fc
 )
@@ -82,6 +89,106 @@ class Encoder(Model):
                 if layer.name in layer_names:
                     layer.trainable = False
 
+
+class Res_Encoder(Model):
+    """Same as Encoder, but does not get rid of any output blocks
+    :param inputs: 4D Tensor, the input tensor
+    :param blocks: 1D array, list of functional convolutional blocks
+
+    :return A Keras Model with outputs
+    """
+
+    def __init__(self, inputs, blocks, weights=None,
+                 trainable=True, name='encoder'):
+        inverse_pyramid = []
+
+        # all blocks
+        for i, block in enumerate(blocks):
+            if i == 0:
+                x = block(inputs)
+                inverse_pyramid.append(x)
+            else:
+                x = block(x)
+                inverse_pyramid.append(x)
+
+        outputs = list(reversed(inverse_pyramid))
+
+        super(Res_Encoder, self).__init__(
+            inputs=inputs, outputs=outputs)
+
+        # load pre-trained weights
+        if weights is not None:
+            weights_path = get_file(
+                '{}_weights_tf_dim_ordering_tf_kernels.h5'.format(name),
+                weights,
+                cache_subdir='models')
+            layer_names = load_weights(self, weights_path)
+            if K.image_data_format() == 'channels_first':
+                layer_utils.convert_all_kernels_in_model(self)
+
+        # Freezing basenet weights
+        if trainable is False:
+            for layer in self.layers:
+                if layer.name in layer_names:
+                    layer.trainable = False
+
+class Alex_Encoder(Res_Encoder):
+    def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True):
+        filters = [96, 256, 384, 384, 256]
+        conv_size = [(7,7),(5,5),(3,3),(3,3),(3,3)]
+        pool_size = [(2,2),(2,2),(1,1),(1,1),(2,2)]
+        pool_stride = [(2,2),(2,2),(1,1),(1,1),(2,2)]
+        pool_bool = [True, True, False, False, True]
+        pad_bool = [False, False, True, True, True]
+        batchnorm_bool = [True, True, False, False, False]
+
+        full_filters = [4096, 4096]
+        drop_bool = [True, True]
+        drop_val = [0.5, 0.5]
+        
+        blocks = []
+        for i in range(len(filters)):
+            block_name = 'alexblock{}'.format(i + 1)
+            block = alex_conv(filters[i], conv_size[i], pad_bool=pad_bool[i], pool_bool=pool_bool[i], batchnorm_bool=batchnorm_bool[i], pool_size=pool_size[i], pool_strides=pool_stride[i], weight_decay=weight_decay, block_name=block_name)
+            blocks.append(block)
+
+        for i in range(len(full_filters)):
+            block_name='alexfc{}'.format(i + 1)
+            if i==0:
+                block = alex_fc(full_filters[i], flatten_bool=True, dropout_bool=drop_bool[i], dropout=drop_val[i], weight_decay=weight_decay, block_name=block_name)
+            else:
+                block = alex_fc(full_filters[i], flatten_bool=False, dropout_bool=drop_bool[i], dropout=drop_val[i], weight_decay=weight_decay, block_name=block_name)
+            blocks.append(block)
+
+        super(Alex_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
+
+
+class Res34_Encoder(Res_Encoder):
+    def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, fcflag = False):
+        weights = None
+        filters = [64, 128, 256, 512]
+        convs = [2,2,2,2]
+        reps = [3,4,6,3]
+        blocks = []
+
+        init_block = res_initialconv(filters=64, weight_decay = weight_decay)
+        blocks.append(init_block)
+
+        for i, (fltr, conv) in enumerate(zip(filters, convs)):
+            block_name = 'megablock{}'.format(i + 1)
+            if i==0:
+                block = res_megaconv(fltr, conv, reps[i], init_strides=(1,1), weight_decay=weight_decay, block_name=block_name)
+            else:
+                block = res_megaconv(fltr, conv, reps[i], init_strides=(2,2), weight_decay=weight_decay, block_name=block_name)
+            blocks.append(block)
+
+        if fcflag:
+            fc_block = res_fc(classes=classes, weight_decay=weight_decay)
+        else:
+            fc_block = res_1b1conv(filters=512, convs=1, weight_decay = weight_decay)
+        blocks.append(fc_block)
+
+        super(Res34_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable=trainable)
 
 class VGGEncoder(Encoder):
     """VGG VGGEncoder.
