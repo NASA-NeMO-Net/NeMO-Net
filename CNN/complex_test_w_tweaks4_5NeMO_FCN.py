@@ -43,13 +43,13 @@ def data():
               valid_out_file = 'NeMO_valid.txt', pixel_mean = [127.5, 127.5, 127.5], pixel_std = [127.5, 127.5, 127.5],
               num_classes = 4, model = FCN, model_name = "NeMO_FCN")
 
-    train_generator, validation_generator = optModel.gen_data()
+    datagen, train_generator, validation_generator = optModel.gen_data()
     print("train_generator_size: ", train_generator.batch_size)
     print("validation_generator_size: ", validation_generator.batch_size)
-    return train_generator, validation_generator
+    return datagen, train_generator, validation_generator
 
  
-def model(train_generator, validation_generator):
+def model(datagen, train_generator, validation_generator):
     '''
     Model providing function:
  
@@ -69,17 +69,18 @@ def model(train_generator, validation_generator):
 
     model = optModel.model2opt()
          
-    choiceval = {{choice(['adam','rmsprop','sgd'])}}
+    choiceval = {{choice(['adam','sgd'])}}
     if choiceval == 'adam':
-        adam    = Adam(lr={{choice([10**-6, 10**-5, 10**-4, 10**-3, 10**-2, 10**-1])}})
+        adam    = Adam(lr={{uniform(10**-6, 10**-1)}}, 
+                                decay={{uniform(1e-4,1e-1)}}, clipnorm=1.)
         optim = adam
     elif choiceval == 'rmsprop':
         rmsprop = RMSprop(lr={{choice([10**-6, 10**-5, 10**-4, 10**-3, 10**-2, 10**-1])}}, 
-                                decay={{choice([1e-2,1e-3,1e-4])}})
+                                decay={{choice([1e-2,1e-3,1e-4])}}, clipnorm=1.)
         optim = rmsprop
     else:
         sgd     = SGD(lr={{choice([10**-6, 10**-5, 10**-4, 10**-3, 10**-2, 10**-1])}}, 
-                                decay={{choice([1e-2,1e-3,1e-4])}})
+                                decay={{choice([1e-2,1e-3,1e-4])}}, clipnorm=1.)
 
         optim = sgd
 
@@ -166,7 +167,7 @@ def model(train_generator, validation_generator):
 
 
     score, acc = model.evaluate_generator(generator=validation_generator, 
-                                                  steps=20, verbose=0)
+                                                  steps=20)
     print('Test accuracy:', acc)
 
     save_file_params = './output/params_run_' + '_' + str(globalvars.globalVar) + '.txt'
@@ -176,7 +177,7 @@ def model(train_generator, validation_generator):
     DAT =  numpy.column_stack((rownames, rowvals))
     numpy.savetxt(save_file_params, DAT, delimiter=",",fmt="%s")
 
-    return {'loss': -acc, 'status': STATUS_OK, 'model': model}
+    return {'loss': -acc, 'status': STATUS_OK}
  
 if __name__ == '__main__':
 

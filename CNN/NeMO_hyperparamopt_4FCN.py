@@ -9,6 +9,7 @@ from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping, ModelCh
 from keras.layers.core import Dense, Dropout, Activation
 from keras.datasets import mnist
 from keras.utils import np_utils
+from keras.backend import clear_session
 import os
 import datetime
 import numpy, json
@@ -60,7 +61,8 @@ def model(train_generator, validation_generator):
     The last one is optional, though recommended, namely:
         - model: specify the model just created so that we can later use it again.
     '''
-    
+    clear_session()
+
     optModel = TrainOptimizer(labelkey=('Sand', 'Branching', 'Mounding', 'Rock'), train_image_path='../Images/Training_Patches/',
               train_label_path = '../Images/TrainingRef_Patches/', train_out_file = 'NeMO_train.txt',
               valid_image_path = '../Images/Valid_Patches/', valid_label_path = '../Images/ValidRef_Patches/',
@@ -69,17 +71,19 @@ def model(train_generator, validation_generator):
 
     model = optModel.model2opt()
          
-    choiceval = {{choice(['adam','rmsprop','sgd'])}}
+    choiceval = {{choice(['adam','sgd'])}}
     if choiceval == 'adam':
-        adam    = Adam(lr={{choice([10**-6, 10**-5, 10**-4, 10**-3, 10**-2, 10**-1])}})
+        adam    = Adam(lr={{choice([10**-6, 10**-5])}}, 
+                                decay={{choice([0])}})
         optim = adam
     elif choiceval == 'rmsprop':
-        rmsprop = RMSprop(lr={{choice([10**-6, 10**-5, 10**-4, 10**-3, 10**-2, 10**-1])}}, 
+        rmsprop = RMSprop(lr={{choice([10**-6, 10**-5, 10**-4, 10**-3, 10**-2])}}, 
                                 decay={{choice([1e-2,1e-3,1e-4])}})
         optim = rmsprop
     else:
-        sgd     = SGD(lr={{choice([10**-6, 10**-5, 10**-4, 10**-3, 10**-2, 10**-1])}}, 
-                                decay={{choice([1e-2,1e-3,1e-4])}})
+        sgd     = SGD(lr={{choice([10**-2, 10**-1])}}, 
+                                decay={{choice([1e-3,1e-4])}}, 
+                                momentum = {{choice([0.1, 0.5,0.9])}} )
 
         optim = sgd
 
@@ -102,11 +106,11 @@ def model(train_generator, validation_generator):
     history = model.fit_generator(
                 train_generator,
                 steps_per_epoch=80,
-                epochs=3,
+                epochs=100,
                 validation_data=validation_generator,
                 validation_steps=20,
                 verbose=0,
-                callbacks=[checkpoint,csv_logger,tensor_board])
+                callbacks=[csv_logger])
 
     
 
@@ -120,12 +124,15 @@ def model(train_generator, validation_generator):
     if choiceval == 'adam':
       lr         = numpy.asarray(parameters["lr"])
       decay      = numpy.asarray(parameters["decay"])
+      momentum   = "none"
     elif choiceval == 'rmsprop':
       lr         = numpy.asarray(parameters["lr_1"])
       decay      = numpy.asarray(parameters["decay_1"])
+      momentum   = "none"
     elif choiceval == 'sgd':
       lr         = numpy.asarray(parameters["lr_2"])
       decay      = numpy.asarray(parameters["decay_2"])
+      momentum   = numpy.asarray(parameters["momentum"])
 
 
 
@@ -157,6 +164,7 @@ def model(train_generator, validation_generator):
     print("opt: ", opt)
     print("lr: ", lr)
     print("decay: ", decay)
+    print("momentum: ", momentum)
     print("val_accuracy: ",val_acc_)
  
     acc_and_loss = numpy.column_stack((acc_, loss_, val_acc_, val_loss_))
@@ -166,7 +174,7 @@ def model(train_generator, validation_generator):
 
 
     score, acc = model.evaluate_generator(generator=validation_generator, 
-                                                  steps=20, verbose=0)
+                                                  steps=20)
     print('Test accuracy:', acc)
 
     save_file_params = './output/params_run_' + '_' + str(globalvars.globalVar) + '.txt'
@@ -191,7 +199,7 @@ if __name__ == '__main__':
     best_run, best_model, space = optim.minimize(model=model,
                                           data=data,
                                           algo=tpe.suggest,
-                                          max_evals=3,
+                                          max_evals=2,
                                           trials=trials,
                                           eval_space=True,
                                           return_space=True)
@@ -199,6 +207,7 @@ if __name__ == '__main__':
     print("validation_generator_size: ", validation_generator.batch_size)
     print("Evalutation of best performing model:")
     print("Parameters of best run", best_run)
+    #print(best_model.evaluate_generator(generator=validation_generator, steps=20))
     print(best_model.evaluate(validation_generator))
     json.dump(best_run, open('./output/best_run' + optModel.model_name + '.txt', 'w'))
 
