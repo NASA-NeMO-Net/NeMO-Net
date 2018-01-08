@@ -6,6 +6,11 @@
 *.out
 *.jpg
 *.txt
+*.shp
+*.shx
+*.tfw
+*.prj
+*.dbf
 # TensorFlow  save files #
 ###############
 *.meta
@@ -18,6 +23,9 @@
 *.hdf5
 *.npy
 *.json
+# Other files #
+################
+*.zip
 # folders
 ##########
 C:/Users/msegalro/NeMO_NET/NeMO-NET/CNN/logs/
