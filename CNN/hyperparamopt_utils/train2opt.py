@@ -10,6 +10,7 @@ import tensorflow as tf
 import sys
 sys.path.append("../utils/") # Adds higher directory to python modules path.
 import loadcoraldata_utils as coralutils
+from loadcoraldata_utils import CoralData
 #sys.path.append("./tmp/")
 from NeMO_models import FCN
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
@@ -112,15 +113,15 @@ class TrainOptimizer:
     def gen_img_set(self):
         # generate train set
         if self.train_image_path is not None:
-             coralutils.export_segmentation_map(self.train_image_path, self.train_label_path, self.train_out_file, 
+             CoralData.export_segmentation_map(exporttrainpath = self.train_image_path, exportlabelpath = self.train_label_path, txtfilename = self.train_out_file, 
                                                 image_size=self.image_size, N=self.trainSample, lastchannelremove = True, labelkey = self.labelkey)
             # generate validation set
         if self.valid_image_path is not None:
-            coralutils.export_segmentation_map(self.valid_image_path, self.valid_label_path, self.valid_out_file, 
+            CoralData.export_segmentation_map(exporttrainpath = self.valid_image_path, exportlabelpath = self.valid_label_path, txtfilename = self.valid_out_file, 
                                                image_size=self.image_size, N=self.trainSample//10, lastchannelremove = True, labelkey = self.labelkey)
         # generate test set
         if self.test_image_path is not None:
-            coralutils.export_segmentation_map(self.test_image_path,  self.test_label_path,  self.test_out_file,  
+            CoralData.export_segmentation_map(exporttrainpath = self.test_image_path,  exportlabelpath = self.test_label_path,  txtfilename = self.test_out_file,  
                                                image_size=self.image_size, N=self.trainSample//10,  lastchannelremove = True, labelkey = self.labelkey)
 
 
