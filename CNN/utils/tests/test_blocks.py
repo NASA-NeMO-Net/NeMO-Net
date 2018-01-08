@@ -6,6 +6,12 @@ sys.path.append("..") # Adds higher directory to python modules path.
 from NeMO_blocks import (
     vgg_conv,
     vgg_fc,
+    res_shortcut,
+    res_initialconv,
+    res_megaconv,
+    res_basicconv,
+    res_1b1conv,
+    res_fc,
     vgg_deconv,
     vgg_score
 )
@@ -37,6 +43,66 @@ def test_vgg_fc():
         x1 = K.variable(np.random.random((1, 14, 14, 512)))
         y1_shape = (1, 8, 8, 512)
 
+def test_res_shortcut():
+    x1 = Input(shape=(56,56,64))
+    x2 = Input(shape=(28,28,128))
+    y_shape = (None, 28, 28, 128)
+
+    y = res_shortcut(x1,x2)
+    assert K.int_shape(y) == y_shape
+
+def test_res_initialconv():
+    x = Input(shape=(224, 224, 3))
+    y_shape = (None, 56, 56, 64)
+
+    initial_block = res_initialconv(filters=64, init_strides=(2,2), block_name='initblock')
+    y = initial_block(x)
+    assert K.int_shape(y) == y_shape
+
+def test_res_basicconv():
+    x = Input(shape=(56,56,64))
+    y1_shape = (None, 56, 56, 64)
+    y2_shape = (None, 28, 28, 128)
+
+    block1 = res_basicconv(filters=64, convs=2, init_strides=(1,1), block_name='megablock1_block1')
+    block2 = res_basicconv(filters=128, convs=2, init_strides=(2,2), block_name='megablock2_block1')
+    y1 = block1(x)
+    y2 = block2(x)
+    assert K.int_shape(y1) == y1_shape
+    assert K.int_shape(y2) == y2_shape
+
+def test_res_megaconv():
+    x = Input(shape=(56,56,64))
+    y1_shape = (None, 56, 56, 64)
+    y2_shape = (None, 28, 28, 128)
+
+    block1 = res_megaconv(filters=64, convs=2, reps=3, init_strides=(1,1), block_name='megablock1')
+    block2 = res_megaconv(filters=128, convs=2, reps=4, init_strides=(2,2), block_name='megablock2')
+    y1 = block1(x)
+    y2 = block2(x)
+    assert K.int_shape(y1) == y1_shape
+    assert K.int_shape(y2) == y2_shape
+
+def test_res_1b1conv():
+    x = Input(shape=(14,14,512))
+    y1_shape = (None, 14, 14, 20)
+    y2_shape = (None, 14, 14, 20)
+
+    block1 = res_1b1conv(filters=20, convs=1, init_kernelsize=(1,1), init_dilationrate=(1,1), block_name='block1b1')
+    block2 = res_1b1conv(filters=20, convs=2, init_kernelsize=(7,7), init_dilationrate=(2,2), block_name='block1b1')
+    y1 = block1(x)
+    y2 = block2(x)
+    assert K.int_shape(y1) == y1_shape
+    assert K.int_shape(y2) == y2_shape
+
+def test_res_fc():
+    x = Input(shape=(7,7,512))
+    classes = 10
+    y_shape = (None,10)
+
+    block1 = res_fc(classes=classes, block_name='blockfc')
+    y = block1(x)
+    assert K.int_shape(y) == y_shape
 
 def test_vgg_deconv():
     if K.image_data_format() == 'channels_first':

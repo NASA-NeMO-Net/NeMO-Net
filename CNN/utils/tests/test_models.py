@@ -2,7 +2,7 @@
 import numpy as np
 import sys
 sys.path.append("..") # Adds higher directory to python modules path.
-from NeMO_models import FCN
+from NeMO_models import FCN, ResNet34
 from keras import backend as K
 
 
@@ -16,6 +16,37 @@ def is_same_shape(shape, expected_shape, data_format=None):
                           expected_shape[1],
                           expected_shape[2])
     return shape == expected_shape
+
+def test_Resnet34():
+    input_shape = (224, 224, 3)
+    resnet34 = ResNet34(input_shape=input_shape, classes=4)
+
+    for l in resnet34.layers:
+        if l.name == 'initblock_conv':
+            test_shape = (None, 112, 112, 64)
+            assert is_same_shape(l.output_shape, test_shape)
+        elif l.name == 'initblock_pool':
+            test_shape = (None, 56, 56, 64)
+            assert is_same_shape(l.output_shape, test_shape)
+        elif 'megablock1' in l.name:
+            test_shape = (None, 56, 56, 64)
+            assert is_same_shape(l.output_shape, test_shape)
+        elif 'megablock2' in l.name:
+            test_shape = (None, 28, 28, 128)
+            assert is_same_shape(l.output_shape, test_shape)
+        elif 'megablock3' in l.name:
+            test_shape = (None, 14, 14, 256)
+            assert is_same_shape(l.output_shape, test_shape)
+        elif 'megablock4' in l.name:
+            test_shape = (None, 7, 7, 512)
+            assert is_same_shape(l.output_shape, test_shape)
+        elif l.name == 'blockfc_pool':
+            test_shape = (None, 1, 1, 512)
+            assert is_same_shape(l.output_shape, test_shape)
+        elif l.name == 'blockfc_dense':
+            test_shape = (None, 4)
+            assert is_same_shape(l.output_shape, test_shape)
+    assert is_same_shape(resnet34.output_shape, (None, 4))
 
 
 def test_fcn_vgg16_shape():

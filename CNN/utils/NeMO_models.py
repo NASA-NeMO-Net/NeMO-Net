@@ -7,12 +7,31 @@ import keras
 import tensorflow as tf
 import keras.backend as K
 from keras.models import Model
-from keras.layers import Input, Flatten, Activation, Reshape
+from keras.layers import Input, Flatten, Activation, Reshape, Dense
 
-
-from NeMO_encoders import VGG16, VGG19
+from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Res34_Encoder
 from NeMO_decoders import VGGDecoder, VGGUpsampler
 
+def AlexNet(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None):
+    inputs = Input(shape=input_shape)
+
+    encoder = Alex_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder)
+    encoder_output = encoder.outputs[0]
+    scores = Dense(classes, activation = 'softmax')(encoder_output)
+
+    return Model(inputs=inputs, outputs=scores)
+
+def ResNet34(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None):
+    """ Normal Resnet34 
+    """
+    inputs = Input(shape=input_shape)
+
+    encoder = Res34_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, fcflag=True)
+    encoder_output = encoder.outputs[0] # Only take last output
+    scores = Activation('softmax')(encoder_output)
+
+    return Model(inputs=inputs, outputs=scores)
+# scores = Activation('softmax')(outputs)
 
 def FCN(*args, **kwargs):
     """Fully Convolutional Networks for semantic segmentation with VGG16.
