@@ -76,19 +76,16 @@ fcn_vgg16.fit_generator(
     datagen.flow_from_imageset(
         class_mode='categorical',
         classes=4,
-<<<<<<< HEAD
         batch_size=20,
         shuffle=True,
         image_set_loader=train_loader),
     steps_per_epoch=50,
     epochs=100,
-=======
         batch_size=10,
         shuffle=True,
         image_set_loader=train_loader),
     steps_per_epoch=80,
     epochs=2,
->>>>>>> Rm122_KerasCNN
     validation_data=datagen.flow_from_imageset(
         class_mode='categorical',
         classes=4,
@@ -97,10 +94,7 @@ fcn_vgg16.fit_generator(
         image_set_loader=val_loader),
     validation_steps=5,
     verbose=1,
-<<<<<<< HEAD
     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
-=======
     callbacks=[lr_reducer, early_stopper, nan_terminator,checkpointer, csv_logger, SaveWeights])
->>>>>>> Rm122_KerasCNN
 
 fcn_vgg16.save('./tmp/fcn_vgg16_model.h5')
