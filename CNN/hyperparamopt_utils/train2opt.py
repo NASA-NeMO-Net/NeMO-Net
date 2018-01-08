@@ -10,7 +10,6 @@ import tensorflow as tf
 import sys
 sys.path.append("../utils/") # Adds higher directory to python modules path.
 import loadcoraldata_utils as coralutils
-from loadcoraldata_utils import CoralData
 #sys.path.append("./tmp/")
 from NeMO_models import FCN
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
@@ -31,6 +30,9 @@ class TrainOptimizer:
                  col_patch_size = 100,
                  image_size     = 100,
                  labelkey       = None,
+                 load_type      = "cv2",
+                 transect_path  = None,
+                 truth_path     = None,
                  train_image_path=None,
                  train_label_path=None,
                  train_out_file = None,
@@ -68,6 +70,9 @@ class TrainOptimizer:
         self.train_label_path= train_label_path
         self.train_out_file  = train_out_file
         self.trainSample     = trainSample
+        self.load_type       = load_type
+        self.transect_path   = transect_path
+        self.truth_path      = truth_path
         self.valid_image_path= valid_image_path
         self.valid_label_path= valid_label_path
         self.valid_out_file  = valid_out_file
@@ -111,18 +116,24 @@ class TrainOptimizer:
 #   trainSample, validSample, testSample; number of samples per class to generate per each set
 #   labelkey: Naming convention of class labels (NOTE: must be same # as the # of classes) (string names of classes)
     def gen_img_set(self):
+        
+        Transect = coralutils.CoralData(self.transect_path, self.truth_path, truth_key=[16,160,198,38], self.load_type)
+
         # generate train set
         if self.train_image_path is not None:
-             CoralData.export_segmentation_map(exporttrainpath = self.train_image_path, exportlabelpath = self.train_label_path, txtfilename = self.train_out_file, 
+             Transect.export_segmentation_map(exporttrainpath = self.train_image_path, exportlabelpath = self.train_label_path, txtfilename = self.train_out_file, 
                                                 image_size=self.image_size, N=self.trainSample, lastchannelremove = True, labelkey = self.labelkey)
+             print("Outputing Training...")
             # generate validation set
         if self.valid_image_path is not None:
-            CoralData.export_segmentation_map(exporttrainpath = self.valid_image_path, exportlabelpath = self.valid_label_path, txtfilename = self.valid_out_file, 
+            Transect.export_segmentation_map(exporttrainpath = self.valid_image_path, exportlabelpath = self.valid_label_path, txtfilename = self.valid_out_file, 
                                                image_size=self.image_size, N=self.trainSample//10, lastchannelremove = True, labelkey = self.labelkey)
+            print("Outputing Validation...")
         # generate test set
         if self.test_image_path is not None:
-            CoralData.export_segmentation_map(exporttrainpath = self.test_image_path,  exportlabelpath = self.test_label_path,  txtfilename = self.test_out_file,  
+            Transect.export_segmentation_map(exporttrainpath = self.test_image_path,  exportlabelpath = self.test_label_path,  txtfilename = self.test_out_file,  
                                                image_size=self.image_size, N=self.trainSample//10,  lastchannelremove = True, labelkey = self.labelkey)
+            print("Outputing Test...")
 
 
 #### define initial arguments dictionary for train/test data set generation for model
