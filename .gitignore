@@ -6,7 +6,11 @@
 *.out
 *.jpg
 *.kmz
-*.txt
+*.shp
+*.shx
+*.tfw
+*.prj
+*.dbf
 # TensorFlow  save files #
 ###############
 *.meta
@@ -22,10 +26,7 @@
 # Other files #
 ################
 *.zip
-# mask folders
-###############
-# folders
-##########
+################
 C:/Users/msegalro/NeMO_NET/NeMO-NET/CNN/logs/
 C:/Users/msegalro/NeMO_NET/NeMO-NET/CNN/output/
 C:/Users/msegalro/NeMO_NET/NeMO-NET/CNN/plots/
