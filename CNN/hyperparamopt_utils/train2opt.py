@@ -117,7 +117,7 @@ class TrainOptimizer:
 #   labelkey: Naming convention of class labels (NOTE: must be same # as the # of classes) (string names of classes)
     def gen_img_set(self):
         
-        Transect = coralutils.CoralData(self.transect_path, self.truth_path, truth_key=[16,160,198,38], self.load_type)
+        Transect = coralutils.CoralData(self.transect_path, self.truth_path, truth_key=[16,160,198,38], load_type=self.load_type)
 
         # generate train set
         if self.train_image_path is not None:
@@ -213,7 +213,7 @@ class TrainOptimizer:
     def gen_data(self):
 
         # upload init_args parameters for dataset loader:
-        init_args  = self.init_args_dict()
+        #init_args  = self.init_args_dict()
 
         batch_size = self.batch_size
 
@@ -225,26 +225,31 @@ class TrainOptimizer:
                                      pixelwise_std_normalization=True,
                                      pixel_std=self.pixel_std)
 
-        train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
-        val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
+        # train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
+        # val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
 
 
         # generate model data
+        if self.load_type == 'cv2':
+            color_mode = 'rgb'
+        elif self.load_type == 'raster':
+            color_mode = '8channel'
 
-        self.train_generator = datagen.flow_from_imageset(
-                    class_mode='categorical',
-                    classes=self.num_classes,
-                    batch_size=batch_size,
-                    shuffle=True,
-                    image_set_loader=train_loader)
+        self.train_generator = datagen.flow_from_NeMOdirectory(self.train_image_path,
+            target_size=self.input_shape,
+            color_mode=color_mode,
+            classes = self.labelkey,
+            class_mode = 'categorical',
+            batch_size = 64,
+            shuffle=True)
 
-        self.validation_generator = datagen.flow_from_imageset(
-                    class_mode='categorical',
-                    classes=self.num_classes,
-                    batch_size=batch_size,
-                    shuffle=True,
-                    image_set_loader=val_loader)
-
+        self.validation_generator = datagen.flow_from_NeMOdirectory(self.valid_image_path,
+            target_size=self.input_shape,
+            color_mode=color_mode,
+            classes = self.labelkey,
+            class_mode = 'categorical',
+            batch_size = 64,
+            shuffle=True)
 
         return self.train_generator, self.validation_generator
 

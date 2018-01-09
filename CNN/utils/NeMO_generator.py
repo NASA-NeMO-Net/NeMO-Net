@@ -146,7 +146,6 @@ class IndexIterator(Iterator):
 
         return batch_x, batch_y
 
-<<<<<<< HEAD
 class NeMODirectoryIterator(Iterator):
     """Iterator capable of reading images from a directory on disk.
 
@@ -360,7 +359,7 @@ class NeMODirectoryIterator(Iterator):
             else:
                 return batch_x
         return batch_x, batch_y
-=======
+
     def next(self):
         """Next batch."""
         with self.lock:
@@ -400,7 +399,6 @@ class NeMODirectoryIterator(Iterator):
 
         # return batch_x, batch_y
 
->>>>>>> Rm122_KerasCNN
 
 class ImageSetLoader(object):
     """Helper class to load image data into numpy arrays."""

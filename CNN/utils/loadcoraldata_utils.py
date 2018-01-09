@@ -301,7 +301,6 @@ class CoralData:
 					else:
 						trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
 						truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
-					f.write('class'+str(k)+'_'+str(nn).zfill(8)+'\n')
 
 				if subdir:
 					if labelkey is not None:
@@ -329,9 +328,11 @@ class CoralData:
 					else:
 						cv2.imwrite(exporttrainpath+subdirpath+trainstr, tempimage)
 						cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+					f.write('./' + subdirpath+trainstr+'\n')
 				else:
 					cv2.imwrite(exporttrainpath+trainstr, tempimage)
 					cv2.imwrite(exportlabelpath+truthstr, templabel)
+					f.write('./' + trainstr+'\n')
 				print(str(k*N+nn+1) + '/ ' + str(self.num_classes*N) +' patches exported', end='\r')
 		f.close()
 

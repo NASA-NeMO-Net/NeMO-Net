@@ -17,8 +17,8 @@ from keras.layers.merge import add
 from keras.layers.normalization import BatchNormalization
 from keras.regularizers import l2
 from NeMO_layers import CroppingLike2D, BilinearUpSampling2D
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
-<<<<<<< HEAD
 def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_bool=False, batchnorm_bool = False, pool_size=(2,2), pool_strides=(2,2), weight_decay=0., block_name='alexblock'):
     def f(input):
       x = input
@@ -47,10 +47,7 @@ def alex_fc(filters, flatten_bool=False, dropout_bool=False, dropout=0.5, weight
         x = Dropout(dropout)(x)
       return x
     return f
-=======
-from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
->>>>>>> Rm122_KerasCNN
 
 def vgg_conv(filters, convs, padding=False, weight_decay=0., block_name='blockx'):
     """A VGG convolutional block for encoding.
