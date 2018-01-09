@@ -42,7 +42,7 @@ def data():
               train_label_path = '../Images/TrainingRef_Patches/', train_out_file = 'NeMO_train.txt',
               valid_image_path = '../Images/Valid_Patches/', valid_label_path = '../Images/ValidRef_Patches/',
               valid_out_file = 'NeMO_valid.txt', pixel_mean = [127.5, 127.5, 127.5], pixel_std = [127.5, 127.5, 127.5],
-              num_classes = 4, model = FCN, model_name = "NeMO_FCN")
+              num_classes = 4, model = FCN, model_name = "NeMO_FCN", input_shape=(150,150,3), image_size=150)
 
     train_generator, validation_generator = optModel.gen_data()
     print("train_generator_size: ", train_generator.batch_size)
@@ -67,7 +67,7 @@ def model(train_generator, validation_generator):
               train_label_path = '../Images/TrainingRef_Patches/', train_out_file = 'NeMO_train.txt',
               valid_image_path = '../Images/Valid_Patches/', valid_label_path = '../Images/ValidRef_Patches/',
               valid_out_file = 'NeMO_valid.txt', pixel_mean = [127.5, 127.5, 127.5], pixel_std = [127.5, 127.5, 127.5],
-              num_classes = 4, model = FCN, model_name = "NeMO_FCN")
+              num_classes = 4, model = FCN, model_name = "NeMO_FCN", input_shape=(150,150,3), image_size=150)
 
     model = optModel.model2opt()
          
@@ -106,7 +106,7 @@ def model(train_generator, validation_generator):
     history = model.fit_generator(
                 train_generator,
                 steps_per_epoch=80,
-                epochs=100,
+                epochs=3,
                 validation_data=validation_generator,
                 validation_steps=20,
                 verbose=0,
@@ -193,9 +193,12 @@ if __name__ == '__main__':
               train_label_path = '../Images/TrainingRef_Patches/', train_out_file = 'NeMO_train.txt',
               valid_image_path = '../Images/Valid_Patches/', valid_label_path = '../Images/ValidRef_Patches/',
               valid_out_file = 'NeMO_valid.txt', pixel_mean = [127.5, 127.5, 127.5], pixel_std = [127.5, 127.5, 127.5],
-              num_classes = 4, model = FCN, model_name = "NeMO_FCN")
+              num_classes = 4, model = FCN, model_name = "NeMO_FCN", input_shape=(150,150,3), image_size=150)
 
     trials=Trials()
+
+    train_generator, validation_generator = data()
+
     best_run, best_model, space = optim.minimize(model=model,
                                           data=data,
                                           algo=tpe.suggest,
@@ -203,7 +206,7 @@ if __name__ == '__main__':
                                           trials=trials,
                                           eval_space=True,
                                           return_space=True)
-    train_generator, validation_generator = data()
+  
     print("validation_generator_size: ", validation_generator.batch_size)
     print("Evalutation of best performing model:")
     print("Parameters of best run", best_run)
