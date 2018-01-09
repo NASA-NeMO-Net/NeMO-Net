@@ -83,8 +83,6 @@ class CoralData:
 					topleft = (np.max([img_xmin, truth_xmin]), np.min([img_ymax, truth_ymax]))
 					bottomright = (np.min([img_xmax, truth_xmax]), np.max([img_ymin, truth_ymin]))
 
-
-
 					x_res = int((xmax - xmin) / pixel_size)
 					y_res = int((ymax - ymin) / pixel_size)
 

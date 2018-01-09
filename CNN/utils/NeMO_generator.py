@@ -286,7 +286,8 @@ class NeMODirectoryIterator(Iterator):
                 current_batch_size = batch_size
                 self.batch_index += 1
             else:
-                current_batch_size = n - current_index
+                # current_batch_size = n - current_index
+                current_batch_size = batch_size
                 self.batch_index = 0
             self.total_batches_seen += 1
             index_array = index_array.astype(np.int64)
@@ -300,6 +301,8 @@ class NeMODirectoryIterator(Iterator):
         """
         with self.lock:
             index_array, current_index, current_batch_size = next(self.index_generator)
+            # print("index array length: " + str(len(index_array)))
+            # print("batch size: " + str(current_batch_size))
         # The transformation of images is not under thread lock
         # so it can be done in parallel
         batch_x = np.zeros((current_batch_size,) + self.image_shape, dtype=K.floatx())
@@ -360,14 +363,14 @@ class NeMODirectoryIterator(Iterator):
                 return batch_x
         return batch_x, batch_y
 
-    def next(self):
-        """Next batch."""
-        with self.lock:
-            index_array, current_index, current_batch_size = next(
-                self.index_generator)
+    # def next(self):
+    #     """Next batch."""
+    #     with self.lock:
+    #         index_array, current_index, current_batch_size = next(
+    #             self.index_generator)
 
-        return self._get_batches_of_transformed_samples(index_array)
-        # batch_x = np.zeros(
+    #     return self._get_batches_of_transformed_samples(index_array)
+    #     # batch_x = np.zeros(
         #     (current_batch_size,) + self.image_shape,
         #     dtype=K.floatx())
         # batch_y = np.zeros(

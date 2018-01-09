@@ -26,7 +26,7 @@ sys.path.append("./utils/")
 import loadcoraldata_utils as coralutils
 sys.path.append("./hyperparamopt_utils/")
 from   train2opt import TrainOptimizer
-from NeMO_models import FCN
+from NeMO_models import FCN, AlexNet
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 
  
@@ -42,7 +42,7 @@ def data():
               train_label_path = '../Images/TrainingRef_Patches/', train_out_file = 'NeMO_train.txt',
               valid_image_path = '../Images/Valid_Patches/', valid_label_path = '../Images/ValidRef_Patches/',
               valid_out_file = 'NeMO_valid.txt', pixel_mean = [127.5, 127.5, 127.5], pixel_std = [127.5, 127.5, 127.5],
-              num_classes = 4, model = FCN, model_name = "NeMO_FCN", input_shape=(150,150,3), image_size=150)
+              num_classes = 4, model = AlexNet, model_name = "NeMO_AlexNet", input_shape=(25,25,3), image_size=25)
 
     train_generator, validation_generator = optModel.gen_data()
     print("train_generator_size: ", train_generator.batch_size)
@@ -67,7 +67,7 @@ def model(train_generator, validation_generator):
               train_label_path = '../Images/TrainingRef_Patches/', train_out_file = 'NeMO_train.txt',
               valid_image_path = '../Images/Valid_Patches/', valid_label_path = '../Images/ValidRef_Patches/',
               valid_out_file = 'NeMO_valid.txt', pixel_mean = [127.5, 127.5, 127.5], pixel_std = [127.5, 127.5, 127.5],
-              num_classes = 4, model = FCN, model_name = "NeMO_FCN", input_shape=(150,150,3), image_size=150)
+              num_classes = 4, model = AlexNet, model_name = "NeMO_AlexNet", input_shape=(25,25,3), image_size=25)
 
     model = optModel.model2opt()
          
@@ -105,11 +105,11 @@ def model(train_generator, validation_generator):
 
     history = model.fit_generator(
                 train_generator,
-                steps_per_epoch=80,
+                steps_per_epoch=10,
                 epochs=3,
                 validation_data=validation_generator,
-                validation_steps=20,
-                verbose=0,
+                validation_steps=5,
+                verbose=1,
                 callbacks=[csv_logger])
 
     
@@ -193,7 +193,7 @@ if __name__ == '__main__':
               train_label_path = '../Images/TrainingRef_Patches/', train_out_file = 'NeMO_train.txt',
               valid_image_path = '../Images/Valid_Patches/', valid_label_path = '../Images/ValidRef_Patches/',
               valid_out_file = 'NeMO_valid.txt', pixel_mean = [127.5, 127.5, 127.5], pixel_std = [127.5, 127.5, 127.5],
-              num_classes = 4, model = FCN, model_name = "NeMO_FCN", input_shape=(150,150,3), image_size=150)
+              num_classes = 4, model = AlexNet, model_name = "NeMO_AlexNet", input_shape=(25,25,3), image_size=25)
 
     trials=Trials()
     train_generator, validation_generator = data()
@@ -209,8 +209,8 @@ if __name__ == '__main__':
     print("validation_generator_size: ", validation_generator.batch_size)
     print("Evalutation of best performing model:")
     print("Parameters of best run", best_run)
-    #print(best_model.evaluate_generator(generator=validation_generator, steps=20))
-    print(best_model.evaluate(validation_generator))
+    print(best_model.evaluate_generator(generator=validation_generator, steps=5))
+    # print(best_model.evaluate(validation_generator))
     json.dump(best_run, open('./output/best_run' + optModel.model_name + '.txt', 'w'))
 
     for t, trial in enumerate(trials):

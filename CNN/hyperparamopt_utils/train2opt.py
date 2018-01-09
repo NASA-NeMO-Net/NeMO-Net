@@ -236,7 +236,7 @@ class TrainOptimizer:
             color_mode = '8channel'
 
         self.train_generator = datagen.flow_from_NeMOdirectory(self.train_image_path,
-            target_size=self.input_shape,
+            target_size=(self.input_shape[0],self.input_shape[1]),
             color_mode=color_mode,
             classes = self.labelkey,
             class_mode = 'categorical',
@@ -244,7 +244,7 @@ class TrainOptimizer:
             shuffle=True)
 
         self.validation_generator = datagen.flow_from_NeMOdirectory(self.valid_image_path,
-            target_size=self.input_shape,
+            target_size=(self.input_shape[0],self.input_shape[1]),
             color_mode=color_mode,
             classes = self.labelkey,
             class_mode = 'categorical',
