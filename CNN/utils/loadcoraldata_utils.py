@@ -52,6 +52,9 @@ class CoralData:
 				tfw_info = np.asarray([float(line.rstrip('\n')) for line in open(tfwpath)]).astype(np.float32)
 				# top left x, w-e pixel resolution, 0, top left y, 0, n-s pixel resolution (negative)
 				self.geotransform = np.asarray([tfw_info[4], tfw_info[0], tfw_info[1], tfw_info[5], tfw_info[2], tfw_info[3]])
+				img_xmin = self.geotransform[0]
+				img_ymax = self.geotransform[3]
+
 			self.image = np.zeros((ysize,xsize,img.RasterCount))
 
 			for band in range(img.RasterCount):
@@ -74,10 +77,16 @@ class CoralData:
 
 					source_ds = ogr.Open(vector_fn)
 					source_layer = source_ds.GetLayer()
-					x_min, x_max, y_min, y_max = source_layer.GetExtent()
+					truth_xmin, truth_xmax, truth_ymin, truth_ymax = source_layer.GetExtent()
 					pixel_size = self.geotransform[1]
-					x_res = int((x_max - x_min) / pixel_size)
-					y_res = int((y_max - y_min) / pixel_size)
+
+					topleft = (np.max([img_xmin, truth_xmin]), np.min([img_ymax, truth_ymax]))
+					bottomright = (np.min([img_xmax, truth_xmax]), np.max([img_ymin, truth_ymin]))
+
+
+
+					x_res = int((xmax - xmin) / pixel_size)
+					y_res = int((ymax - ymin) / pixel_size)
 
 					target_ds = gdal.GetDriverByName('GTiff').Create(raster_fn, x_res, y_res, 1, gdal.GDT_Int32)
 					target_ds.SetGeoTransform(self.geotransform)
