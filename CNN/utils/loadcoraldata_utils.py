@@ -52,6 +52,8 @@ class CoralData:
 				tfw_info = np.asarray([float(line.rstrip('\n')) for line in open(tfwpath)]).astype(np.float32)
 				# top left x, w-e pixel resolution, 0, top left y, 0, n-s pixel resolution (negative)
 				self.geotransform = np.asarray([tfw_info[4], tfw_info[0], tfw_info[1], tfw_info[5], tfw_info[2], tfw_info[3]])
+
+				pixel_size = self.geotransform[1]
 				img_xmin = self.geotransform[0]
 				img_ymax = self.geotransform[3]
 
@@ -63,51 +65,107 @@ class CoralData:
 				self.image[:,:,band-1] = imgband.ReadAsArray()
 
 			if Truthpath is not None:
-				counter = 1
-				self.class_labels = ['NoData']
-				raster_fn = 'temp.tif'
 				NoData_value = -1
+				class_labels = []
+				labelmap = None
 
-				for file in glob.glob(Truthpath + '*.shp'):
-					vector_fn = file
-					underscore_pos = vector_fn.find('_')
-					period_pos = -4
-					self.class_labels.append(file[underscore_pos+1:period_pos])
-					print("Class loaded: " + file[underscore_pos+1:period_pos] + "\n")
+				orig_data_source = ogr.Open(Truthpath)
+				source_ds = ogr.GetDriverByName("Memory").CopyDataSource(orig_data_source, "")
+				source_layer = source_ds.GetLayer(0)
+				source_srs = source_layer.GetSpatialRef()
 
-					source_ds = ogr.Open(vector_fn)
-					source_layer = source_ds.GetLayer()
-					truth_xmin, truth_xmax, truth_ymin, truth_ymax = source_layer.GetExtent()
-					pixel_size = self.geotransform[1]
+				field_vals = list(set([feature.GetFieldAsString('Class_name') for feature in source_layer]))
+				self.class_labels = ['NoData'] + field_vals 	# all unique labels
 
-					topleft = (np.max([img_xmin, truth_xmin]), np.min([img_ymax, truth_ymax]))
-					bottomright = (np.min([img_xmax, truth_xmax]), np.max([img_ymin, truth_ymin]))
+				x_min, x_max, y_min, y_max = source_layer.GetExtent()
 
-					x_res = int((xmax - xmin) / pixel_size)
-					y_res = int((ymax - ymin) / pixel_size)
+				field_def = ogr.FieldDefn("Class_id", ogr.OFTReal)
+				source_layer.CreateField(field_def)
+				source_layer_def = source_layer.GetLayerDefn()
+				field_index = source_layer_def.GetFieldIndex("Class_id")
 
-					target_ds = gdal.GetDriverByName('GTiff').Create(raster_fn, x_res, y_res, 1, gdal.GDT_Int32)
-					target_ds.SetGeoTransform(self.geotransform)
-					band = target_ds.GetRasterBand(1)
-					band.SetNoDataValue(NoData_value)
-					gdal.RasterizeLayer(target_ds, [1], source_layer, None, None, [1], ['ALL_TOUCHED=TRUE'])
+				for feature in source_layer:
+					val = field_vals.index(feature.GetFieldAsString('Class_name'))+1
+					feature.SetField(field_index, val)
+					source_layer.SetFeature(feature)
 
-					tempband = target_ds.GetRasterBand(1)
-					temparray = tempband.ReadAsArray()
-					temparray[temparray == -1] = 0
-					temparray[temparray == 1] = counter
+				x_res = int((x_max - x_min) / pixel_size)
+				y_res = int((y_max - y_min) / pixel_size)
+				target_ds = gdal.GetDriverByName('GTiff').Create('temp.tif', x_res, y_res, gdal.GDT_Int32)
+				target_ds.SetGeoTransform((x_min, pixel_size, 0, y_max, 0, -pixel_size))
+				band = target_ds.GetRasterBand(1)
+				band.SetNoDataValue(NoData_value)
+				target_ds.SetProjection(self.projection)
+				err = gdal.RasterizeLayer(target_ds, [1], source_layer, None, None, [0], options=['ATTRIBUTE=Class_id'])
+				if err != 0:
+					raise Exception("error rasterizing layer: %s" % err)
 
-					if self.truthimage is None:
-						self.truthimage = np.copy(temparray)
-					else:
-						temparray2 = temparray + self.truthimage
-						temparray[temparray2 > counter] = 0
-						self.truthimage = self.truthimage + temparray
+				tempband = target_ds.GetRasterBand(1)
+				self.truthimage = tempband.ReadAsArray()
 
-					target_ds = None
-					counter +=1
+				truth_classes = np.unique(self.truthimage)
+				print("truth classes: ", truth_classes)
+				for c in truth_classes:
+					print('Class {c} contains {n} pixels'.format(c=c, n=(self.truthimage == c).sum()))
 				self.truthimage = self.truthimage.astype(np.uint8)
+				target_ds = None
 
+				# fix .tif vs .shp dimensional mismatch
+				image_xstart = np.max([0, int((x_min - self.geotransform[0])/pixel_size)])
+				truth_xstart = np.max([0, int((self.geotransform[0] - x_min)/pixel_size)])
+				image_ystart = np.max([0, int((self.geotransform[3] - y_max)/pixel_size)])
+				truth_ystart = np.max([0, int((y_max - self.geotransform[3])/pixel_size)])
+
+				total_cols = int((np.min([xsize*pixel_size + self.geotransform[0], x_max]) - np.max([self.geotransform[0], x_min]))/pixel_size)
+				total_rows = int((np.min([self.geotransform[3], y_max]) - np.max([-ysize*pixel_size + self.geotransform[3], y_min]))/pixel_size)
+
+				self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
+				self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
+				''' PREVIOUS CODE FOR ONE SHAPE PER CLASS
+				# counter = 1
+				# self.class_labels = ['NoData']
+				# raster_fn = 'temp.tif'
+				# NoData_value = -1
+
+				# for file in glob.glob(Truthpath + '*.shp'):
+				# 	vector_fn = file
+				# 	underscore_pos = vector_fn.find('_')
+				# 	period_pos = -4
+				# 	self.class_labels.append(file[underscore_pos+1:period_pos])
+				# 	print("Class loaded: " + file[underscore_pos+1:period_pos] + "\n")
+
+				# 	source_ds = ogr.Open(vector_fn)
+				# 	source_layer = source_ds.GetLayer()
+				# 	truth_xmin, truth_xmax, truth_ymin, truth_ymax = source_layer.GetExtent()
+				# 	pixel_size = self.geotransform[1]
+
+				# 	topleft = (np.max([img_xmin, truth_xmin]), np.min([img_ymax, truth_ymax]))
+				# 	bottomright = (np.min([img_xmax, truth_xmax]), np.max([img_ymin, truth_ymin]))
+
+				# 	x_res = int((xmax - xmin) / pixel_size)
+				# 	y_res = int((ymax - ymin) / pixel_size)
+
+				# 	target_ds = gdal.GetDriverByName('GTiff').Create(raster_fn, x_res, y_res, 1, gdal.GDT_Int32)
+				# 	target_ds.SetGeoTransform(self.geotransform)
+				# 	band = target_ds.GetRasterBand(1)
+				# 	band.SetNoDataValue(NoData_value)
+				# 	gdal.RasterizeLayer(target_ds, [1], source_layer, None, None, [1], ['ALL_TOUCHED=TRUE'])
+
+				# 	tempband = target_ds.GetRasterBand(1)
+				# 	temparray = tempband.ReadAsArray()
+				# 	temparray[temparray == -1] = 0
+				# 	temparray[temparray == 1] = counter
+
+				# 	if self.truthimage is None:
+				# 		self.truthimage = np.copy(temparray)
+				# 	else:
+				# 		temparray2 = temparray + self.truthimage
+				# 		temparray[temparray2 > counter] = 0
+				# 		self.truthimage = self.truthimage + temparray
+
+				# 	target_ds = None
+				# 	counter +=1dddPrevious code for 1 shape per class
+				'''
 		else:
 			print("Load type error: specify either PIL, cv2, or raster")
 			return None
@@ -120,7 +178,7 @@ class CoralData:
 				item_counter+=1
 			self.num_classes = len(np.unique(self.truthimage))
 		else:
-			self.num_classes = len(np.unique(self.truthimage))
+			self.num_classes = len(self.class_labels)
 
 #### Load Image
 # Input:
@@ -276,62 +334,63 @@ class CoralData:
 
 		for k in range(self.num_classes):
 			[i,j] = np.where(truthcrop == k)
-			idx = np.asarray(random.sample(range(len(i)), N)).astype(int)
-			for nn in range(len(idx)):
-				# Note: i,j are off of truthcrop, and hence when taken against image needs only +image_size to be centered
-				tempimage = self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :]
-				templabel = np.asarray(self.truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]*(self.depth/self.num_classes)).astype(np.uint8)
+			if len(i) != 0:
+				idx = np.asarray(random.sample(range(len(i)), N)).astype(int)
+				for nn in range(len(idx)):
+					# Note: i,j are off of truthcrop, and hence when taken against image needs only +image_size to be centered
+					tempimage = self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :]
+					templabel = np.asarray(self.truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]*(self.depth/self.num_classes)).astype(np.uint8)
 
-				if lastchannelremove:
-					tempimage = np.delete(tempimage, -1,-1) # Remove last dimension of array
+					if lastchannelremove:
+						tempimage = np.delete(tempimage, -1,-1) # Remove last dimension of array
 
-				if labelkey is not None:
-					if self.load_type == "raster":
-						trainstr = labelkey[k] + '_' + str(nn).zfill(8) + '.tif'
-						truthstr = labelkey[k] + '_' + str(nn).zfill(8) + '.tif'
-					else:
-						trainstr = labelkey[k] + '_' + str(nn).zfill(8) + '.png'
-						truthstr = labelkey[k] + '_' + str(nn).zfill(8) + '.png'
-				else:
-					if self.load_type == "raster":
-						trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.tif'
-						truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.tif'
-					else:
-						trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
-						truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
-
-				if subdir:
 					if labelkey is not None:
-						subdirpath = '{}/'.format(labelkey[k])
+						if self.load_type == "raster":
+							trainstr = labelkey[k] + '_' + str(nn).zfill(8) + '.tif'
+							truthstr = labelkey[k] + '_' + str(nn).zfill(8) + '.tif'
+						else:
+							trainstr = labelkey[k] + '_' + str(nn).zfill(8) + '.png'
+							truthstr = labelkey[k] + '_' + str(nn).zfill(8) + '.png'
 					else:
-						subdirpath = 'class' + str(k) + '/'
+						if self.load_type == "raster":
+							trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.tif'
+							truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.tif'
+						else:
+							trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
+							truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
 
-					if not os.path.exists(exporttrainpath+subdirpath):
-						os.makedirs(exporttrainpath+subdirpath)
-					if not os.path.exists(exportlabelpath+subdirpath):
-						os.makedirs(exportlabelpath+subdirpath)
+					if subdir:
+						if labelkey is not None:
+							subdirpath = '{}/'.format(labelkey[k])
+						else:
+							subdirpath = 'class' + str(k) + '/'
 
-					if self.load_type == "raster":
-						driver = gdal.GetDriverByName('GTiff')
-						dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, self.image.shape[2], gdal.GDT_Int32)
-						x, y = self._calculate_corner(self.geotransform, j[idx[nn]]-crop_len, i[idx[nn]]-crop_len)
-						# print(x, self.geotransform[1], y, self.geotransform[5])
-						dataset.SetGeoTransform((x, self.geotransform[1], 0, y, 0, self.geotransform[5]))
-						dataset.SetProjection(self.projection)
+						if not os.path.exists(exporttrainpath+subdirpath):
+							os.makedirs(exporttrainpath+subdirpath)
+						if not os.path.exists(exportlabelpath+subdirpath):
+							os.makedirs(exportlabelpath+subdirpath)
 
-						for chan in range(self.image.shape[2]):
-							dataset.GetRasterBand(chan+1).WriteArray(tempimage[:,:,chan])
-							dataset.FlushCache()
-						cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+						if self.load_type == "raster":
+							driver = gdal.GetDriverByName('GTiff')
+							dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, self.image.shape[2], gdal.GDT_Int32)
+							x, y = self._calculate_corner(self.geotransform, j[idx[nn]]-crop_len, i[idx[nn]]-crop_len)
+							# print(x, self.geotransform[1], y, self.geotransform[5])
+							dataset.SetGeoTransform((x, self.geotransform[1], 0, y, 0, self.geotransform[5]))
+							dataset.SetProjection(self.projection)
+
+							for chan in range(self.image.shape[2]):
+								dataset.GetRasterBand(chan+1).WriteArray(tempimage[:,:,chan])
+								dataset.FlushCache()
+							cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+						else:
+							cv2.imwrite(exporttrainpath+subdirpath+trainstr, tempimage)
+							cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+						f.write('./' + subdirpath+trainstr+'\n')
 					else:
-						cv2.imwrite(exporttrainpath+subdirpath+trainstr, tempimage)
-						cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
-					f.write('./' + subdirpath+trainstr+'\n')
-				else:
-					cv2.imwrite(exporttrainpath+trainstr, tempimage)
-					cv2.imwrite(exportlabelpath+truthstr, templabel)
-					f.write('./' + trainstr+'\n')
-				print(str(k*N+nn+1) + '/ ' + str(self.num_classes*N) +' patches exported', end='\r')
+						cv2.imwrite(exporttrainpath+trainstr, tempimage)
+						cv2.imwrite(exportlabelpath+truthstr, templabel)
+						f.write('./' + trainstr+'\n')
+					print(str(k*N+nn+1) + '/ ' + str(self.num_classes*N) +' patches exported', end='\r')
 		f.close()
 
 #### Load entire line(s) of patches from testimage

@@ -1,240 +1,50 @@
-NoData/NoData_00000000.tif
-NoData/NoData_00000001.tif
-NoData/NoData_00000002.tif
-NoData/NoData_00000003.tif
-NoData/NoData_00000004.tif
-NoData/NoData_00000005.tif
-NoData/NoData_00000006.tif
-NoData/NoData_00000007.tif
-NoData/NoData_00000008.tif
-NoData/NoData_00000009.tif
-back reef - pavement/back reef - pavement_00000000.tif
-back reef - pavement/back reef - pavement_00000001.tif
-back reef - pavement/back reef - pavement_00000002.tif
-back reef - pavement/back reef - pavement_00000003.tif
-back reef - pavement/back reef - pavement_00000004.tif
-back reef - pavement/back reef - pavement_00000005.tif
-back reef - pavement/back reef - pavement_00000006.tif
-back reef - pavement/back reef - pavement_00000007.tif
-back reef - pavement/back reef - pavement_00000008.tif
-back reef - pavement/back reef - pavement_00000009.tif
-back reef - rubble dominated/back reef - rubble dominated_00000000.tif
-back reef - rubble dominated/back reef - rubble dominated_00000001.tif
-back reef - rubble dominated/back reef - rubble dominated_00000002.tif
-back reef - rubble dominated/back reef - rubble dominated_00000003.tif
-back reef - rubble dominated/back reef - rubble dominated_00000004.tif
-back reef - rubble dominated/back reef - rubble dominated_00000005.tif
-back reef - rubble dominated/back reef - rubble dominated_00000006.tif
-back reef - rubble dominated/back reef - rubble dominated_00000007.tif
-back reef - rubble dominated/back reef - rubble dominated_00000008.tif
-back reef - rubble dominated/back reef - rubble dominated_00000009.tif
-back reef - sediment dominated/back reef - sediment dominated_00000000.tif
-back reef - sediment dominated/back reef - sediment dominated_00000001.tif
-back reef - sediment dominated/back reef - sediment dominated_00000002.tif
-back reef - sediment dominated/back reef - sediment dominated_00000003.tif
-back reef - sediment dominated/back reef - sediment dominated_00000004.tif
-back reef - sediment dominated/back reef - sediment dominated_00000005.tif
-back reef - sediment dominated/back reef - sediment dominated_00000006.tif
-back reef - sediment dominated/back reef - sediment dominated_00000007.tif
-back reef - sediment dominated/back reef - sediment dominated_00000008.tif
-back reef - sediment dominated/back reef - sediment dominated_00000009.tif
-back reef coral framework/back reef coral framework_00000000.tif
-back reef coral framework/back reef coral framework_00000001.tif
-back reef coral framework/back reef coral framework_00000002.tif
-back reef coral framework/back reef coral framework_00000003.tif
-back reef coral framework/back reef coral framework_00000004.tif
-back reef coral framework/back reef coral framework_00000005.tif
-back reef coral framework/back reef coral framework_00000006.tif
-back reef coral framework/back reef coral framework_00000007.tif
-back reef coral framework/back reef coral framework_00000008.tif
-back reef coral framework/back reef coral framework_00000009.tif
-beach/beach_00000000.tif
-beach/beach_00000001.tif
-beach/beach_00000002.tif
-beach/beach_00000003.tif
-beach/beach_00000004.tif
-beach/beach_00000005.tif
-beach/beach_00000006.tif
-beach/beach_00000007.tif
-beach/beach_00000008.tif
-beach/beach_00000009.tif
-clouds/clouds_00000000.tif
-clouds/clouds_00000001.tif
-clouds/clouds_00000002.tif
-clouds/clouds_00000003.tif
-clouds/clouds_00000004.tif
-clouds/clouds_00000005.tif
-clouds/clouds_00000006.tif
-clouds/clouds_00000007.tif
-clouds/clouds_00000008.tif
-clouds/clouds_00000009.tif
-coralline algal ridge (reef crest)/coralline algal ridge (reef crest)_00000000.tif
-coralline algal ridge (reef crest)/coralline algal ridge (reef crest)_00000001.tif
-coralline algal ridge (reef crest)/coralline algal ridge (reef crest)_00000002.tif
-coralline algal ridge (reef crest)/coralline algal ridge (reef crest)_00000003.tif
-coralline algal ridge (reef crest)/coralline algal ridge (reef crest)_00000004.tif
-coralline algal ridge (reef crest)/coralline algal ridge (reef crest)_00000005.tif
-coralline algal ridge (reef crest)/coralline algal ridge (reef crest)_00000006.tif
-coralline algal ridge (reef crest)/coralline algal ridge (reef crest)_00000007.tif
-coralline algal ridge (reef crest)/coralline algal ridge (reef crest)_00000008.tif
-coralline algal ridge (reef crest)/coralline algal ridge (reef crest)_00000009.tif
-deep fore reef slope/deep fore reef slope_00000000.tif
-deep fore reef slope/deep fore reef slope_00000001.tif
-deep fore reef slope/deep fore reef slope_00000002.tif
-deep fore reef slope/deep fore reef slope_00000003.tif
-deep fore reef slope/deep fore reef slope_00000004.tif
-deep fore reef slope/deep fore reef slope_00000005.tif
-deep fore reef slope/deep fore reef slope_00000006.tif
-deep fore reef slope/deep fore reef slope_00000007.tif
-deep fore reef slope/deep fore reef slope_00000008.tif
-deep fore reef slope/deep fore reef slope_00000009.tif
-deep lagoonal water/deep lagoonal water_00000000.tif
-deep lagoonal water/deep lagoonal water_00000001.tif
-deep lagoonal water/deep lagoonal water_00000002.tif
-deep lagoonal water/deep lagoonal water_00000003.tif
-deep lagoonal water/deep lagoonal water_00000004.tif
-deep lagoonal water/deep lagoonal water_00000005.tif
-deep lagoonal water/deep lagoonal water_00000006.tif
-deep lagoonal water/deep lagoonal water_00000007.tif
-deep lagoonal water/deep lagoonal water_00000008.tif
-deep lagoonal water/deep lagoonal water_00000009.tif
-deep ocean water/deep ocean water_00000000.tif
-deep ocean water/deep ocean water_00000001.tif
-deep ocean water/deep ocean water_00000002.tif
-deep ocean water/deep ocean water_00000003.tif
-deep ocean water/deep ocean water_00000004.tif
-deep ocean water/deep ocean water_00000005.tif
-deep ocean water/deep ocean water_00000006.tif
-deep ocean water/deep ocean water_00000007.tif
-deep ocean water/deep ocean water_00000008.tif
-deep ocean water/deep ocean water_00000009.tif
-dense seagrass meadows/dense seagrass meadows_00000000.tif
-dense seagrass meadows/dense seagrass meadows_00000001.tif
-dense seagrass meadows/dense seagrass meadows_00000002.tif
-dense seagrass meadows/dense seagrass meadows_00000003.tif
-dense seagrass meadows/dense seagrass meadows_00000004.tif
-dense seagrass meadows/dense seagrass meadows_00000005.tif
-dense seagrass meadows/dense seagrass meadows_00000006.tif
-dense seagrass meadows/dense seagrass meadows_00000007.tif
-dense seagrass meadows/dense seagrass meadows_00000008.tif
-dense seagrass meadows/dense seagrass meadows_00000009.tif
-fore reef sand flats/fore reef sand flats_00000000.tif
-fore reef sand flats/fore reef sand flats_00000001.tif
-fore reef sand flats/fore reef sand flats_00000002.tif
-fore reef sand flats/fore reef sand flats_00000003.tif
-fore reef sand flats/fore reef sand flats_00000004.tif
-fore reef sand flats/fore reef sand flats_00000005.tif
-fore reef sand flats/fore reef sand flats_00000006.tif
-fore reef sand flats/fore reef sand flats_00000007.tif
-fore reef sand flats/fore reef sand flats_00000008.tif
-fore reef sand flats/fore reef sand flats_00000009.tif
-inland waters/inland waters_00000000.tif
-inland waters/inland waters_00000001.tif
-inland waters/inland waters_00000002.tif
-inland waters/inland waters_00000003.tif
-inland waters/inland waters_00000004.tif
-inland waters/inland waters_00000005.tif
-inland waters/inland waters_00000006.tif
-inland waters/inland waters_00000007.tif
-inland waters/inland waters_00000008.tif
-inland waters/inland waters_00000009.tif
-lagoonal floor - barren/lagoonal floor - barren_00000000.tif
-lagoonal floor - barren/lagoonal floor - barren_00000001.tif
-lagoonal floor - barren/lagoonal floor - barren_00000002.tif
-lagoonal floor - barren/lagoonal floor - barren_00000003.tif
-lagoonal floor - barren/lagoonal floor - barren_00000004.tif
-lagoonal floor - barren/lagoonal floor - barren_00000005.tif
-lagoonal floor - barren/lagoonal floor - barren_00000006.tif
-lagoonal floor - barren/lagoonal floor - barren_00000007.tif
-lagoonal floor - barren/lagoonal floor - barren_00000008.tif
-lagoonal floor - barren/lagoonal floor - barren_00000009.tif
-lagoonal fringing reefs/lagoonal fringing reefs_00000000.tif
-lagoonal fringing reefs/lagoonal fringing reefs_00000001.tif
-lagoonal fringing reefs/lagoonal fringing reefs_00000002.tif
-lagoonal fringing reefs/lagoonal fringing reefs_00000003.tif
-lagoonal fringing reefs/lagoonal fringing reefs_00000004.tif
-lagoonal fringing reefs/lagoonal fringing reefs_00000005.tif
-lagoonal fringing reefs/lagoonal fringing reefs_00000006.tif
-lagoonal fringing reefs/lagoonal fringing reefs_00000007.tif
-lagoonal fringing reefs/lagoonal fringing reefs_00000008.tif
-lagoonal fringing reefs/lagoonal fringing reefs_00000009.tif
-lagoonal patch reefs/lagoonal patch reefs_00000000.tif
-lagoonal patch reefs/lagoonal patch reefs_00000001.tif
-lagoonal patch reefs/lagoonal patch reefs_00000002.tif
-lagoonal patch reefs/lagoonal patch reefs_00000003.tif
-lagoonal patch reefs/lagoonal patch reefs_00000004.tif
-lagoonal patch reefs/lagoonal patch reefs_00000005.tif
-lagoonal patch reefs/lagoonal patch reefs_00000006.tif
-lagoonal patch reefs/lagoonal patch reefs_00000007.tif
-lagoonal patch reefs/lagoonal patch reefs_00000008.tif
-lagoonal patch reefs/lagoonal patch reefs_00000009.tif
-lagoonal sediment apron - sediment dominated/lagoonal sediment apron - sediment dominated_00000000.tif
-lagoonal sediment apron - sediment dominated/lagoonal sediment apron - sediment dominated_00000001.tif
-lagoonal sediment apron - sediment dominated/lagoonal sediment apron - sediment dominated_00000002.tif
-lagoonal sediment apron - sediment dominated/lagoonal sediment apron - sediment dominated_00000003.tif
-lagoonal sediment apron - sediment dominated/lagoonal sediment apron - sediment dominated_00000004.tif
-lagoonal sediment apron - sediment dominated/lagoonal sediment apron - sediment dominated_00000005.tif
-lagoonal sediment apron - sediment dominated/lagoonal sediment apron - sediment dominated_00000006.tif
-lagoonal sediment apron - sediment dominated/lagoonal sediment apron - sediment dominated_00000007.tif
-lagoonal sediment apron - sediment dominated/lagoonal sediment apron - sediment dominated_00000008.tif
-lagoonal sediment apron - sediment dominated/lagoonal sediment apron - sediment dominated_00000009.tif
-mangroves/mangroves_00000000.tif
-mangroves/mangroves_00000001.tif
-mangroves/mangroves_00000002.tif
-mangroves/mangroves_00000003.tif
-mangroves/mangroves_00000004.tif
-mangroves/mangroves_00000005.tif
-mangroves/mangroves_00000006.tif
-mangroves/mangroves_00000007.tif
-mangroves/mangroves_00000008.tif
-mangroves/mangroves_00000009.tif
-rocky beach/rocky beach_00000000.tif
-rocky beach/rocky beach_00000001.tif
-rocky beach/rocky beach_00000002.tif
-rocky beach/rocky beach_00000003.tif
-rocky beach/rocky beach_00000004.tif
-rocky beach/rocky beach_00000005.tif
-rocky beach/rocky beach_00000006.tif
-rocky beach/rocky beach_00000007.tif
-rocky beach/rocky beach_00000008.tif
-rocky beach/rocky beach_00000009.tif
-shallow fore reef slope/shallow fore reef slope_00000000.tif
-shallow fore reef slope/shallow fore reef slope_00000001.tif
-shallow fore reef slope/shallow fore reef slope_00000002.tif
-shallow fore reef slope/shallow fore reef slope_00000003.tif
-shallow fore reef slope/shallow fore reef slope_00000004.tif
-shallow fore reef slope/shallow fore reef slope_00000005.tif
-shallow fore reef slope/shallow fore reef slope_00000006.tif
-shallow fore reef slope/shallow fore reef slope_00000007.tif
-shallow fore reef slope/shallow fore reef slope_00000008.tif
-shallow fore reef slope/shallow fore reef slope_00000009.tif
-shallow fore reef terrace/shallow fore reef terrace_00000000.tif
-shallow fore reef terrace/shallow fore reef terrace_00000001.tif
-shallow fore reef terrace/shallow fore reef terrace_00000002.tif
-shallow fore reef terrace/shallow fore reef terrace_00000003.tif
-shallow fore reef terrace/shallow fore reef terrace_00000004.tif
-shallow fore reef terrace/shallow fore reef terrace_00000005.tif
-shallow fore reef terrace/shallow fore reef terrace_00000006.tif
-shallow fore reef terrace/shallow fore reef terrace_00000007.tif
-shallow fore reef terrace/shallow fore reef terrace_00000008.tif
-shallow fore reef terrace/shallow fore reef terrace_00000009.tif
-terrestrial vegetation/terrestrial vegetation_00000000.tif
-terrestrial vegetation/terrestrial vegetation_00000001.tif
-terrestrial vegetation/terrestrial vegetation_00000002.tif
-terrestrial vegetation/terrestrial vegetation_00000003.tif
-terrestrial vegetation/terrestrial vegetation_00000004.tif
-terrestrial vegetation/terrestrial vegetation_00000005.tif
-terrestrial vegetation/terrestrial vegetation_00000006.tif
-terrestrial vegetation/terrestrial vegetation_00000007.tif
-terrestrial vegetation/terrestrial vegetation_00000008.tif
-terrestrial vegetation/terrestrial vegetation_00000009.tif
-wetlands/wetlands_00000000.tif
-wetlands/wetlands_00000001.tif
-wetlands/wetlands_00000002.tif
-wetlands/wetlands_00000003.tif
-wetlands/wetlands_00000004.tif
-wetlands/wetlands_00000005.tif
-wetlands/wetlands_00000006.tif
-wetlands/wetlands_00000007.tif
-wetlands/wetlands_00000008.tif
-wetlands/wetlands_00000009.tif
+./NoData/NoData_00000000.tif
+./NoData/NoData_00000001.tif
+./NoData/NoData_00000002.tif
+./NoData/NoData_00000003.tif
+./NoData/NoData_00000004.tif
+./NoData/NoData_00000005.tif
+./NoData/NoData_00000006.tif
+./NoData/NoData_00000007.tif
+./NoData/NoData_00000008.tif
+./NoData/NoData_00000009.tif
+./Rocky beach/Rocky beach_00000000.tif
+./Rocky beach/Rocky beach_00000001.tif
+./Rocky beach/Rocky beach_00000002.tif
+./Rocky beach/Rocky beach_00000003.tif
+./Rocky beach/Rocky beach_00000004.tif
+./Rocky beach/Rocky beach_00000005.tif
+./Rocky beach/Rocky beach_00000006.tif
+./Rocky beach/Rocky beach_00000007.tif
+./Rocky beach/Rocky beach_00000008.tif
+./Rocky beach/Rocky beach_00000009.tif
+./back reef - pavement/back reef - pavement_00000000.tif
+./back reef - pavement/back reef - pavement_00000001.tif
+./back reef - pavement/back reef - pavement_00000002.tif
+./back reef - pavement/back reef - pavement_00000003.tif
+./back reef - pavement/back reef - pavement_00000004.tif
+./back reef - pavement/back reef - pavement_00000005.tif
+./back reef - pavement/back reef - pavement_00000006.tif
+./back reef - pavement/back reef - pavement_00000007.tif
+./back reef - pavement/back reef - pavement_00000008.tif
+./back reef - pavement/back reef - pavement_00000009.tif
+./back reef - sediment dominated/back reef - sediment dominated_00000000.tif
+./back reef - sediment dominated/back reef - sediment dominated_00000001.tif
+./back reef - sediment dominated/back reef - sediment dominated_00000002.tif
+./back reef - sediment dominated/back reef - sediment dominated_00000003.tif
+./back reef - sediment dominated/back reef - sediment dominated_00000004.tif
+./back reef - sediment dominated/back reef - sediment dominated_00000005.tif
+./back reef - sediment dominated/back reef - sediment dominated_00000006.tif
+./back reef - sediment dominated/back reef - sediment dominated_00000007.tif
+./back reef - sediment dominated/back reef - sediment dominated_00000008.tif
+./back reef - sediment dominated/back reef - sediment dominated_00000009.tif
+./back reef coral framework/back reef coral framework_00000000.tif
+./back reef coral framework/back reef coral framework_00000001.tif
+./back reef coral framework/back reef coral framework_00000002.tif
+./back reef coral framework/back reef coral framework_00000003.tif
+./back reef coral framework/back reef coral framework_00000004.tif
+./back reef coral framework/back reef coral framework_00000005.tif
+./back reef coral framework/back reef coral framework_00000006.tif
+./back reef coral framework/back reef coral framework_00000007.tif
+./back reef coral framework/back reef coral framework_00000008.tif
+./back reef coral framework/back reef coral framework_00000009.tif
