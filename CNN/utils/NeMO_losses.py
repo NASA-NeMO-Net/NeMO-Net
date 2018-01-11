@@ -1,6 +1,8 @@
 import keras
 import keras.backend as K
 
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
+
 
 def mean_categorical_crossentropy(y_true, y_pred):
     if K.image_data_format() == 'channels_last':
