@@ -11,6 +11,7 @@ from keras.layers import Input, Flatten, Activation, Reshape, Dense
 
 from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Res34_Encoder
 from NeMO_decoders import VGGDecoder, VGGUpsampler
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
 def AlexNet(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None):
     inputs = Input(shape=input_shape)
@@ -32,6 +33,8 @@ def ResNet34(input_shape, classes, weight_decay=0., trainable_encoder=True, weig
 
     return Model(inputs=inputs, outputs=scores)
 # scores = Activation('softmax')(outputs)
+
+
 
 def FCN(*args, **kwargs):
     """Fully Convolutional Networks for semantic segmentation with VGG16.

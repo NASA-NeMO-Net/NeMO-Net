@@ -22,6 +22,8 @@ from NeMO_blocks import (
 )
 from NeMO_backend import load_weights
 
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
+
 
 class Encoder(Model):
     """Encoder for Fully Convolutional Networks.
