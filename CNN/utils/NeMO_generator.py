@@ -419,11 +419,13 @@ class ImageSetLoader(object):
         if not os.path.exists(image_set):
             raise IOError('Image set {} does not exist. Please provide a'
                           'valid file.'.format(image_set))
-        self.filenames = np.loadtxt(image_set, dtype=bytes)
+
         try:
+            self.filenames = np.loadtxt(image_set, dtype=bytes)
             self.filenames = [fn.decode('utf-8') for fn in self.filenames]
-        except AttributeError as e:
-            print(str(e), self.filenames[:5])
+        except:
+            pass
+            
         if not os.path.exists(image_dir):
             raise IOError('Directory {} does not exist. Please provide a '
                           'valid directory.'.format(image_dir))
@@ -433,7 +435,7 @@ class ImageSetLoader(object):
                           'valid directory.'.format(label_dir))
         self.label_dir = label_dir
 
-        white_list_formats = {'png', 'jpg', 'jpeg', 'bmp'}
+        white_list_formats = {'png', 'jpg', 'jpeg', 'bmp','tif'}
         self.image_format = image_format
         if self.image_format not in white_list_formats:
             raise ValueError('Invalid image format:', image_format,

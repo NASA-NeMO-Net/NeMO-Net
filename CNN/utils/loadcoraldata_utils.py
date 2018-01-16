@@ -75,7 +75,8 @@ class CoralData:
 				source_srs = source_layer.GetSpatialRef()
 
 				field_vals = list(set([feature.GetFieldAsString('Class_name') for feature in source_layer]))
-				self.class_labels = ['NoData'] + field_vals 	# all unique labels
+				if 'NoData' not in field_vals:
+					self.class_labels = ['NoData'] + field_vals 	# all unique labels
 
 				x_min, x_max, y_min, y_max = source_layer.GetExtent()
 
@@ -178,7 +179,10 @@ class CoralData:
 				item_counter+=1
 			self.num_classes = len(np.unique(self.truthimage))
 		else:
-			self.num_classes = len(self.class_labels)
+			try:
+				self.num_classes = len(self.class_labels)
+			except:
+				pass
 
 #### Load Image
 # Input:
@@ -335,7 +339,10 @@ class CoralData:
 		for k in range(self.num_classes):
 			[i,j] = np.where(truthcrop == k)
 			if len(i) != 0:
-				idx = np.asarray(random.sample(range(len(i)), N)).astype(int)
+				if len(i) < N:
+					idx = [count%len(i) for count in range(N)]
+				else:
+					idx = np.asarray(random.sample(range(len(i)), N)).astype(int)
 				for nn in range(len(idx)):
 					# Note: i,j are off of truthcrop, and hence when taken against image needs only +image_size to be centered
 					tempimage = self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :]

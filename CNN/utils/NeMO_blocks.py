@@ -24,6 +24,9 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_boo
       x = input
       if pad_bool:
         x = ZeroPadding2D(padding=(1,1))(x)
+        if kernel_size[0] > x.shape[1]:
+          temp_padsize = int(np.ceil((kernel_size[0]-x.shape[1])/2))
+          x = ZeroPadding2D(padding=(temp_padsize,temp_padsize))(x)
 
       x = Conv2D(filters, kernel_size, strides=conv_strides, activation='relu',
         kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay),
