@@ -1,4 +1,5 @@
 import keras.backend as K
+import numpy as np
 from keras.layers import (
     Dropout,
     Lambda,
@@ -19,13 +20,13 @@ from keras.regularizers import l2
 from NeMO_layers import CroppingLike2D, BilinearUpSampling2D
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
-def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_bool=False, batchnorm_bool = False, pool_size=(2,2), pool_strides=(2,2), weight_decay=0., block_name='alexblock'):
+def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_bool=False, batchnorm_bool = False, pad_size=(0,0), pool_size=(2,2), pool_strides=(2,2), weight_decay=0., block_name='alexblock'):
     def f(input):
       x = input
       if pad_bool:
-        x = ZeroPadding2D(padding=(1,1))(x)
+        x = ZeroPadding2D(padding=pad_size)(x)
         if kernel_size[0] > x.shape[1]:
-          temp_padsize = int(np.ceil((kernel_size[0]-x.shape[1])/2))
+          temp_padsize = int(np.ceil((kernel_size[0]-int(x.shape[1]))/2))
           x = ZeroPadding2D(padding=(temp_padsize,temp_padsize))(x)
 
       x = Conv2D(filters, kernel_size, strides=conv_strides, activation='relu',
@@ -33,6 +34,9 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_boo
         name='{}_conv'.format(block_name))(x)
 
       if pool_bool:
+        if pool_size[0] > x.shape[1]:
+          temp_padsize = int(np.ceil((pool_size[0]-int(x.shape[1]))/2))
+          x = ZeroPadding2D(padding=(temp_padsize,temp_padsize))(x)
         x = MaxPooling2D(pool_size=pool_size, strides=pool_strides, name='{}_pool'.format(block_name))(x)
       if batchnorm_bool:
         x = BatchNormalization()(x)

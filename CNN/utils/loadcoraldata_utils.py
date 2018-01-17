@@ -105,9 +105,9 @@ class CoralData:
 				self.truthimage = tempband.ReadAsArray()
 
 				truth_classes = np.unique(self.truthimage)
-				print("truth classes: ", truth_classes)
-				for c in truth_classes:
-					print('Class {c} contains {n} pixels'.format(c=c, n=(self.truthimage == c).sum()))
+				# print("truth classes: ", truth_classes)
+				# for c in truth_classes:
+				# 	print('Class {c} contains {n} pixels'.format(c=c, n=(self.truthimage == c).sum()))
 				self.truthimage = self.truthimage.astype(np.uint8)
 				target_ds = None
 

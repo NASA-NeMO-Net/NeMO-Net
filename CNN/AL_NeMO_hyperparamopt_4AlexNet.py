@@ -30,17 +30,25 @@ import loadcoraldata_utils as coralutils
 sys.path.append("./hyperparamopt_utils/")
 from   train2opt import TrainOptimizer
 from NeMO_models import FCN, AlexNet
-from NeMO_encoders import Alex_Encoder
+from NeMO_encoders import Alex_Encoder, Alex_Hyperopt_Encoder
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 
  
 def data():
-  labelkey = ['Sand', 'Branching', 'Mounding', 'Rock']
+  imgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tif'
+  tfwpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tfw'
+  truthpath = '../Images/BIOT-PerosBanhos-sample-habitat-map/BIOT-PerosBanhos-sample-habitat-map.shp'
+  PerosBanhos = coralutils.CoralData(imgpath, Truthpath=truthpath, load_type="raster", tfwpath=tfwpath)
+  labelkey = PerosBanhos.class_labels
+
+  # labelkey = ['Sand', 'Branching', 'Mounding', 'Rock']
+
+
   num_classes = len(labelkey)
   batch_size = 120
   model_name = "NeMO_AlexNet"
 
-  with open("init_args - AlexNet.yml", 'r') as stream:
+  with open("init_args - AlexNet_Raster.yml", 'r') as stream:
     try:
       init_args = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -56,8 +64,8 @@ def data():
 
   y = train_loader.target_size[1]
   x = train_loader.target_size[0]
-  pixel_mean =127.5*np.ones(num_channels)
-  pixel_std = 127.5*np.ones(num_channels)
+  pixel_mean =1023.5*np.ones(num_channels)
+  pixel_std = 1023.5*np.ones(num_channels)
 
   # generate datasets for train/validation
   datagen = NeMOImageGenerator(image_shape = (y,x,num_channels),
@@ -92,8 +100,33 @@ def model(train_generator, validation_generator, model_name, num_channels):
   num_classes = train_generator.num_class
   print("==============================================================================")
 
+  conv_layers = {{choice([3,4,5])}}
+  full_layers = {{choice([1,2])}}
+  filter1 = {{choice([96,128])}}
+  filter2 = {{choice([128,192,256])}}
+  filter3 = {{choice([384,512])}}
+  filter4 = {{choice([384,512])}}
+  filter5 = {{choice([256,512,1024])}}
+  conv_size1 = {{choice([(7,7),(6,6),(5,5)])}}
+  conv_size2 = {{choice([(5,5),(4,4),(3,3)])}}
+  conv_size3 = {{choice([(3,3),(2,2)])}}
+  conv_size4 = {{choice([(3,3),(2,2)])}}
+  conv_size5 = {{choice([(3,3),(2,2)])}}
+  pool_size1 = (2,2)
+  pool_size2 = (2,2)
+  pool_size3 = (1,1)
+  pool_size4 = (1,1)
+  pool_size5 = {{choice([(2,2),(1,1)])}}
+  full_filter1 = {{choice([2048,4096])}}
+  full_filter2 = {{choice([1024,2048,4096])}}
+  conv_params= {"filters": [filter1, filter2, filter3, filter4, filter5],
+    "conv_size": [conv_size1, conv_size2, conv_size3, conv_size4, conv_size5],
+    "pool_size": [pool_size1, pool_size2, pool_size3, pool_size4, pool_size5],
+    "full_filters": [full_filter1, full_filter2]}
+
   inputs = Input(shape=train_generator.image_shape)
-  encoder = Alex_Encoder(inputs, classes=num_classes, weight_decay=0, weights=None, trainable=True)
+  encoder = Alex_Hyperopt_Encoder(inputs, classes=num_classes, weight_decay=0, weights=None, trainable=True, conv_layers=conv_layers, 
+    full_layers = full_layers, conv_params = conv_params)
   encoder_output = encoder.outputs[0]
   scores = Dense(num_classes, activation = 'softmax')(encoder_output)
 
@@ -101,7 +134,7 @@ def model(train_generator, validation_generator, model_name, num_channels):
   model.summary()
 
 
-  optim = Adam(lr={{choice([10**-6, 10**-5])}}, decay=0)
+  optim = Adam(lr=10**-5, decay=0)
       
 
   model.compile(loss='categorical_crossentropy',
@@ -121,8 +154,8 @@ def model(train_generator, validation_generator, model_name, num_channels):
 
   history = model.fit_generator(
               train_generator,
-              steps_per_epoch=10,
-              epochs=3,
+              steps_per_epoch=25,
+              epochs=10,
               validation_data=validation_generator,
               validation_steps=5,
               verbose=1,
@@ -195,7 +228,7 @@ if __name__ == '__main__':
   best_run, best_model, space = optim.minimize(model=model,
                                         data=data,
                                         algo=tpe.suggest,
-                                        max_evals=2,
+                                        max_evals=3,
                                         trials=trials,
                                         eval_space=True,
                                         return_space=True)
@@ -216,7 +249,8 @@ if __name__ == '__main__':
       temp_acc = f.readline()
       print("========================================================================")
       vals = trial.get('misc').get('vals')
-      print("Trial %s vals: %s" % (t, vals))
+      # print("Trial %s vals: %s" % (t, vals))
+      print("Trial %s:" %(t+1))
       print(eval_hyperopt_space(space, vals))
       print("Accuracy: ", temp_acc)
   f.close()

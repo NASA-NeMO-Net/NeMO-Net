@@ -164,6 +164,113 @@ class Alex_Encoder(Res_Encoder):
 
         super(Alex_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
+class Alex_Hyperopt_Encoder(Res_Encoder):
+    def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, conv_layers=5, full_layers=2, conv_params=None):
+        default_filters = [96, 256, 384, 384, 256]
+        try:
+            filters = conv_params["filters"]
+            if len(filters) != conv_layers:
+                print("Found %d convolutional layers but %d filters, will only replace initial %d filters..." %(conv_layers,len(filters),len(filters)))
+                for i in range(len(filters), conv_layers):
+                    filters.append(default_filters[i])
+            print("filters: ", filters[:conv_layers])
+        except:
+            print("filters not found, reverting to default: ", default_filters[:conv_layers])
+            filters = default_filters
+
+        default_conv_size = [(7,7),(5,5),(3,3),(3,3),(3,3)]
+        try:
+            conv_size = conv_params["conv_size"]
+            if len(conv_size) != conv_layers:
+                print("Found %d convolutional layers but %d conv_size, will only replace initial %d conv_size..." %(conv_layers,len(conv_size),len(conv_size)))
+                for i in range(len(conv_size), conv_layers):
+                    conv_size.append(default_conv_size[i])
+            print("conv_size: ", conv_size[:conv_layers])
+        except:
+            print("conv_size not found, reverting to default: ", default_conv_size[:conv_layers])
+            conv_size = default_conv_size
+
+        default_pool_size = [(2,2),(2,2),(1,1),(1,1),(2,2)]
+        try:
+            pool_size = conv_params["pool_size"]
+            if len(pool_size) != conv_layers:
+                print("Found %d convolutional layers but %d pool_size, will only replace initial %d pool_size..." %(conv_layers,len(pool_size),len(pool_size)))
+                for i in range(len(pool_size), conv_layers):
+                    pool_size.append(default_pool_size[i])
+            print("pool_size: ", pool_size[:conv_layers])
+        except:
+            print("pool_size not found, reverting to default: ", default_pool_size[:conv_layers])
+            pool_size = default_pool_size
+        pool_stride = pool_size     # usually true
+
+
+        default_pad_size = [(0,0),(0,0),(0,0),(0,0),(0,0)]
+        try:
+            pad_size  = conv_params["pad_size"]
+            if len(pad_size) != conv_layers:
+                print("Found %d convolutional layers but %d pad_size, will only replace initial %d pad_size..." %(conv_layers,len(pad_size),len(pad_size)))
+                for i in range(len(pad_size), conv_layers):
+                    pad_size.append(default_pad_size[i])
+            print("pad_size: ", pad_size[:conv_layers])
+        except:
+            print("pad_size not found, reverting to default: ", default_pad_size[:conv_layers])
+            pad_size = default_pad_size
+
+        default_batchnorm_bool = [True, True, False, False, False]
+        try:
+            batchnorm_bool  = conv_params["batchnorm_bool"]
+            if len(batchnorm_bool) != conv_layers:
+                print("Found %d convolutional layers but %d batchnorm_bool, will only replace initial %d batchnorm_bool..." %(conv_layers,len(batchnorm_bool),len(batchnorm_bool)))
+                for i in range(len(batchnorm_bool), conv_layers):
+                    batchnorm_bool.append(default_batchnorm_bool[i])
+            print("batchnorm_bool: ", batchnorm_bool[:conv_layers])
+        except:
+            print("batchnorm_bool not found, reverting to default: ", default_batchnorm_bool[:conv_layers])
+            batchnorm_bool = default_batchnorm_bool
+
+
+        default_full_filters = [4096, 4096]
+        try:
+            full_filters  = conv_params["full_filters"]
+            if len(full_filters) != full_layers:
+                print("Found %d fully connected layers but %d full_filters, will only replace initial %d full_filters..." %(full_layers,len(full_filters),len(full_filters)))
+                for i in range(len(full_filters), full_layers):
+                    full_filters.append(default_full_filters[i])
+            print("full_filters: ", full_filters[:full_layers])
+        except:
+            print("full_filters not found, reverting to default: ", default_full_filters[:full_layers])
+            full_filters = default_full_filters
+
+
+        default_dropout = [0.5, 0.5]
+        try:
+            dropout  = conv_params["dropout"]
+            if len(dropout) != full_layers:
+                print("Found %d fully connected layers but %d dropout, will only replace initial %d dropout..." %(full_layers,len(dropout),len(dropout)))
+                for i in range(len(dropout), full_layers):
+                    dropout.append(default_dropout[i])
+            print("dropout: ", dropout[:full_layers])
+        except:
+            print("dropout not found, reverting to default: ", default_dropout[:full_layers])
+            dropout = default_dropout
+        
+        blocks = []
+        for i in range(conv_layers):
+            block_name = 'alexblock{}'.format(i + 1)
+            block = alex_conv(filters[i], conv_size[i], pad_bool=True, pool_bool=True, batchnorm_bool=batchnorm_bool[i], pad_size=pad_size[i],
+                pool_size=pool_size[i], pool_strides=pool_stride[i], weight_decay=weight_decay, block_name=block_name)
+            blocks.append(block)
+
+        for i in range(full_layers):
+            block_name='alexfc{}'.format(i + 1)
+            if i==0:
+                block = alex_fc(full_filters[i], flatten_bool=True, dropout_bool=True, dropout=dropout[i], weight_decay=weight_decay, block_name=block_name)
+            else:
+                block = alex_fc(full_filters[i], flatten_bool=False, dropout_bool=True, dropout=dropout[i], weight_decay=weight_decay, block_name=block_name)
+            blocks.append(block)
+
+        super(Alex_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
+
 
 class Res34_Encoder(Res_Encoder):
     def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, fcflag = False):

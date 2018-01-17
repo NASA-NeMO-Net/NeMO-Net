@@ -425,7 +425,7 @@ class ImageSetLoader(object):
             self.filenames = [fn.decode('utf-8') for fn in self.filenames]
         except:
             pass
-            
+
         if not os.path.exists(image_dir):
             raise IOError('Directory {} does not exist. Please provide a '
                           'valid directory.'.format(image_dir))
@@ -445,7 +445,7 @@ class ImageSetLoader(object):
             raise ValueError('Invalid image format:', label_format,
                              '; expected "png", "jpg", "jpeg" or "bmp"')
 
-        if color_mode not in {'rgb', 'grayscale'}:
+        if color_mode not in {'rgb', 'grayscale', '8channel'}:
             raise ValueError('Invalid color mode:', color_mode,
                              '; expected "rgb" or "grayscale".')
         self.color_mode = color_mode
@@ -454,6 +454,11 @@ class ImageSetLoader(object):
                 self.image_shape = self.target_size + (3,)
             else:
                 self.image_shape = (3,) + self.target_size
+        elif self.color_mode == '8channel':
+            if self.data_format == 'channels_last':
+                self.image_shape = self.target_size + (8,)
+            else:
+                self.image_shape = (8,) + self.target_size
         else:
             if self.data_format == 'channels_last':
                 self.image_shape = self.target_size + (1,)
