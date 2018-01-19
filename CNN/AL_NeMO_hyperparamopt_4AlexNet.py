@@ -117,11 +117,14 @@ def model(train_generator, validation_generator, model_name, num_channels):
   pool_size3 = (1,1)
   pool_size4 = (1,1)
   pool_size5 = {{choice([(2,2),(1,1)])}}
+  dilation1 = {{choice([(2,2),(1,1)])}}
+  dilation2 = {{choice([(2,2),(1,1)])}}
   full_filter1 = {{choice([2048,4096])}}
   full_filter2 = {{choice([1024,2048,4096])}}
   conv_params= {"filters": [filter1, filter2, filter3, filter4, filter5],
     "conv_size": [conv_size1, conv_size2, conv_size3, conv_size4, conv_size5],
     "pool_size": [pool_size1, pool_size2, pool_size3, pool_size4, pool_size5],
+    "dilation_rate": [dilation1, dilation2],
     "full_filters": [full_filter1, full_filter2]}
 
   inputs = Input(shape=train_generator.image_shape)
@@ -154,8 +157,8 @@ def model(train_generator, validation_generator, model_name, num_channels):
 
   history = model.fit_generator(
               train_generator,
-              steps_per_epoch=25,
-              epochs=10,
+              steps_per_epoch=200,
+              epochs=100,
               validation_data=validation_generator,
               validation_steps=5,
               verbose=1,

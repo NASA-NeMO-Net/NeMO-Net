@@ -190,6 +190,18 @@ class Alex_Hyperopt_Encoder(Res_Encoder):
             print("conv_size not found, reverting to default: ", default_conv_size[:conv_layers])
             conv_size = default_conv_size
 
+        default_dilation_rate = [(1,1),(1,1),(1,1),(1,1),(1,1)]
+        try:
+            dilation_rate = conv_params["dilation_rate"]
+            if len(dilation_rate) != conv_layers:
+                print("Found %d convolutional layers but %d dilation_rate, will only replace initial %d dilation_rate..." %(conv_layers,len(dilation_rate),len(dilation_rate)))
+                for i in range(len(dilation_rate), conv_layers):
+                    dilation_rate.append(default_dilation_rate[i])
+            print("dilation_rate: ", dilation_rate[:conv_layers])
+        except:
+            print("dilation_rate not found, reverting to default: ", default_dilation_rate[:conv_layers])
+            dilation_rate = default_dilation_rate
+
         default_pool_size = [(2,2),(2,2),(1,1),(1,1),(2,2)]
         try:
             pool_size = conv_params["pool_size"]
@@ -228,7 +240,6 @@ class Alex_Hyperopt_Encoder(Res_Encoder):
             print("batchnorm_bool not found, reverting to default: ", default_batchnorm_bool[:conv_layers])
             batchnorm_bool = default_batchnorm_bool
 
-
         default_full_filters = [4096, 4096]
         try:
             full_filters  = conv_params["full_filters"]
@@ -253,7 +264,9 @@ class Alex_Hyperopt_Encoder(Res_Encoder):
         except:
             print("dropout not found, reverting to default: ", default_dropout[:full_layers])
             dropout = default_dropout
-        
+
+
+        # actual start of CNN
         blocks = []
         for i in range(conv_layers):
             block_name = 'alexblock{}'.format(i + 1)
