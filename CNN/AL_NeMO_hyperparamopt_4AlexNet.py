@@ -45,7 +45,7 @@ def data():
 
 
   num_classes = len(labelkey)
-  batch_size = 120
+  batch_size = 24
   model_name = "NeMO_AlexNet"
 
   with open("init_args - AlexNet_Raster.yml", 'r') as stream:
@@ -154,8 +154,8 @@ def model(train_generator, validation_generator, model_name, num_channels):
 
   history = model.fit_generator(
               train_generator,
-              steps_per_epoch=25,
-              epochs=10,
+              steps_per_epoch=200,
+              epochs=100,
               validation_data=validation_generator,
               validation_steps=5,
               verbose=1,
@@ -221,6 +221,11 @@ def model(train_generator, validation_generator, model_name, num_channels):
   return {'loss': -acc, 'status': STATUS_OK, 'model': model}
  
 if __name__ == '__main__':
+  global _SESSION
+  config = tf.ConfigProto(allow_soft_placement=True)
+  config.gpu_options.allow_growth = True
+  _SESSION = tf.Session(config=config)
+  K.set_session(_SESSION)
 
   trials=Trials()
   train_generator, validation_generator, model_name, num_channels = data()
@@ -228,7 +233,7 @@ if __name__ == '__main__':
   best_run, best_model, space = optim.minimize(model=model,
                                         data=data,
                                         algo=tpe.suggest,
-                                        max_evals=3,
+                                        max_evals=10,
                                         trials=trials,
                                         eval_space=True,
                                         return_space=True)
