@@ -1,1 +1,3 @@
-{}
+{
+  "test_blocks.py::test_vgg_deconv": true
+}

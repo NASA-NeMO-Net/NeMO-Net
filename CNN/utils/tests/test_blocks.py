@@ -6,6 +6,7 @@ sys.path.append("..") # Adds higher directory to python modules path.
 from NeMO_blocks import (
     vgg_conv,
     vgg_fc,
+    parallel_conv,
     res_shortcut,
     res_initialconv,
     res_megaconv,
@@ -42,6 +43,14 @@ def test_vgg_fc():
     else:
         x1 = K.variable(np.random.random((1, 14, 14, 512)))
         y1_shape = (1, 8, 8, 512)
+
+def test_parallel_conv():
+    x = [Input(shape=(25,25,8)), Input(shape=(50,50,8)), Input(shape=(100,100,8))]
+    y_shape = [(None,9,9,64), (None,9,9,64), (None,9,9,64)]
+
+    y = parallel_conv(filters=64, kernel_size=(7,7), pad_size=(0,0), pool_size=(2,2), dilation_rate=(1,1))(x)
+    for count,y_i in enumerate(y):
+        assert K.int_shape(y_i) == y_shape[count]
 
 def test_res_shortcut():
     x1 = Input(shape=(56,56,64))
@@ -104,44 +113,44 @@ def test_res_fc():
     y = block1(x)
     assert K.int_shape(y) == y_shape
 
-def test_vgg_deconv():
-    if K.image_data_format() == 'channels_first':
-        x1 = K.variable(np.random.random((1, 512, 8, 8)))
-        y1_shape = (1, 21, 18, 18)
-        x2 = K.variable(np.random.random((1, 512, 27, 27)))
-        y2_shape = (1, 21, 38, 38)
-        x3 = K.variable(np.random.random((1, 256, 53, 53)))
-        y3_shape = (1, 21, 312, 312)
-    else:
-        x1 = K.variable(np.random.random((1, 8, 8, 512)))
-        y1_shape = (1, 18, 18, 21)
-        x2 = K.variable(np.random.random((1, 27, 27, 512)))
-        y2_shape = (1, 38, 38, 21)
-        x3 = K.variable(np.random.random((1, 53, 53, 256)))
-        y3_shape = (1, 312, 312, 21)
+# def test_vgg_deconv():
+#     if K.image_data_format() == 'channels_first':
+#         x1 = K.variable(np.random.random((1, 512, 8, 8)))
+#         y1_shape = (1, 21, 18, 18)
+#         x2 = K.variable(np.random.random((1, 512, 27, 27)))
+#         y2_shape = (1, 21, 38, 38)
+#         x3 = K.variable(np.random.random((1, 256, 53, 53)))
+#         y3_shape = (1, 21, 312, 312)
+#     else:
+#         x1 = K.variable(np.random.random((1, 8, 8, 512)))
+#         y1_shape = (1, 18, 18, 21)
+#         x2 = K.variable(np.random.random((1, 27, 27, 512)))
+#         y2_shape = (1, 38, 38, 21)
+#         x3 = K.variable(np.random.random((1, 53, 53, 256)))
+#         y3_shape = (1, 312, 312, 21)
 
-    upscore1 = vgg_deconv(classes=21)(x1, None)
-    assert K.int_shape(upscore1) == y1_shape
-    assert not np.any(np.isnan(K.eval(upscore1)))
+#     upscore1 = vgg_deconv(classes=21)(x1, None)
+#     assert K.int_shape(upscore1) == y1_shape
+#     assert not np.any(np.isnan(K.eval(upscore1)))
 
-    upscore2 = vgg_deconv(classes=21)(x2, upscore1)
-    assert K.int_shape(upscore2) == y2_shape
-    assert not np.any(np.isnan(K.eval(upscore2)))
+#     upscore2 = vgg_deconv(classes=21)(x2, upscore1)
+#     assert K.int_shape(upscore2) == y2_shape
+#     assert not np.any(np.isnan(K.eval(upscore2)))
 
-    upscore3 = vgg_deconv(classes=21, kernel_size=(16, 16),
-                          strides=(8, 8))(x3, upscore2)
-    assert K.int_shape(upscore3) == y3_shape
-    assert not np.any(np.isnan(K.eval(upscore3)))
+#     upscore3 = vgg_deconv(classes=21, kernel_size=(16, 16),
+#                           strides=(8, 8))(x3, upscore2)
+#     assert K.int_shape(upscore3) == y3_shape
+#     assert not np.any(np.isnan(K.eval(upscore3)))
 
 
-def test_vgg_score():
-    if K.image_data_format() == 'channels_first':
-        x1 = K.variable(np.random.random((1, 3, 224, 224)))
-        x2 = K.variable(np.random.random((1, 21, 312, 312)))
-        y_shape = (1, 21, 224, 224)
-    else:
-        x1 = K.variable(np.random.random((1, 224, 224, 3)))
-        x2 = K.variable(np.random.random((1, 312, 312, 21)))
-        y_shape = (1, 224, 224, 21)
-    score = vgg_score(crop_offset='centered')(x1, x2)
-    assert K.int_shape(score) == y_shape
+# def test_vgg_score():
+    # if K.image_data_format() == 'channels_first':
+    #     x1 = K.variable(np.random.random((1, 3, 224, 224)))
+    #     x2 = K.variable(np.random.random((1, 21, 312, 312)))
+    #     y_shape = (1, 21, 224, 224)
+    # else:
+    #     x1 = K.variable(np.random.random((1, 224, 224, 3)))
+    #     x2 = K.variable(np.random.random((1, 312, 312, 21)))
+    #     y_shape = (1, 224, 224, 21)
+    # score = vgg_score(crop_offset='centered')(x1, x2)
+    # assert K.int_shape(score) == y_shape

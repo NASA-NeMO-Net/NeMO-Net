@@ -26,8 +26,9 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_boo
       x = input
       if pad_bool:
         x = ZeroPadding2D(padding=pad_size)(x)
-        if kernel_size[0] > x.shape[1]:
-          temp_padsize = int(np.ceil((kernel_size[0]-int(x.shape[1]))/2))
+        test_size = dilation_rate[0]*(kernel_size[0]-1)+1   # have to make sure this size is smaller than x.size
+        if test_size > x.shape[1]:
+          temp_padsize = int(np.ceil((test_size-int(x.shape[1]))/2))
           x = ZeroPadding2D(padding=(temp_padsize,temp_padsize))(x)
 
       x = Conv2D(filters, kernel_size, strides=conv_strides, dilation_rate=dilation_rate, activation='relu',
@@ -43,6 +44,26 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_boo
         x = BatchNormalization()(x)
       return x
     return f
+
+def parallel_conv(filters, kernel_size, pad_size=(0,0), pool_size=(2,2), dilation_rate=(1,1), weight_decay=0., batchnorm_bool=False,
+  block_name='parallel_block'):
+    def f(input):
+      n = len(input)
+      x = input
+      factor = [int(x_i.shape[1]//x[0].shape[1]) for x_i in x]
+
+      for i in range(n):
+        pad_size_i = [factor[i]*k for k in pad_size]
+        dilation_rate_i = [factor[i]*k for k in dilation_rate]
+        pool_size_i = [factor[i]*k for k in pool_size]
+
+        x[i] = alex_conv(filters, kernel_size, pad_bool=True, pool_bool=True, batchnorm_bool=batchnorm_bool, pad_size=pad_size_i,
+          pool_size=pool_size_i, pool_strides=pool_size_i, dilation_rate=dilation_rate_i, weight_decay=weight_decay, 
+          block_name='{}_alexconv{}'.format(block_name,i+1))(x[i])
+
+      return x
+    return f
+
 
 def alex_fc(filters, flatten_bool=False, dropout_bool=False, dropout=0.5, weight_decay=0., block_name='alexfc'):
     def f(input):

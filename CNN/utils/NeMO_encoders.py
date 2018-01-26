@@ -136,30 +136,40 @@ class Res_Encoder(Model):
 
 class Alex_Encoder(Res_Encoder):
     def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True):
-        filters = [96, 256, 384, 384, 256]
-        conv_size = [(7,7),(5,5),(3,3),(3,3),(3,3)]
-        pool_size = [(2,2),(2,2),(1,1),(1,1),(2,2)]
-        pool_stride = [(2,2),(2,2),(1,1),(1,1),(2,2)]
-        pool_bool = [True, True, False, False, True]
-        pad_bool = [False, False, True, True, True]
-        batchnorm_bool = [True, True, False, False, False]
+        # filters = [64, 128, 256, 384, 512]
+        # conv_size = [(7,7),(5,5),(3,3),(3,3),(3,3)]
+        # pool_size = [(2,2),(2,2),(1,1),(1,1),(2,2)]
+        # pool_stride = [(2,2),(2,2),(1,1),(1,1),(2,2)]
+        # pool_bool = [True, True, False, False, True]
+        # pad_bool = [False, False, True, True, True]
+        # batchnorm_bool = [True, True, False, False, False]
+        filters = [64, 128]
+        conv_size = [(7,7),(5,5)]
+        pool_size = [(2,2),(2,2)]
+        pool_stride = [(2,2),(2,2)]
+        pool_bool = [True, True]
+        pad_bool = [False, False]
+        batchnorm_bool = [True, True]
 
-        full_filters = [4096, 4096]
-        drop_bool = [True, True]
-        drop_val = [0.5, 0.5]
+        full_filters = [256]
+        drop_bool = [True]
+        drop_val = [0.5]
         
         blocks = []
         for i in range(len(filters)):
             block_name = 'alexblock{}'.format(i + 1)
-            block = alex_conv(filters[i], conv_size[i], pad_bool=pad_bool[i], pool_bool=pool_bool[i], batchnorm_bool=batchnorm_bool[i], pool_size=pool_size[i], pool_strides=pool_stride[i], weight_decay=weight_decay, block_name=block_name)
+            block = alex_conv(filters[i], conv_size[i], pad_bool=pad_bool[i], pool_bool=pool_bool[i], batchnorm_bool=batchnorm_bool[i], 
+                pool_size=pool_size[i], pool_strides=pool_stride[i], weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
         for i in range(len(full_filters)):
             block_name='alexfc{}'.format(i + 1)
             if i==0:
-                block = alex_fc(full_filters[i], flatten_bool=True, dropout_bool=drop_bool[i], dropout=drop_val[i], weight_decay=weight_decay, block_name=block_name)
+                block = alex_fc(full_filters[i], flatten_bool=True, dropout_bool=drop_bool[i], dropout=drop_val[i], weight_decay=weight_decay, 
+                    block_name=block_name)
             else:
-                block = alex_fc(full_filters[i], flatten_bool=False, dropout_bool=drop_bool[i], dropout=drop_val[i], weight_decay=weight_decay, block_name=block_name)
+                block = alex_fc(full_filters[i], flatten_bool=False, dropout_bool=drop_bool[i], dropout=drop_val[i], weight_decay=weight_decay, 
+                    block_name=block_name)
             blocks.append(block)
 
         super(Alex_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
@@ -271,7 +281,7 @@ class Alex_Hyperopt_Encoder(Res_Encoder):
         for i in range(conv_layers):
             block_name = 'alexblock{}'.format(i + 1)
             block = alex_conv(filters[i], conv_size[i], pad_bool=True, pool_bool=True, batchnorm_bool=batchnorm_bool[i], pad_size=pad_size[i],
-                pool_size=pool_size[i], pool_strides=pool_stride[i], weight_decay=weight_decay, block_name=block_name)
+                pool_size=pool_size[i], pool_strides=pool_stride[i], dilation_rate=dilation_rate[i], weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
         for i in range(full_layers):
@@ -283,6 +293,9 @@ class Alex_Hyperopt_Encoder(Res_Encoder):
             blocks.append(block)
 
         super(Alex_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
+
+# class Alex_Parallel_Hyperopt_Encoder(Res_Encoder):
+
 
 
 class Res34_Encoder(Res_Encoder):
