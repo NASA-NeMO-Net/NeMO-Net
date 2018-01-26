@@ -10,6 +10,7 @@ from osgeo import gdal, ogr, osr
 from functools import partial
 from keras import backend as K
 from keras.utils.np_utils import to_categorical
+from glob import glob
 from keras.preprocessing.image import (
     ImageDataGenerator,
     Iterator,
@@ -191,7 +192,7 @@ class NeMODirectoryIterator(Iterator):
                  save_to_dir=None, save_prefix='', save_format='png',
                  follow_links=False):
         if data_format is None:
-            data_format = K.image_data_format()
+            data_format = K.image_data_format() #channels_last
         self.directory = directory
         self.image_data_generator = image_data_generator
         self.target_size = tuple(target_size)
@@ -232,6 +233,7 @@ class NeMODirectoryIterator(Iterator):
         # first, count the number of samples and classes
         self.samples = 0
 
+        # print("CLASSES BEFORE: ", classes)
         if not classes:
             classes = []
             for subdir in sorted(os.listdir(directory)):
@@ -239,6 +241,8 @@ class NeMODirectoryIterator(Iterator):
                     classes.append(subdir)
         self.num_class = len(classes)
         self.class_indices = dict(zip(classes, range(len(classes))))
+        # print("CLASSES: ", classes)
+        # print("CLASS INDICIES: ", self.class_indices)
 
         pool = multiprocessing.pool.ThreadPool()
         function_partial = partial(_count_valid_files_in_directory,

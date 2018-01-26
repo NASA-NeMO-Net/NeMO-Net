@@ -20,7 +20,8 @@ from keras.regularizers import l2
 from NeMO_layers import CroppingLike2D, BilinearUpSampling2D
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
-def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_bool=False, batchnorm_bool = False, pad_size=(0,0), pool_size=(2,2), pool_strides=(2,2), weight_decay=0., block_name='alexblock'):
+def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_bool=False, batchnorm_bool = False, pad_size=(0,0), 
+  pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), weight_decay=0., block_name='alexblock'):
     def f(input):
       x = input
       if pad_bool:
@@ -29,7 +30,7 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_boo
           temp_padsize = int(np.ceil((kernel_size[0]-int(x.shape[1]))/2))
           x = ZeroPadding2D(padding=(temp_padsize,temp_padsize))(x)
 
-      x = Conv2D(filters, kernel_size, strides=conv_strides, activation='relu',
+      x = Conv2D(filters, kernel_size, strides=conv_strides, dilation_rate=dilation_rate, activation='relu',
         kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay),
         name='{}_conv'.format(block_name))(x)
 

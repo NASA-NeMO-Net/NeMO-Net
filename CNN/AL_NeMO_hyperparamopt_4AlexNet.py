@@ -117,11 +117,14 @@ def model(train_generator, validation_generator, model_name, num_channels):
   pool_size3 = (1,1)
   pool_size4 = (1,1)
   pool_size5 = {{choice([(2,2),(1,1)])}}
+  dilation1 = {{choice([(2,2),(1,1)])}}
+  dilation2 = {{choice([(2,2),(1,1)])}}
   full_filter1 = {{choice([2048,4096])}}
   full_filter2 = {{choice([1024,2048,4096])}}
   conv_params= {"filters": [filter1, filter2, filter3, filter4, filter5],
     "conv_size": [conv_size1, conv_size2, conv_size3, conv_size4, conv_size5],
     "pool_size": [pool_size1, pool_size2, pool_size3, pool_size4, pool_size5],
+    "dilation_rate": [dilation1, dilation2],
     "full_filters": [full_filter1, full_filter2]}
 
   inputs = Input(shape=train_generator.image_shape)
@@ -143,10 +146,13 @@ def model(train_generator, validation_generator, model_name, num_channels):
 
   globalvars.globalVar += 1
 
-  filepath = './output/weights_' + model_name + 'hyperas' + str(globalvars.globalVar) + ".hdf5"
-  checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+  filepath = './output/weights_' + model_name + '_hyperas' + str(globalvars.globalVar) + ".h5"
+  early_stopper = EarlyStopping(monitor='val_loss', min_delta=0.001, patience=30)
+  checkpointer = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+  lr_reducer = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.001)
+  nan_terminator = TerminateOnNaN()
 
-  csv_logger = CSVLogger('./output/hyperas_' + model_name + 'test_log.csv', 
+  csv_logger = CSVLogger('./output/hyperas_' + model_name + '_log.csv', 
                                  append=True, separator=';')
   tensor_board_logfile = './logs/' + model_name + str(globalvars.globalVar)
   tensor_board = TensorBoard(log_dir=tensor_board_logfile, histogram_freq=0, write_graph=True)
@@ -154,12 +160,12 @@ def model(train_generator, validation_generator, model_name, num_channels):
 
   history = model.fit_generator(
               train_generator,
-              steps_per_epoch=200,
-              epochs=100,
+              steps_per_epoch=10,
+              epochs=1,
               validation_data=validation_generator,
               validation_steps=5,
               verbose=1,
-              callbacks=[csv_logger])
+              callbacks=[lr_reducer, early_stopper, csv_logger])
 
   
   h1   = history.history
@@ -233,7 +239,7 @@ if __name__ == '__main__':
   best_run, best_model, space = optim.minimize(model=model,
                                         data=data,
                                         algo=tpe.suggest,
-                                        max_evals=10,
+                                        max_evals=1,
                                         trials=trials,
                                         eval_space=True,
                                         return_space=True)
@@ -246,7 +252,7 @@ if __name__ == '__main__':
   print("Parameters of best run", best_run)
   # print(best_model.evaluate_generator(generator=validation_generator, steps=5))
   # print(best_model.evaluate(validation_generator))
-  json.dump(best_run, open('./output/best_run' + model_name + '.txt', 'w'))
+  json.dump(best_run, open('./output/best_run_' + model_name + '.txt', 'w'))
 
   f = open("./output/temp_saveacc.txt","r")
 

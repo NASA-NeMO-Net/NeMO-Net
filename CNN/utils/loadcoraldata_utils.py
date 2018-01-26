@@ -75,6 +75,7 @@ class CoralData:
 				source_srs = source_layer.GetSpatialRef()
 
 				field_vals = list(set([feature.GetFieldAsString('Class_name') for feature in source_layer]))
+				field_vals.sort(key=lambda x: x.lower())
 				if 'NoData' not in field_vals:
 					self.class_labels = ['NoData'] + field_vals 	# all unique labels
 
@@ -86,7 +87,7 @@ class CoralData:
 				field_index = source_layer_def.GetFieldIndex("Class_id")
 
 				for feature in source_layer:
-					val = field_vals.index(feature.GetFieldAsString('Class_name'))+1
+					val = self.class_labels.index(feature.GetFieldAsString('Class_name'))
 					feature.SetField(field_index, val)
 					source_layer.SetFeature(feature)
 
@@ -405,23 +406,25 @@ class CoralData:
 #	image_size: size of image patch
 # 	crop_len: sides to crop (if predicting upon middle pixel)
 # 	offset: offset from top of image
-# 	lines: Number of lines of patches to output
+# 	yoffset: offset from left of image 
+# 	cols: number of columns to output
+# 	lines: Number of lines of patches to output (None defaults to all possible)
 # 	toremove: Remove last channel or not
 # Output:
-# 	whole_dataset: Entire line(s) of patches from testimage
-	def _load_whole_data(self, image_size, crop_len, offset=0, yoffset = 0, cols = 1, lines=None, toremove=False):
+# 	whole_dataset: Patch(es) of test image
+	def _load_whole_data(self, image_size, crop_len, offset=0, yoffset = 0, cols = 1, lines=None, toremove=None):
 		if lines is None:
 			lines = self.testimage.shape[0] - 2*crop_len
 
-		if offset+lines+2*crop_len > self.testimage.shape[0]:
+		if offset+lines+crop_len > self.testimage.shape[0]:
 			print("Too many lines specified, reverting to maximum possible")
-			lines = self.testimage.shape[0] - offset - 2*crop_len
+			lines = self.testimage.shape[0] - offset - crop_len
 
 		whole_datasets = []
-		for i in range(offset+crop_len, lines+offset+crop_len):
+		for i in range(offset, lines+offset):
 			#for j in range(crop_len, self.testimage.shape[1] - crop_len):
-			for j in range(yoffset+crop_len, yoffset+crop_len+cols):
-				whole_datasets.append(self.testimage[i-crop_len:i+crop_len, j-crop_len:j+crop_len,:])
+			for j in range(yoffset, yoffset+cols):
+				whole_datasets.append(self.testimage[i-crop_len:i+crop_len+1, j-crop_len:j+crop_len+1,:])
 
 		whole_datasets = np.asarray(whole_datasets)
 
@@ -430,24 +433,37 @@ class CoralData:
 		whole_dataset = self._rescale(whole_datasets)
 		return whole_dataset
 
-	def predict_on_whole_image(self, model, image_size, num_lines = None, spacing = (1,1), crop = False, lastchannelremove = True):
-		offstart = 0
-		crop_len = int(np.floor(image_size/2)) 	# crop_len is NOT currently used to crop the image!!! 
+#### Load entire line(s) of patches from testimage
+# Input:
+#	model: Keras model to predict on
+# 	image_size: size of each image
+# 	num_lines: number of lines to predict
+# 	spacing: Spacing between each image (row,col)
+# 	predict_size: size of prediction area square (starting from center); FCN will use predict_size = image_size
+# 	lastchannelremove: Remove last channel or not
+# Output:
+# 	whole_predict: Predicted class array
+#   num_predict: Number of times per prediction in array
+# 	truth_predict: Original truth image (cropped)
+# 	accuracy: Overall accuracy of entire prediction
+	def predict_on_whole_image(self, model, image_size, num_lines = None, spacing = (1,1), predict_size = 1, lastchannelremove = True):
+		crop_len = int(np.floor(image_size/2)) # lengths from sides to not take into account in the calculation of num_lines
+		offstart = crop_len-int(np.floor(predict_size/2))
 
 		if num_lines is None:
-			num_lines = int(np.floor((self.testimage.shape[0] - 2*crop_len)/spacing[0]))
+			num_lines = int(np.floor((self.testimage.shape[0] - 2*crop_len)/spacing[0])) # Predict on whole image
 
-		if num_lines*spacing[0]+image_size == int(np.floor((self.testimage.shape[0]-image_size)/spacing[0])): # If predict on whole image
-			whole_predict = np.zeros(self.testimage.shape)
-			num_predict = np.zeros(self.testimage.shape)
+		if num_lines*spacing[0]+2*crop_len == int(np.floor((self.testimage.shape[0]-2*crop_len)/spacing[0])): # If predict on whole image
+			whole_predict = np.zeros((self.testimage.shape[0]-2*crop_len+predict_size-1, self.testimage.shape[1]-2*crop_len+predict_size-1))
+			num_predict = np.zeros((self.testimage.shape[0]-2*crop_len+predict_size-1, self.testimage.shape[1]-2*crop_len+predict_size-1))
 		else:
-			whole_predict = np.zeros((spacing[0]*(num_lines-1)+image_size,self.testimage.shape[1]))
-			num_predict = np.zeros((spacing[0]*(num_lines-1)+image_size,self.testimage.shape[1]))
+			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-2*crop_len+predict_size-1))
+			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-2*crop_len+predict_size-1))
 
-		truth_predict = self.truthimage[offstart:offstart+whole_predict.shape[0], 0:whole_predict.shape[1]]
+		truth_predict = self.truthimage[offstart:offstart+whole_predict.shape[0], offstart:offstart+whole_predict.shape[1]]
 
-		for offset in range(offstart, offstart+spacing[0]*num_lines, spacing[0]):
-			for cols in range(0, whole_predict.shape[1]-image_size+1, spacing[1]):
+		for offset in range(crop_len, crop_len+spacing[0]*num_lines, spacing[0]):
+			for cols in range(crop_len, self.testimage.shape[1]-crop_len, spacing[1]):
 				if lastchannelremove:
 					temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1, toremove=3)
 				else:
@@ -455,42 +471,44 @@ class CoralData:
 				temp_predict = model.predict_on_batch(temp_dataset)
 				temp_predict = self._classifyback(temp_predict)
 				
-				for predict_mat in temp_predict:
-					whole_predict[offset:offset+image_size, cols:cols+image_size] = whole_predict[offset:offset+image_size, cols:cols+image_size] + predict_mat
-					num_predict[offset:offset+image_size, cols:cols+image_size] = num_predict[offset:offset+image_size, cols:cols+image_size] + np.ones(predict_mat.shape)
-				print("Line: " + str(offset) + " Col: " + str(cols) + '/ ' + str(whole_predict.shape[1]-image_size+1) + ' completed', end='\r')
+				for predict_mat in temp_predict: 	# this is incorrect if temp_predict has more than 1 prediction (e.g. cols>1, lines>1)
+					whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + predict_mat
+					num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones(predict_mat.shape)
+				print("Line: " + str(offset-crop_len) + " Col: " + str(cols-crop_len) + '/ ' + str(self.testimage.shape[1]-2*crop_len) + ' completed', end='\r')
+
+		# Remaining code is for the special case in which spacing does not get to the last col/row
 
 			# Classify last column of row
-			tempcol = whole_predict.shape[1]-image_size
-			temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = tempcol, cols=1, lines=1, toremove = 3)
-			temp_predict = model.predict_on_batch(temp_dataset)
-			temp_predict = self._classifyback(temp_predict)
-			whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] = whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] + predict_mat
-			num_predict[offset:offset+image_size, tempcol:tempcol+image_size] = num_predict[offset:offset+image_size, tempcol:tempcol+image_size] + np.ones(predict_mat.shape)
+			# tempcol = whole_predict.shape[1]-image_size
+			# temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = tempcol, cols=1, lines=1, toremove = 3)
+			# temp_predict = model.predict_on_batch(temp_dataset)
+			# temp_predict = self._classifyback(temp_predict)
+			# whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] = whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] + predict_mat
+			# num_predict[offset:offset+image_size, tempcol:tempcol+image_size] = num_predict[offset:offset+image_size, tempcol:tempcol+image_size] + np.ones(predict_mat.shape)
 		
 		# Predict on last rows
-		if num_lines*spacing[0]+image_size == int(np.floor((self.testimage.shape[0]-image_size)/spacing[0])):
-			offset = self.testimage.shape[0]-image_size
-			for cols in range(0, whole_predict.shape[1]-image_size+1, spacing[1]):
-				if lastchannelremove:
-					temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1, toremove=3)
-				else:
-					temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1)
-				temp_predict = model.predict_on_batch(temp_dataset)
-				temp_predict = self._classifyback(temp_predict)
+		# if num_lines*spacing[0]+image_size == int(np.floor((self.testimage.shape[0]-image_size)/spacing[0])):
+		# 	offset = self.testimage.shape[0]-image_size
+		# 	for cols in range(0, whole_predict.shape[1]-image_size+1, spacing[1]):
+		# 		if lastchannelremove:
+		# 			temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1, toremove=3)
+		# 		else:
+		# 			temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1)
+		# 		temp_predict = model.predict_on_batch(temp_dataset)
+		# 		temp_predict = self._classifyback(temp_predict)
 				
-				for predict_mat in temp_predict:
-					whole_predict[offset:offset+image_size, cols:cols+image_size] = whole_predict[offset:offset+image_size, cols:cols+image_size] + predict_mat
-					num_predict[offset:offset+image_size, cols:cols+image_size] = num_predict[offset:offset+image_size, cols:cols+image_size] + np.ones(predict_mat.shape)
-				print("Line: " + str(offset) + " Col: " + str(cols) + '/ ' + str(whole_predict.shape[1]-image_size+1) + ' completed', end='\r')
+		# 		for predict_mat in temp_predict:
+		# 			whole_predict[offset:offset+image_size, cols:cols+image_size] = whole_predict[offset:offset+image_size, cols:cols+image_size] + predict_mat
+		# 			num_predict[offset:offset+image_size, cols:cols+image_size] = num_predict[offset:offset+image_size, cols:cols+image_size] + np.ones(predict_mat.shape)
+		# 		print("Line: " + str(offset) + " Col: " + str(cols) + '/ ' + str(whole_predict.shape[1]-image_size+1) + ' completed', end='\r')
 
-			# Classify last column of row
-			tempcol = whole_predict.shape[1]-image_size
-			temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = tempcol, cols=1, lines=1, toremove = 3)
-			temp_predict = model.predict_on_batch(temp_dataset)
-			temp_predict = self._classifyback(temp_predict)
-			whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] = whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] + predict_mat
-			num_predict[offset:offset+image_size, tempcol:tempcol+image_size] = num_predict[offset:offset+image_size, tempcol:tempcol+image_size] + np.ones(predict_mat.shape)
+		# 	# Classify last column of row
+		# 	tempcol = whole_predict.shape[1]-image_size
+		# 	temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = tempcol, cols=1, lines=1, toremove = 3)
+		# 	temp_predict = model.predict_on_batch(temp_dataset)
+		# 	temp_predict = self._classifyback(temp_predict)
+		# 	whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] = whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] + predict_mat
+		# 	num_predict[offset:offset+image_size, tempcol:tempcol+image_size] = num_predict[offset:offset+image_size, tempcol:tempcol+image_size] + np.ones(predict_mat.shape)
 		
 		whole_predict = np.round(whole_predict.astype(np.float)/num_predict.astype(np.float)).astype(np.uint8)
 		accuracy = 100*np.asarray((whole_predict == truth_predict)).astype(np.float32).sum()/(whole_predict.shape[0]*whole_predict.shape[1])
