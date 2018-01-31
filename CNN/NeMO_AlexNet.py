@@ -33,23 +33,23 @@ with open("init_args - AlexNet.yml", 'r') as stream:
     except yaml.YAMLError as exc:
         print(exc)
 
-checkpointer = ModelCheckpoint(filepath="./tmp/AlexNet_weights.h5", verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="./tmp/AlexNet_weights.h5", monitor='val_acc', verbose=1, save_best_only=True, mode='max')
 lr_reducer = ReduceLROnPlateau(monitor='val_loss',
                                factor=np.sqrt(0.1),
-                               cooldown=0,
-                               patience=10, min_lr=1e-12)
+                               cooldown=2,
+                               patience=2, min_lr=1e-12)
 early_stopper = EarlyStopping(monitor='val_loss',
                               min_delta=0.001,
-                              patience=30)
+                              patience=5)
 nan_terminator = TerminateOnNaN()
 
 
 datagen = NeMOImageGenerator(image_shape=[image_size, image_size, 3],
                                     image_resample=True,
                                     pixelwise_center=True,
-                                    pixel_mean=[127, 127, 127],
+                                    pixel_mean=[127.5, 127.5, 127.5],
                                     pixelwise_std_normalization=True,
-                                    pixel_std=[127, 127, 127])
+                                    pixel_std=[127.5, 127.5, 127.5])
 
 # train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
 # val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
@@ -68,22 +68,22 @@ train_generator = datagen.flow_from_NeMOdirectory('../Images/Training_Patches/',
   color_mode='rgb',
   classes=['Sand','Branching','Mounding','Rock'],
   class_mode='categorical',
-  batch_size=64,
+  batch_size=512,
   shuffle=True)
 
-valid_generator = datagen.flow_from_directory('../Images/Valid_Patches/',
+valid_generator = datagen.flow_from_NeMOdirectory('../Images/Valid_Patches/',
   target_size=(image_size, image_size),
   color_mode='rgb',
   classes=['Sand','Branching','Mounding','Rock'],
   class_mode='categorical',
-  batch_size=64,
+  batch_size=512,
   shuffle=True)
 
 alexnet.fit_generator(train_generator,
-  steps_per_epoch=625,
-  epochs=10,
+  steps_per_epoch=60,
+  epochs=20,
   validation_data=valid_generator,
-  validation_steps=5,
+  validation_steps=10,
   verbose=1,
   callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 

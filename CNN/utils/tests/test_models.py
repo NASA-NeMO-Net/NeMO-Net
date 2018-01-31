@@ -2,7 +2,7 @@
 import numpy as np
 import sys
 sys.path.append("..") # Adds higher directory to python modules path.
-from NeMO_models import FCN, ResNet34
+from NeMO_models import FCN, ResNet34, Alex_Hyperopt_ParallelNet
 from keras import backend as K
 
 
@@ -16,6 +16,38 @@ def is_same_shape(shape, expected_shape, data_format=None):
                           expected_shape[1],
                           expected_shape[2])
     return shape == expected_shape
+
+def test_Alex_Hyperopt_ParallelNet():
+    input_shape = (100,100,8)
+    crop_shapes = [(25,25), (50,50), (100,100)]
+    alex_parallelNet = Alex_Hyperopt_ParallelNet(input_shape=input_shape, crop_shapes=crop_shapes, classes=24, conv_layers=3, full_layers=1)
+
+    for l in alex_parallelNet.layers:
+        # print("LAYER NAME: ", l.name)
+        # print("LAYER SHAPE: ", l.output_shape)
+        if l.name == 'parallel_block1_alexconv1_pool':
+            assert is_same_shape(l.output_shape, (None,9,9,64))
+        if l.name == 'parallel_block1_alexconv2_pool':
+            assert is_same_shape(l.output_shape, (None,19,19,64))
+        if l.name == 'parallel_block1_alexconv3_pool':
+            assert is_same_shape(l.output_shape, (None,38,38,64))
+        if l.name == 'parallel_block2_alexconv1_pool':
+            assert is_same_shape(l.output_shape, (None,3,3,128))
+        if l.name == 'parallel_block2_alexconv2_pool':
+            assert is_same_shape(l.output_shape, (None,7,7,128))
+        if l.name == 'parallel_block2_alexconv3_pool':
+            assert is_same_shape(l.output_shape, (None,15,15,128))
+        if l.name == 'parallel_block3_alexconv1_pool':
+            assert is_same_shape(l.output_shape, (None,1,1,256))
+        if l.name == 'parallel_block3_alexconv2_pool':
+            assert is_same_shape(l.output_shape, (None,3,3,256))
+        if l.name == 'parallel_block3_alexconv3_pool':
+            assert is_same_shape(l.output_shape, (None,5,5,256))
+        if l.name == 'poolconcat_block_concat2':
+            assert is_same_shape(l.output_shape, (None,1,1,768))
+        if l.name == 'alexfc1_dense':
+            assert is_same_shape(l.output_shape, (None,4096))
+    assert is_same_shape(alex_parallelNet.output_shape, (None,24))
 
 def test_Resnet34():
     input_shape = (224, 224, 3)
