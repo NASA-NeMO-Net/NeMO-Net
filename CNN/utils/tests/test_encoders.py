@@ -2,13 +2,49 @@ import numpy as np
 import keras.backend as K
 from keras.layers import Input
 import sys
+import numpy as np
 sys.path.append("..") # Adds higher directory to python modules path.
 from NeMO_encoders import (
     Res34_Encoder,
+    Alex_Parallel_Hyperopt_Encoder,
     VGG16,
     VGG19)
 
 from keras.utils.test_utils import keras_test
+
+@keras_test
+def test_Alex_Parallel():
+    # x = [Input(shape=(25,25,8)), Input(shape=(50,50,8)), Input(shape=(100,100,8))]
+    x = Input(shape=(100,100,8))
+    crop_shapes = [(25,25),(50,50),(100,100)]
+    classes = 24
+
+    conv_params= {"filters": [64,128,256],
+        "conv_size": [(7,7),(3,3),(3,3)],
+        "dilation_rate": [(1,1),(1,1),(1,1)],
+        "pool_size": [(2,2),(2,2),(1,1)],
+        "pad_size": [(0,0),(0,0),(0,0)],
+        "batchnorm_bool": [True,True,False],
+        "full_filters": [2048],
+        "dropout": [0.5]}
+
+    p1_shape = [(None,1,1,256), (None,3,3,128), (None,9,9,64)] # smallest parallel branch
+    p2_shape = [(None,3,3,256), (None,7,7,128), (None,19,19,64)] # middle parallel branch
+    p3_shape = [(None,5,5,256), (None,15,15,128), (None,38,38,64)] # largest parallel branch
+    pc_shape = (None,1,1,768)
+    fc_shape = (None,2048)
+
+    encoder = Alex_Parallel_Hyperopt_Encoder(x, crop_shapes, classes, weights=None, weight_decay=0., trainable=True, conv_layers=3, full_layers=1, conv_params=conv_params)
+    feat_pyramid = encoder.outputs
+
+    offset = 2
+    input_len = len(crop_shapes)
+    for i in range(input_len):
+        assert K.int_shape(feat_pyramid[i*input_len+offset]) == p1_shape[i]
+        assert K.int_shape(feat_pyramid[i*input_len+1+offset]) == p2_shape[i]
+        assert K.int_shape(feat_pyramid[i*input_len+2+offset]) == p3_shape[i]
+    assert K.int_shape(feat_pyramid[1]) == pc_shape
+    assert K.int_shape(feat_pyramid[0]) == fc_shape
 
 @keras_test
 def test_Res34():

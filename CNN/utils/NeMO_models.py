@@ -3,13 +3,14 @@ from __future__ import (
     absolute_import,
     unicode_literals
 )
+import numpy as np
 import keras
 import tensorflow as tf
 import keras.backend as K
 from keras.models import Model
-from keras.layers import Input, Flatten, Activation, Reshape, Dense
+from keras.layers import Input, Flatten, Activation, Reshape, Dense, Cropping2D
 
-from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Res34_Encoder
+from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Res34_Encoder, Alex_Parallel_Hyperopt_Encoder
 from NeMO_decoders import VGGDecoder, VGGUpsampler
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
@@ -21,6 +22,17 @@ def AlexNet(input_shape, classes, weight_decay=0., trainable_encoder=True, weigh
     scores = Dense(classes, activation = 'softmax')(encoder_output)
 
     return Model(inputs=inputs, outputs=scores)
+
+def Alex_Hyperopt_ParallelNet(input_shape, crop_shapes, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=3, full_layers=1, conv_params=None):
+    inputs=Input(shape=input_shape)
+
+    encoder = Alex_Parallel_Hyperopt_Encoder(inputs, crop_shapes=crop_shapes, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder,
+        conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
+    encoder_output = encoder.outputs[0]
+    scores = Dense(classes, activation = 'softmax')(encoder_output)
+
+    return Model(inputs=inputs, outputs=scores)
+
 
 def ResNet34(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None):
     """ Normal Resnet34 

@@ -7,6 +7,7 @@ from NeMO_blocks import (
     vgg_conv,
     vgg_fc,
     parallel_conv,
+    pool_concat,
     res_shortcut,
     res_initialconv,
     res_megaconv,
@@ -46,11 +47,26 @@ def test_vgg_fc():
 
 def test_parallel_conv():
     x = [Input(shape=(25,25,8)), Input(shape=(50,50,8)), Input(shape=(100,100,8))]
-    y_shape = [(None,9,9,64), (None,9,9,64), (None,9,9,64)]
+    y_shape = [(None,9,9,64), (None,19,19,64), (None,38,38,64)]
+    y2_shape = [(None,3,3,128), (None,7,7,128), (None,15,15,128)]
+    y3_shape = [(None,1,1,256), (None,3,3,256), (None,5,5,256)]
 
-    y = parallel_conv(filters=64, kernel_size=(7,7), pad_size=(0,0), pool_size=(2,2), dilation_rate=(1,1))(x)
+    y = parallel_conv(filters=64, kernel_size=(7,7), pad_size=(0,0), pool_size=(2,2), dilation_rate=(1,1), batchnorm_bool=True)(x)
     for count,y_i in enumerate(y):
         assert K.int_shape(y_i) == y_shape[count]
+    y = parallel_conv(filters=128, kernel_size=(3,3), pad_size=(0,0), pool_size=(2,2), dilation_rate=(1,1), batchnorm_bool=True)(y)
+    for count,y_i in enumerate(y):
+        assert K.int_shape(y_i) == y2_shape[count]
+    y = parallel_conv(filters=256, kernel_size=(3,3), pad_size=(0,0), pool_size=(1,1), dilation_rate=(1,1), batchnorm_bool=True)(y)
+    for count,y_i in enumerate(y):
+        assert K.int_shape(y_i) == y3_shape[count]
+
+def test_pool_concat():
+    x = [Input(shape=(9,9,64)), Input(shape=(19,19,64)), Input(shape=(38,38,64))]
+    y_shape = (None,9,9,192)
+
+    y = pool_concat(pool_size=(1,1), batchnorm_bool=True)(x)
+    assert K.int_shape(y) == y_shape
 
 def test_res_shortcut():
     x1 = Input(shape=(56,56,64))

@@ -5,7 +5,8 @@ from keras.layers import (
     Lambda,
     Activation,
     Dense,
-    Flatten
+    Flatten,
+    concatenate
 )
 from keras.layers.convolutional import (
     Conv2D,
@@ -55,15 +56,38 @@ def parallel_conv(filters, kernel_size, pad_size=(0,0), pool_size=(2,2), dilatio
       for i in range(n):
         pad_size_i = [factor[i]*k for k in pad_size]
         dilation_rate_i = [factor[i]*k for k in dilation_rate]
-        pool_size_i = [factor[i]*k for k in pool_size]
+        # pool_size_i = [factor[i]//2*k for k in pool_size]
 
-        x[i] = alex_conv(filters, kernel_size, pad_bool=True, pool_bool=True, batchnorm_bool=batchnorm_bool, pad_size=pad_size_i,
-          pool_size=pool_size_i, pool_strides=pool_size_i, dilation_rate=dilation_rate_i, weight_decay=weight_decay, 
-          block_name='{}_alexconv{}'.format(block_name,i+1))(x[i])
+        # NOTE!!! A list PASSES by reference, and hence will point to the same location!
+        x[i] = alex_conv(filters, kernel_size, pad_bool=True, pool_bool=True, batchnorm_bool=False, pad_size=pad_size_i,
+          pool_size=pool_size, pool_strides=pool_size, dilation_rate=dilation_rate_i, weight_decay=weight_decay, 
+          block_name='{}_alexconv{}'.format(block_name,i+1))(x[i]) # first don't factor the pools, need to save them for later sections
 
+        if batchnorm_bool:
+          x[i] = BatchNormalization()(x[i])
       return x
     return f
 
+def pool_concat(pool_size=(1,1), batchnorm_bool=False, block_name='poolconcat_block'):
+    def f(input):
+      n = len(input)
+      x = input
+      factor = [int(x_i.shape[1]//x[0].shape[1]) for x_i in x]
+
+      for i in range(n):
+        pool_size_i = [factor[i]*k for k in pool_size]
+        if pool_size_i[0] > x[i].shape[1]:
+          temp_padsize = int(np.ceil((pool_size_i[0]-int(x[i].shape[1]))/2))
+          x[i] = ZeroPadding2D(padding=(temp_padsize, temp_padsize))(x[i])
+        x[i] = MaxPooling2D(pool_size=pool_size_i, strides=pool_size_i, name='{}_pool{}'.format(block_name,i+1))(x[i])
+
+        if batchnorm_bool:
+          x[i] = BatchNormalization()(x[i])
+        if i!=0:
+          x[0] = concatenate([x[0],x[i]], name='{}_concat{}'.format(block_name,i))
+
+      return x[0]
+    return f
 
 def alex_fc(filters, flatten_bool=False, dropout_bool=False, dropout=0.5, weight_decay=0., block_name='alexfc'):
     def f(input):
