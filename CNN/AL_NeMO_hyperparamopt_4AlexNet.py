@@ -45,7 +45,7 @@ def data():
 
 
   num_classes = len(labelkey)
-  batch_size = 24
+  batch_size = 120
   model_name = "NeMO_AlexNet"
 
   with open("init_args - AlexNet_Raster.yml", 'r') as stream:
@@ -127,6 +127,9 @@ def model(train_generator, validation_generator, model_name, num_channels):
     "dilation_rate": [dilation1, dilation2],
     "full_filters": [full_filter1, full_filter2]}
 
+
+  print("Convolution layers: {}".format(conv_layers))
+  print("Full layers: {}".format(full_layers))
   inputs = Input(shape=train_generator.image_shape)
   encoder = Alex_Hyperopt_Encoder(inputs, classes=num_classes, weight_decay=0, weights=None, trainable=True, conv_layers=conv_layers, 
     full_layers = full_layers, conv_params = conv_params)
@@ -160,12 +163,12 @@ def model(train_generator, validation_generator, model_name, num_channels):
 
   history = model.fit_generator(
               train_generator,
-              steps_per_epoch=10,
-              epochs=1,
+              steps_per_epoch=200,
+              epochs=100,
               validation_data=validation_generator,
-              validation_steps=5,
+              validation_steps=10,
               verbose=1,
-              callbacks=[lr_reducer, early_stopper, csv_logger])
+              callbacks=[lr_reducer, early_stopper, csv_logger, checkpointer])
 
   
   h1   = history.history
