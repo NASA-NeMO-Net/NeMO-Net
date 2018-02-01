@@ -18,7 +18,7 @@ def is_same_shape(shape, expected_shape, data_format=None):
     return shape == expected_shape
 
 def test_Alex_Hyperopt_ParallelNet():
-    input_shape = (100,100,8)
+    input_shape = (150,150,8)
     crop_shapes = [(25,25), (50,50), (100,100)]
     alex_parallelNet = Alex_Hyperopt_ParallelNet(input_shape=input_shape, crop_shapes=crop_shapes, classes=24, conv_layers=3, full_layers=1)
 
