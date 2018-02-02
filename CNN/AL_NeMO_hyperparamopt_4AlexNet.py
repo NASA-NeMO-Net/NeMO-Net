@@ -160,12 +160,12 @@ def model(train_generator, validation_generator, model_name, num_channels):
 
   history = model.fit_generator(
               train_generator,
-              steps_per_epoch=10,
-              epochs=1,
+              steps_per_epoch=200,
+              epochs=100,
               validation_data=validation_generator,
-              validation_steps=5,
+              validation_steps=10,
               verbose=1,
-              callbacks=[lr_reducer, early_stopper, csv_logger])
+              callbacks=[lr_reducer, early_stopper, csv_logger, checkpointer])
 
   
   h1   = history.history
