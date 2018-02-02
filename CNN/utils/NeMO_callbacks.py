@@ -36,22 +36,21 @@ class CheckNumericsOps(Callback):
 
 class WeightsSaver(Callback):
     """Callback that saves weights on either epoch end or batch end."""
-    
-    def __init__(self, filepath, N):
-    	super(WeightsSaver, self).__init__()
-    	self.N = N
-    	self.batch = 0
-    	self.epoch = 0
-    	self.filepath = filepath
+
+    def __init__(self, filepath, model_name, N):
+        super(WeightsSaver, self).__init__()
+        self.N = N
+        self.batch = 0
+        self.epoch = 0
+        self.model_name = model_name
+        self.filepath = filepath
 
     def on_batch_end(self, batch, logs={}):
-    	if self.batch % self.N == 0:
-    		name = 'weights_epoch%02d_batch%08d.hdf5' % (self.epoch, self.batch)
-    		savestr = self.filepath+name
-    		self.model.save_weights(savestr, overwrite=True)
-    	self.batch += 1
+        if self.batch % self.N == 0:
+            name = 'weights_' + self.model_name + '_epoch%03d_batch%05d.hdf5'%(self.epoch, self.batch)
+            savestr = self.filepath+name
+            self.model.save_weights(savestr, overwrite=True)
+        self.batch += 1
 
     def on_epoch_end(self, epoch, logs=None):
-    	self.epoch += 1
-		
-		
+        self.epoch += 1

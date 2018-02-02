@@ -11,6 +11,7 @@ from keras.layers import Input
 from keras.models import Model
 from keras.utils import np_utils
 from keras.backend import clear_session
+import keras.backend as K
 import os
 import datetime
 import numpy as np
@@ -32,7 +33,7 @@ from   train2opt import TrainOptimizer
 from NeMO_models import FCN, AlexNet, Alex_Hyperopt_ParallelNet
 from NeMO_encoders import Alex_Encoder, Alex_Hyperopt_Encoder
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
-
+from NeMO_callbacks import CheckNumericsOps, WeightsSaver
  
 def data():
   imgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tif'
@@ -130,6 +131,7 @@ def model(train_generator, validation_generator, model_name, num_channels):
                                  append=True, separator=';')
   tensor_board_logfile = './logs/' + model_name + str(globalvars.globalVar)
   tensor_board = TensorBoard(log_dir=tensor_board_logfile, histogram_freq=0, write_graph=True)
+  SaveWeights = WeightsSaver(filepath='./weights/', model_name=model_name, N=50)
 
   history = model.fit_generator(
               train_generator,
@@ -138,7 +140,7 @@ def model(train_generator, validation_generator, model_name, num_channels):
               validation_data=validation_generator,
               validation_steps=10,
               verbose=1,
-              callbacks=[lr_reducer, early_stopper, csv_logger, checkpointer])
+              callbacks=[lr_reducer, early_stopper, csv_logger, checkpointer, SaveWeights])
 
   
   h1   = history.history
