@@ -134,7 +134,7 @@ def model(train_generator, validation_generator, model_name, num_channels):
   history = model.fit_generator(
               train_generator,
               steps_per_epoch=200,
-              epochs=50,
+              epochs=100,
               validation_data=validation_generator,
               validation_steps=10,
               verbose=1,

@@ -1,8 +1,8 @@
 image_set_loader:
   train:
-    image_set: F:/Images/LO_Training_Patches/rastertrain.txt
-    image_dir: F:/Images/LO_Training_Patches/
-    label_dir: F:/Images/LO_TrainingRef_Patches/
+    image_set: ../Images/LO_Training_Patches/rastertrain.txt
+    image_dir: ../Images/LO_Training_Patches_150/
+    label_dir: ../Images/LO_TrainingRef_Patches_150/
     target_size:
       - 150
       - 150
@@ -10,9 +10,9 @@ image_set_loader:
     color_mode: '8channel'
     label_format: 'tif'
   val:
-    image_set: F:/Images/LO_Valid_Patches/rastervalid.txt
-    image_dir: F:/Images/LO_Valid_Patches/
-    label_dir: F:/Images/LO_ValidRef_Patches/
+    image_set: ../Images/LO_Valid_Patches/rastervalid.txt
+    image_dir: ../Images/LO_Valid_Patches_150/
+    label_dir: ../Images/LO_ValidRef_Patches_150/
     target_size:
       - 150
       - 150
