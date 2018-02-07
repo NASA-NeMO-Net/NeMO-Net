@@ -28,12 +28,32 @@ _SESSION = tf.Session(config=config)
 K.set_session(_SESSION)
 
 image_size = 150
+batch_size = 120
 
-with open("init_args.yml", 'r') as stream:
+imgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tif'
+tfwpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tfw'
+truthpath = '../Images/BIOT-PerosBanhos-sample-habitat-map/BIOT-PerosBanhos-sample-habitat-map.shp'
+PerosBanhos = coralutils.CoralData(imgpath, Truthpath=truthpath, load_type="raster", tfwpath=tfwpath)
+labelkey = PerosBanhos.class_labels
+
+with open("init_args - AlexNetParallel_Raster.yml", 'r') as stream:
     try:
         init_args = yaml.load(stream)
     except yaml.YAMLError as exc:
         print(exc)
+
+train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
+val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
+
+if train_loader.color_mode == 'rgb':
+    num_channels = 3
+elif train_loader.color_mode == '8channel':
+    num_channels = 8
+
+y = train_loader.target_size[1]
+x = train_loader.target_size[0]
+pixel_mean =1023.5*np.ones(num_channels)
+pixel_std = 1023.5*np.ones(num_channels)
 
 checkpointer = ModelCheckpoint(filepath="./tmp/fcn_vgg16_weights.h5", verbose=1, save_best_only=True)
 lr_reducer = ReduceLROnPlateau(monitor='val_loss',
@@ -54,17 +74,31 @@ SaveWeights = WeightsSaver(filepath='./weights/', N=10)
 # log history during model fit
 csv_logger = CSVLogger('output/log.csv', append=True, separator=';')
 
-datagen = NeMOImageGenerator(image_shape=[image_size, image_size, 3],
+datagen = NeMOImageGenerator(image_shape=[y, x, num_channels],
                                     image_resample=True,
                                     pixelwise_center=True,
-                                    pixel_mean=[127.5, 127.5, 127.5],
+                                    pixel_mean=pixel_mean,
                                     pixelwise_std_normalization=True,
-                                    pixel_std=[127.5, 127.5, 127.5])
+                                    pixel_std=pixel_std)
+train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
+    target_size=(x,y),
+    color_mode=train_loader.color_mode,
+    classes = labelkey,
+    class_mode = 'categorical',
+    batch_size = batch_size,
+    shuffle=True)
 
-train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
-val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
+validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
+    target_size=(x,y),
+    color_mode=val_loader.color_mode,
+    classes = labelkey,
+    class_mode = 'categorical',
+    batch_size = batch_size,
+    shuffle=True)
 
-fcn_vgg16 = FCN(input_shape=(image_size, image_size, 3), classes=4, weight_decay=3e-3,
+num_classes = train_generator.num_class
+
+fcn_vgg16 = FCN(input_shape=(y, x, num_channels), classes=num_classes, weight_decay=3e-3,
                 weights='imagenet', trainable_encoder=True)
 optimizer = keras.optimizers.Adam(1e-4)
 
