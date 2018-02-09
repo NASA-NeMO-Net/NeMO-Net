@@ -19,17 +19,16 @@ from keras.callbacks import (
     TerminateOnNaN)
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
-global _SESSION
-config = tf.ConfigProto(allow_soft_placement=True)
-config.gpu_options.allow_growth = True
-_SESSION = tf.Session(config=config)
-K.set_session(_SESSION)
+# global _SESSION
+# config = tf.ConfigProto(allow_soft_placement=True)
+# config.gpu_options.allow_growth = True
+# _SESSION = tf.Session(config=config)
+# K.set_session(_SESSION)
 
 image_size = 150
-batch_size = 48
+batch_size = 72
 model_name = 'FCN_Raster_TestRun'
 
 imgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tif'
@@ -112,10 +111,10 @@ fcn_vgg16.compile(optimizer=optimizer,
                   metrics=['accuracy'])
 
 fcn_vgg16.fit_generator(train_generator,
-    steps_per_epoch=50,
-    epochs=2,
+    steps_per_epoch=200,
+    epochs=100,
     validation_data=validation_generator,
-    validation_steps=5,
+    validation_steps=10,
     verbose=1,
     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 
