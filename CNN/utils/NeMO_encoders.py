@@ -529,7 +529,9 @@ class VGGEncoder(Encoder):
             blocks.append(block)
 
         # Fully Convolutional block
-        fc_block = vgg_fc(filters=4096, weight_decay=weight_decay)
+        fc_block = vgg_fc(filters=1024, weight_decay=weight_decay)
+        # fc_block = vgg_fc(filters=4096, weight_decay=weight_decay)
+
         blocks.append(fc_block)
 
         super(VGGEncoder, self).__init__(inputs=inputs, blocks=blocks,
@@ -555,11 +557,18 @@ class VGG16(VGGEncoder):
             weights = None
 
         super(VGG16, self).__init__(inputs,
-                                    filters=[64, 128, 256, 512, 512],
-                                    convs=[2, 2, 3, 3, 3],
+                                    filters=[64, 128, 256, 384, 512],
+                                    convs=[5, 4, 3, 3, 3],
                                     weight_decay=weight_decay,
                                     weights=weights,
                                     trainable=trainable)
+
+        # super(VGG16, self).__init__(inputs,
+        #                             filters=[64, 128, 256, 512, 512],
+        #                             convs=[2, 2, 3, 3, 3],
+        #                             weight_decay=weight_decay,
+        #                             weights=weights,
+        #                             trainable=trainable)
 
 
 class VGG19(VGGEncoder):
