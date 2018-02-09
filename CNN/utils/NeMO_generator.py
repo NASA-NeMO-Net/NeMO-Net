@@ -80,7 +80,7 @@ class NeMOImageGenerator(ImageDataGenerator):
             shuffle=shuffle,
             seed=seed)
 
-    def flow_from_NeMOdirectory(self, directory,
+    def flow_from_NeMOdirectory(self, directory, FCN_directory=None,
                             target_size=(256, 256), color_mode='rgb',
                             classes=None, class_mode='categorical',
                             batch_size=32, shuffle=True, seed=None,
@@ -89,7 +89,7 @@ class NeMOImageGenerator(ImageDataGenerator):
                             save_format='png',
                             follow_links=False):
         return NeMODirectoryIterator(
-            directory, self,
+            directory, self, FCN_directory=FCN_directory,
             target_size=target_size, color_mode=color_mode,
             classes=classes, class_mode=class_mode,
             data_format=self.data_format,
@@ -158,6 +158,7 @@ class NeMODirectoryIterator(Iterator):
             via the `classes` argument.
         image_data_generator: Instance of `ImageDataGenerator`
             to use for random transformations and normalization.
+        FCN_directory: Directory to use for FCN data, or complete labelled patch data
         target_size: tuple of integers, dimensions to resize input images to.
         color_mode: One of `"rgb"`, `"grayscale"`. Color mode to read images.
         classes: Optional list of strings, names of sudirectories
@@ -184,7 +185,7 @@ class NeMODirectoryIterator(Iterator):
             (if `save_to_dir` is set).
     """
 
-    def __init__(self, directory, image_data_generator,
+    def __init__(self, directory, image_data_generator, FCN_directory=None,
                  target_size=(256, 256), color_mode='rgb',
                  classes=None, class_mode='categorical',
                  batch_size=32, shuffle=True, seed=None,
@@ -194,6 +195,7 @@ class NeMODirectoryIterator(Iterator):
         if data_format is None:
             data_format = K.image_data_format() #channels_last
         self.directory = directory
+        self.FCN_directory = FCN_directory
         self.image_data_generator = image_data_generator
         self.target_size = tuple(target_size)
         if color_mode not in {'rgb', 'grayscale','8channel'}:
@@ -251,12 +253,17 @@ class NeMODirectoryIterator(Iterator):
         self.samples = sum(pool.map(function_partial,
                                     (os.path.join(directory, subdir)
                                      for subdir in classes)))
-
         print('Found %d images belonging to %d classes.' % (self.samples, self.num_class))
+
+        # Check FCN label directory if specified
+        if FCN_directory is not None:
+            labelsamples = sum(pool.map(function_partial,
+                (os.path.join(FCN_directory, subdir) for subdir in self.classes)))
+            if labelsamples != self.samples:
+                raise ValueError("Error! %d training images found but only %d labelled images found." %(self.samples,labelsamples))
 
         # second, build an index of the images in the different class subfolders
         results = []
-
         self.filenames = []
         self.classes = np.zeros((self.samples,), dtype='int32')
         i = 0
@@ -265,10 +272,28 @@ class NeMODirectoryIterator(Iterator):
                                             (dirpath, white_list_formats,
                                              self.class_indices, follow_links)))
         for res in results:
-            classes, filenames = res.get()
-            self.classes[i:i + len(classes)] = classes
+            tempclasses, filenames = res.get()
+            self.classes[i:i + len(tempclasses)] = tempclasses
             self.filenames += filenames
-            i += len(classes)
+            i += len(tempclasses)
+
+        # Build an index of images in FCN label directory if specified
+        if FCN_directory is not None:
+            FCN_results = []
+            self.FCN_filenames = []
+            self.labelkey = [np.uint8(255/self.num_class*i) for i in range(self.num_class)]
+            label_shape = list(self.image_shape)
+            label_shape[self.image_data_generator.channel_axis - 1] = self.num_class
+            self.label_shape = tuple(label_shape)
+
+            for dirpath in (os.path.join(FCN_directory, subdir) for subdir in classes):
+                FCN_results.append(pool.apply_async(_list_valid_filenames_in_directory,
+                    (dirpath, white_list_formats, self.class_indices, follow_links)))
+
+            for res in FCN_results:
+                tempclasses, filenames = res.get()
+                self.FCN_filenames += filenames
+
         pool.close()
         pool.join()
         super(NeMODirectoryIterator, self).__init__(self.samples, batch_size, shuffle, seed)
@@ -325,6 +350,13 @@ class NeMODirectoryIterator(Iterator):
                 batch_y = self.classes[index_array]
             elif self.class_mode == 'binary':
                 batch_y = self.classes[index_array].astype(K.floatx())
+            elif self.FCN_directory is not None:
+                batch_y = np.zeros((len(batch_x),) + self.label_shape, dtype=np.int8)
+                for i, j in enumerate(index_array):
+                    fname = self.FCN_filenames[j]
+                    y = self._load_seg(fname)
+                    y = to_categorical(y, self.num_class).reshape(self.label_shape)
+                    batch_y[i] = y
             elif self.class_mode == 'categorical':
                 batch_y = np.zeros((len(batch_x), self.num_class), dtype=K.floatx())
                 for i, label in enumerate(self.classes[index_array]):
@@ -366,6 +398,28 @@ class NeMODirectoryIterator(Iterator):
             else:
                 return batch_x
         return batch_x, batch_y
+
+    def _load_seg(self, fn):
+        """Segmentation load method.
+
+        # Arguments
+            fn: filename of the image (with extension suffix)
+        # Returns
+            arr: numpy array of shape self.target_size
+        """
+        label_path = os.path.join(self.FCN_directory, fn)
+        img = pil_image.open(label_path)
+        if self.target_size:
+            wh_tuple = (self.target_size[1], self.target_size[0])
+        if img.size != wh_tuple:
+            img = img.resize(wh_tuple)
+        y = img_to_array(img, data_format=self.data_format)
+
+        item_counter = 0
+        for item in self.labelkey:
+            y[y == item] = item_counter 
+            item_counter+=1
+        return y
 
     # def next(self):
     #     """Next batch."""
@@ -516,7 +570,6 @@ class ImageSetLoader(object):
             for item in labelkey:
                 y[y == item ] = item_counter 
                 item_counter+=1
-
         return y
 
     def save(self, x, y, index):

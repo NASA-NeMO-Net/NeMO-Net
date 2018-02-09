@@ -8,6 +8,7 @@ import tensorflow as tf
 import sys
 sys.path.append("./utils/") # Adds higher directory to python modules path.
 #sys.path.append("./tmp/")
+import loadcoraldata_utils as coralutils
 from NeMO_models import FCN
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 from keras.callbacks import (
@@ -28,7 +29,8 @@ _SESSION = tf.Session(config=config)
 K.set_session(_SESSION)
 
 image_size = 150
-batch_size = 120
+batch_size = 48
+model_name = 'FCN_Raster_TestRun'
 
 imgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tif'
 tfwpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tfw'
@@ -55,7 +57,7 @@ x = train_loader.target_size[0]
 pixel_mean =1023.5*np.ones(num_channels)
 pixel_std = 1023.5*np.ones(num_channels)
 
-checkpointer = ModelCheckpoint(filepath="./tmp/fcn_vgg16_weights.h5", verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, save_best_only=True)
 lr_reducer = ReduceLROnPlateau(monitor='val_loss',
                                factor=np.sqrt(0.1),
                                cooldown=0,
@@ -64,7 +66,7 @@ early_stopper = EarlyStopping(monitor='val_loss',
                               min_delta=0.001,
                               patience=30)
 nan_terminator = TerminateOnNaN()
-SaveWeights = WeightsSaver(filepath='./weights/', N=10)
+SaveWeights = WeightsSaver(filepath='./weights/', model_name=model_name, N=10)
 #csv_logger = CSVLogger('output/tmp_fcn_vgg16.csv')
     #'output/{}_fcn_vgg16.csv'.format(datetime.datetime.now().isoformat()))
 
@@ -81,6 +83,7 @@ datagen = NeMOImageGenerator(image_shape=[y, x, num_channels],
                                     pixelwise_std_normalization=True,
                                     pixel_std=pixel_std)
 train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
+    FCN_directory=train_loader.label_dir,
     target_size=(x,y),
     color_mode=train_loader.color_mode,
     classes = labelkey,
@@ -89,6 +92,7 @@ train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     shuffle=True)
 
 validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
+    FCN_directory=val_loader.label_dir,
     target_size=(x,y),
     color_mode=val_loader.color_mode,
     classes = labelkey,
@@ -99,36 +103,44 @@ validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
 num_classes = train_generator.num_class
 
 fcn_vgg16 = FCN(input_shape=(y, x, num_channels), classes=num_classes, weight_decay=3e-3,
-                weights='imagenet', trainable_encoder=True)
+                weights=None, trainable_encoder=True)
 optimizer = keras.optimizers.Adam(1e-4)
 
+fcn_vgg16.summary()
 fcn_vgg16.compile(optimizer=optimizer,
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
 
-fcn_vgg16.fit_generator(
-    datagen.flow_from_imageset(
-        class_mode='categorical',
-        classes=4,
-        batch_size=20,
-        shuffle=True,
-        image_set_loader=train_loader),
+fcn_vgg16.fit_generator(train_generator,
     steps_per_epoch=50,
-    epochs=100,
-        batch_size=10,
-        shuffle=True,
-        image_set_loader=train_loader),
-    steps_per_epoch=80,
     epochs=2,
-    validation_data=datagen.flow_from_imageset(
-        class_mode='categorical',
-        classes=4,
-        batch_size=20,
-        shuffle=True,
-        image_set_loader=val_loader),
+    validation_data=validation_generator,
     validation_steps=5,
     verbose=1,
     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
-    callbacks=[lr_reducer, early_stopper, nan_terminator,checkpointer, csv_logger, SaveWeights])
 
-fcn_vgg16.save('./tmp/fcn_vgg16_model.h5')
+# fcn_vgg16.fit_generator(
+#     datagen.flow_from_imageset(
+#         class_mode='categorical',
+#         classes=4,
+#         batch_size=20,
+#         shuffle=True,
+#         image_set_loader=train_loader),
+#     steps_per_epoch=50,
+#     epochs=100,
+#         batch_size=10,
+#         shuffle=True,
+#         image_set_loader=train_loader),
+#     steps_per_epoch=80,
+#     epochs=2,
+#     validation_data=datagen.flow_from_imageset(
+#         class_mode='categorical',
+#         classes=4,
+#         batch_size=20,
+#         shuffle=True,
+#         image_set_loader=val_loader),
+#     validation_steps=5,
+#     verbose=1,
+#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+
+# fcn_vgg16.save('./tmp/fcn_vgg16_model.h5')
