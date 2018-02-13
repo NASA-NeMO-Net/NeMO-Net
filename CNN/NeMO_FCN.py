@@ -5,9 +5,17 @@ import numpy as np
 import keras
 import keras.backend as K
 import tensorflow as tf
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+global _SESSION
+config = tf.ConfigProto(allow_soft_placement=True)
+config.gpu_options.allow_growth = True
+_SESSION = tf.Session(config=config)
+K.set_session(_SESSION)
+
 import sys
 sys.path.append("./utils/") # Adds higher directory to python modules path.
-#sys.path.append("./tmp/")
 import loadcoraldata_utils as coralutils
 from NeMO_models import FCN
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
@@ -18,14 +26,6 @@ from keras.callbacks import (
     ModelCheckpoint,
     TerminateOnNaN)
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
-
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
-# global _SESSION
-# config = tf.ConfigProto(allow_soft_placement=True)
-# config.gpu_options.allow_growth = True
-# _SESSION = tf.Session(config=config)
-# K.set_session(_SESSION)
 
 image_size = 150
 batch_size = 72
