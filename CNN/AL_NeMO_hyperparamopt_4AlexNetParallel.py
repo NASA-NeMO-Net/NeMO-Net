@@ -203,6 +203,14 @@ def model(train_generator, validation_generator, model_name, num_channels):
  
 if __name__ == '__main__':
 
+  os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+  global _SESSION
+  config = tf.ConfigProto(allow_soft_placement=False)
+  config.gpu_options.allow_growth = False
+  _SESSION = tf.Session(config=config)
+  K.set_session(_SESSION)
+
   trials=Trials()
   train_generator, validation_generator, model_name, num_channels = data()
 

@@ -467,7 +467,7 @@ class CoralData:
 
 		if image_size%2 == 0:
 			if num_lines is None:
-				num_lines = int(np.floor((self.testimage.shape[0] - 2*crop_len+1)/spacing[0])) # Predict on whole image
+				num_lines = int(np.floor((self.testimage.shape[0] - 2*offstart+1)/spacing[0])) # Predict on whole image
 
 			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-2*crop_len+1+predict_size-1))
 			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-2*crop_len+1+predict_size-1))
