@@ -35,9 +35,13 @@ imgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2
 tfwpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tfw'
 truthpath = '../Images/BIOT-PerosBanhos-sample-habitat-map/BIOT-PerosBanhos-sample-habitat-map.shp'
 PerosBanhos = coralutils.CoralData(imgpath, Truthpath=truthpath, load_type="raster", tfwpath=tfwpath)
-labelkey = PerosBanhos.class_labels
+PerosBanhos.load_PB_consolidated_classes()
 
-with open("init_args - AlexNetParallel_Raster.yml", 'r') as stream:
+#labelkey = PerosBanhos.class_labels
+labelkey = PerosBanhos.consol_labels
+num_classes = len(PerosBanhos.PB_consolidated_classes)
+
+with open("init_args - VGG16FCN_Raster.yml", 'r') as stream:
     try:
         init_args = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -98,8 +102,6 @@ validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
     class_mode = 'categorical',
     batch_size = batch_size,
     shuffle=True)
-
-num_classes = train_generator.num_class
 
 fcn_vgg16 = FCN(input_shape=(y, x, num_channels), classes=num_classes, weight_decay=3e-3,
                 weights=None, trainable_encoder=True)

@@ -218,7 +218,6 @@ class NeMODirectoryIterator(Iterator):
                 self.image_shape = self.target_size + (1,)
             else:
                 self.image_shape = (1,) + self.target_size
-        self.classes = classes
         if class_mode not in {'categorical', 'binary', 'sparse',
                               'input', None}:
             raise ValueError('Invalid class_mode:', class_mode,
@@ -235,16 +234,20 @@ class NeMODirectoryIterator(Iterator):
         # first, count the number of samples and classes
         self.samples = 0
 
-        # print("CLASSES BEFORE: ", classes)
         if not classes:
             classes = []
             for subdir in sorted(os.listdir(directory)):
                 if os.path.isdir(os.path.join(directory, subdir)):
                     classes.append(subdir)
         self.num_class = len(classes)
-        self.class_indices = dict(zip(classes, range(len(classes))))
-        # print("CLASSES: ", classes)
-        # print("CLASS INDICIES: ", self.class_indices)
+
+        if type(classes) is dict:
+            self.class_indices = classes
+            self.num_consolclass = len(np.unique([self.class_indices[k] for k in self.class_indices]))
+            classes = [k for k in self.class_indices] #redefine classes as a list
+        else:
+            self.class_indices = dict(zip(classes, range(len(classes))))
+            self.num_consolclass = self.num_class
 
         pool = multiprocessing.pool.ThreadPool()
         function_partial = partial(_count_valid_files_in_directory,
@@ -253,12 +256,12 @@ class NeMODirectoryIterator(Iterator):
         self.samples = sum(pool.map(function_partial,
                                     (os.path.join(directory, subdir)
                                      for subdir in classes)))
-        print('Found %d images belonging to %d classes.' % (self.samples, self.num_class))
+        print('Found %d images belonging to %d classes, split into %d consolidated classes.' % (self.samples, self.num_class, self.num_consolclass))
 
         # Check FCN label directory if specified
         if FCN_directory is not None:
             labelsamples = sum(pool.map(function_partial,
-                (os.path.join(FCN_directory, subdir) for subdir in self.classes)))
+                (os.path.join(FCN_directory, subdir) for subdir in classes)))
             if labelsamples != self.samples:
                 raise ValueError("Error! %d training images found but only %d labelled images found." %(self.samples,labelsamples))
 
@@ -283,7 +286,7 @@ class NeMODirectoryIterator(Iterator):
             self.FCN_filenames = []
             self.labelkey = [np.uint8(255/self.num_class*i) for i in range(self.num_class)]
             label_shape = list(self.image_shape)
-            label_shape[self.image_data_generator.channel_axis - 1] = self.num_class
+            label_shape[self.image_data_generator.channel_axis - 1] = self.num_consolclass
             self.label_shape = tuple(label_shape)
 
             for dirpath in (os.path.join(FCN_directory, subdir) for subdir in classes):
@@ -355,10 +358,10 @@ class NeMODirectoryIterator(Iterator):
                 for i, j in enumerate(index_array):
                     fname = self.FCN_filenames[j]
                     y = self._load_seg(fname)
-                    y = to_categorical(y, self.num_class).reshape(self.label_shape)
+                    y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
                     batch_y[i] = y
             elif self.class_mode == 'categorical':
-                batch_y = np.zeros((len(batch_x), self.num_class), dtype=K.floatx())
+                batch_y = np.zeros((len(batch_x), self.num_consolclass), dtype=K.floatx())
                 for i, label in enumerate(self.classes[index_array]):
                     batch_y[i, label] = 1.
             else:
@@ -414,10 +417,11 @@ class NeMODirectoryIterator(Iterator):
         if img.size != wh_tuple:
             img = img.resize(wh_tuple)
         y = img_to_array(img, data_format=self.data_format)
+        # Need to add correction for consol_class
 
         item_counter = 0
         for item in self.labelkey:
-            y[y == item] = item_counter 
+            y[y == item] = self.class_indices[list(self.class_indices.keys())[item_counter]]
             item_counter+=1
         return y
 

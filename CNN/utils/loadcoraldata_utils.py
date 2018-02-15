@@ -123,51 +123,6 @@ class CoralData:
 
 				self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
 				self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
-				''' PREVIOUS CODE FOR ONE SHAPE PER CLASS
-				# counter = 1
-				# self.class_labels = ['NoData']
-				# raster_fn = 'temp.tif'
-				# NoData_value = -1
-
-				# for file in glob.glob(Truthpath + '*.shp'):
-				# 	vector_fn = file
-				# 	underscore_pos = vector_fn.find('_')
-				# 	period_pos = -4
-				# 	self.class_labels.append(file[underscore_pos+1:period_pos])
-				# 	print("Class loaded: " + file[underscore_pos+1:period_pos] + "\n")
-
-				# 	source_ds = ogr.Open(vector_fn)
-				# 	source_layer = source_ds.GetLayer()
-				# 	truth_xmin, truth_xmax, truth_ymin, truth_ymax = source_layer.GetExtent()
-				# 	pixel_size = self.geotransform[1]
-
-				# 	topleft = (np.max([img_xmin, truth_xmin]), np.min([img_ymax, truth_ymax]))
-				# 	bottomright = (np.min([img_xmax, truth_xmax]), np.max([img_ymin, truth_ymin]))
-
-				# 	x_res = int((xmax - xmin) / pixel_size)
-				# 	y_res = int((ymax - ymin) / pixel_size)
-
-				# 	target_ds = gdal.GetDriverByName('GTiff').Create(raster_fn, x_res, y_res, 1, gdal.GDT_Int32)
-				# 	target_ds.SetGeoTransform(self.geotransform)
-				# 	band = target_ds.GetRasterBand(1)
-				# 	band.SetNoDataValue(NoData_value)
-				# 	gdal.RasterizeLayer(target_ds, [1], source_layer, None, None, [1], ['ALL_TOUCHED=TRUE'])
-
-				# 	tempband = target_ds.GetRasterBand(1)
-				# 	temparray = tempband.ReadAsArray()
-				# 	temparray[temparray == -1] = 0
-				# 	temparray[temparray == 1] = counter
-
-				# 	if self.truthimage is None:
-				# 		self.truthimage = np.copy(temparray)
-				# 	else:
-				# 		temparray2 = temparray + self.truthimage
-				# 		temparray[temparray2 > counter] = 0
-				# 		self.truthimage = self.truthimage + temparray
-
-				# 	target_ds = None
-				# 	counter +=1dddPrevious code for 1 shape per class
-				'''
 		else:
 			print("Load type error: specify either PIL, cv2, or raster")
 			return None
@@ -184,6 +139,29 @@ class CoralData:
 				self.num_classes = len(self.class_labels)
 			except:
 				pass
+
+	def load_PB_consolidated_classes(self):
+		self.PB_LOF2consolclass = {"NoData": "Other", "Clouds": "Other", "deep lagoonal water": "Other", "deep ocean water": "Other", "Inland waters": "Other", 
+			"mangroves": "Other", "terrestrial vegetation": "Other", "Wetlands": "Other",
+			"back reef - pavement": "Pavement with algae",
+			"back reef - rubble dominated": "Rubble with CCA",
+			"back reef - sediment dominated": "Sediment bare", "Beach": "Sediment bare", "fore reef sand flats": "Sediment bare", 
+			"lagoonal sediment apron - sediment dominated": "Sediment bare", "lagoonal floor - barren": "Sediment bare", 
+			"dense seagrass meadows": "Seagrass",
+			"Rocky beach": "Rock",
+			"coralline algal ridge (reef crest)": "Reef crest",
+			"deep fore reef slope": "Low Relief HB", "shallow fore reef slope": "Low Relief HB", "shallow fore reef terrace": "Low Relief HB",
+			"back reef coral framework": "High Relief HB", "lagoonal fringing reefs": "High Relief HB",
+			"lagoonal patch reefs": "Patch reefs"
+			}
+		self.PB_consolidated_classes = {"Other": 0, "Pavement with algae": 1, "Rubble with CCA": 2, "Sediment bare": 3, "Seagrass": 4, "Rock": 5,
+			"Reef crest": 6, "Low Relief HB": 7, "High Relief HB": 8, "Patch reefs": 9}
+
+		for k in self.class_labels:
+			self.consol_labels = dict((k,self.PB_consolidated_classes[self.PB_LOF2consolclass[k]]) for k in self.class_labels)
+
+		# will rewrite truthimage as consol_labels
+
 
 #### Load Image
 # Input:
@@ -415,10 +393,10 @@ class CoralData:
 # 	whole_dataset: Patch(es) of test image
 	def _load_whole_data(self, image_size, crop_len, offset=0, yoffset = 0, cols = 1, lines=None, toremove=None):
 		if image_size%2 == 0:
-			if lines is None:
+			if lines is None: 	# this is never used currently
 				lines = self.testimage.shape[0] - 2*crop_len +1
 
-			if offset+lines+crop_len > self.testimage.shape[0]+1:
+			if offset+lines+crop_len > self.testimage.shape[0]+1: # this is never used currently
 				print("Too many lines specified, reverting to maximum possible")
 				lines = self.testimage.shape[0] - offset - crop_len
 
@@ -437,7 +415,6 @@ class CoralData:
 
 			whole_datasets = []
 			for i in range(offset, lines+offset):
-				#for j in range(crop_len, self.testimage.shape[1] - crop_len):
 				for j in range(yoffset, yoffset+cols):
 					whole_datasets.append(self.testimage[i-crop_len:i+crop_len+1, j-crop_len:j+crop_len+1,:])
 
@@ -465,12 +442,16 @@ class CoralData:
 		crop_len = int(np.floor(image_size/2)) # lengths from sides to not take into account in the calculation of num_lines
 		offstart = crop_len-int(np.floor(predict_size/2))
 
+		if image_size%spacing[0] != 0 or image_size%spacing[1] != 0:
+			print("Error: Spacing does not divide into image size!")
+			raise ValueError
+
 		if image_size%2 == 0:
 			if num_lines is None:
-				num_lines = int(np.floor((self.testimage.shape[0] - 2*offstart+1)/spacing[0])) # Predict on whole image
+				num_lines = int(np.floor((self.testimage.shape[0] - image_size)/spacing[0])+1) # Predict on whole image
 
-			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-2*crop_len+1+predict_size-1))
-			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-2*crop_len+1+predict_size-1))
+			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
+			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
 
 			truth_predict = self.truthimage[offstart:offstart+whole_predict.shape[0], offstart:offstart+whole_predict.shape[1]]
 
@@ -484,15 +465,17 @@ class CoralData:
 					temp_predict = self._classifyback(temp_predict)
 					
 					for predict_mat in temp_predict: 	# this is incorrect if temp_predict has more than 1 prediction (e.g. cols>1, lines>1)
-						whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + predict_mat
-						num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones(predict_mat.shape)
-					print("Line: " + str(offset-crop_len) + " Col: " + str(cols-crop_len) + '/ ' + str(self.testimage.shape[1]-2*crop_len+1) + ' completed', end='\r')
+						whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = \
+							whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + predict_mat
+						num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = \
+							num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones(predict_mat.shape)
+					print("Line: " + str(offset-crop_len) + " Col: " + str(cols-crop_len) + '/ ' + str(self.testimage.shape[1]-image_size+1) + ' completed', end='\r')
 		else:
 			if num_lines is None:
-				num_lines = int(np.floor((self.testimage.shape[0] - 2*crop_len)/spacing[0])) # Predict on whole image
+				num_lines = int(np.floor((self.testimage.shape[0] - image_size)/spacing[0])+1) # Predict on whole image
 
-			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-2*crop_len+predict_size-1))
-			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-2*crop_len+predict_size-1))
+			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
+			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
 
 			truth_predict = self.truthimage[offstart:offstart+whole_predict.shape[0], offstart:offstart+whole_predict.shape[1]]
 
