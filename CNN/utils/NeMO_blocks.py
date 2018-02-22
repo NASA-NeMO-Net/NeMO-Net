@@ -21,7 +21,21 @@ from keras.regularizers import l2
 from NeMO_layers import CroppingLike2D, BilinearUpSampling2D
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
-def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_bool=False, batchnorm_bool = False, pad_size=(0,0), 
+# General multi-purpose convolution block used for all convolutions
+# filters: # of filters [int]
+# kernel_size: Size of convolutional kernel [(int,int)]
+# conv_strides: Stride of convolution kernel [(int,int)]
+# padding: Type of padding for convolution ['valid' or 'same']
+# pad_bool: Custom padding of the tensor [bool]
+# pool_bool: Max pooling at end of convolutions [bool]
+# batchnorm_bool: Batch normalization at end of pooling [bool]
+# pad_size: Custom padding size for the tensor [(int,int)]
+# pool_size: Max pooling size [(int,int)]
+# pool_strides: Max pooling stride size [(int,int)]
+# dilation_rate: Convolution kernel dilation rate [(int,int)]
+# weight_decay: kernel regularizer l2 weight decay [float]
+# block_name: Name of block [string]
+def alex_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_bool=False, pool_bool=False, batchnorm_bool = False, pad_size=(0,0), 
   pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), weight_decay=0., block_name='alexblock'):
     def f(input):
       x = input
@@ -32,9 +46,8 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_boo
           temp_padsize = int(np.ceil((test_size-int(x.shape[1]))/2))
           x = ZeroPadding2D(padding=(temp_padsize,temp_padsize))(x)
 
-      x = Conv2D(filters, kernel_size, strides=conv_strides, dilation_rate=dilation_rate, activation='relu',
-        kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay),
-        name='{}_conv'.format(block_name))(x)
+      x = Conv2D(filters, kernel_size, strides=conv_strides, padding=padding, dilation_rate=dilation_rate, activation='relu',
+        kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay), name='{}_conv'.format(block_name))(x)
 
       if pool_bool:
         if pool_size[0] > x.shape[1]:
@@ -42,7 +55,7 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), pad_bool=False, pool_boo
           x = ZeroPadding2D(padding=(temp_padsize,temp_padsize))(x)
         x = MaxPooling2D(pool_size=pool_size, strides=pool_strides, name='{}_pool'.format(block_name))(x)
       if batchnorm_bool:
-        x = BatchNormalization()(x)
+        x = BatchNormalization(name='{}_BatchNorm'.format(block_name))(x)
       return x
     return f
 
@@ -67,6 +80,45 @@ def parallel_conv(filters, kernel_size, pad_size=(0,0), pool_size=(2,2), dilatio
           x[i] = BatchNormalization()(x[i])
       return x
     return f
+
+def vgg_convblock(filters, kernel_size, convs=1, conv_strides=(1,1), padding='same', pad_bool=False, pool_bool=True, batchnorm_bool=False, pad_size=(0,0),
+  pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), weight_decay=0., block_name='vgg_convblock'):
+    def f(input):
+      x = input
+      for i in range(convs):
+        if i < convs-1:
+          x = alex_conv(filters, kernel_size, padding=padding, pad_bool=pad_bool, pool_bool=False, batchnorm_bool=False, pad_size=pad_size,
+            dilation_rate=dilation_rate, weight_decay=weight_decay, block_name='{}_alexconv{}'.format(block_name, int(i+1)))(x)
+        else:
+          x = alex_conv(filters, kernel_size, padding=padding, pad_bool=pad_bool, pool_bool=pool_bool, batchnorm_bool=batchnorm_bool, pad_size=pad_size,
+            pool_size=pool_size, pool_strides=pool_size, dilation_rate=dilation_rate, weight_decay=weight_decay, 
+            block_name='{}_alexconv{}'.format(block_name, int(i+1)))(x)
+      return x
+    return f
+
+def vgg_deconvblock(filters, kernel_size, convs, classes, batchnorm_bool=True, target_shape=None, scale=1, weight_decay=0., block_name='vgg_deconvblock'):
+    def f(x, y):
+        for i in range(convs):
+          if i < convs-1:
+            x = alex_conv(filters, kernel_size, padding='same', pad_bool=False, pool_bool=False, batchnorm_bool=False, pad_size=(0,0), dilation_rate=(1,1),
+              weight_decay=weight_decay, block_name='{}_alexconv{}'.format(block_name, int(i+1)))(x)
+          else:
+            x = alex_conv(filters, kernel_size, padding='same', pad_bool=False, pool_bool=False, batchnorm_bool=batchnorm_bool, pad_size=(0,0), dilation_rate=(1,1),
+              weight_decay=weight_decay, block_name='{}_alexconv{}'.format(block_name, int(i+1)))(x)
+
+        x = Conv2D(classes, kernel_size=(1,1), activation='linear', padding='valid', kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay),
+          name='{}_1b1conv'.format(block_name))(x)
+
+        if y is not None:
+          def scaling(xx, ss=1):
+            return xx * ss
+          scaled = Lambda(scaling, arguments={'ss': scale}, name='{}_scale'.format(block_name))(x)
+          x = add([y, scaled])
+
+        upscore = BilinearUpSampling2D(target_shape=target_shape, name='{}_BilinearUpsample'.format(block_name))(x)
+        return upscore
+    return f
+
 
 def pool_concat(pool_size=(1,1), batchnorm_bool=False, block_name='poolconcat_block'):
     def f(input):
@@ -102,63 +154,16 @@ def alex_fc(filters, flatten_bool=False, dropout_bool=False, dropout=0.5, weight
     return f
 
 
-def vgg_conv(filters, convs, padding=False, weight_decay=0., block_name='blockx'):
-    """A VGG convolutional block for encoding.
-    # NOTE: All kernels are 3x3 hard-coded!
+def vgg_fcblock(filters, full_layers, dropout_bool=False, dropout=0.5, weight_decay=0., block_name='vgg_fcblock'):
+    def f(input):
+      x = input
 
-    :param filters: Integer, number of filters per conv layer
-    :param convs: Integer, number of conv layers in the block
-    :param block_name: String, the name of the block, e.g., block1
-
-    >>> from keras_fcn.blocks import vgg_conv
-    >>> x = vgg_conv(filters=64, convs=2, block_name='block1')(x)
-
-    """
-    def f(x):
-        for i in range(convs):
-            if block_name == 'block1' and i == 0:
-                if padding is True:
-                    x = ZeroPadding2D(padding=(100, 100))(x)
-                x = Conv2D(filters, (3, 3), activation='relu', padding='same',
-                           kernel_initializer='he_normal',
-                           kernel_regularizer=l2(weight_decay),
-                           name='{}_conv{}'.format(block_name, int(i + 1)))(x)
-            else:
-                x = Conv2D(filters, (3, 3), activation='relu', padding='same',
-                           kernel_initializer='he_normal',
-                           kernel_regularizer=l2(weight_decay),
-                           name='{}_conv{}'.format(block_name, int(i + 1)))(x)
-
-        pool = MaxPooling2D((2, 2), strides=(2, 2), padding='same',
-                            name='{}_pool'.format(block_name))(x)
-        return pool
-    return f
-
-
-def vgg_fc(filters, weight_decay=0., block_name='block5'):
-    """A fully convolutional block for encoding.
-
-    :param filters: Integer, number of filters per fc layer
-
-    >>> from keras_fcn.blocks import vgg_fc
-    >>> x = vgg_fc(filters=4096)(x)
-
-    """
-    def f(x):
-        fc6 = Conv2D(filters, kernel_size=(7, 7),
-                     activation='relu', padding='same',
-                     dilation_rate=(2, 2),
-                     kernel_initializer='he_normal',
-                     kernel_regularizer=l2(weight_decay),
-                     name='{}_fc6'.format(block_name))(x)
-        drop6 = Dropout(0.5)(fc6)
-        fc7 = Conv2D(filters, kernel_size=(1, 1),
-                     activation='relu', padding='same',
-                     kernel_initializer='he_normal',
-                     kernel_regularizer=l2(weight_decay),
-                     name='{}_fc7'.format(block_name))(drop6)
-        drop7 = Dropout(0.5)(fc7)
-        return drop7
+      for i in range(full_layers):
+        x = Conv2D(filters[i], kernel_size=(1,1), activation='relu', padding='same', kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay),
+          name='{}_1b1conv{}'.format(block_name,i+1))(x)
+        if dropout_bool:
+          x = Dropout(dropout[i])(x)
+      return x
     return f
 
 def res_shortcut(input, residual, weight_decay=0):
@@ -260,6 +265,68 @@ def res_fc(classes, weight_decay=0., block_name='blockfc'):
       flatten = Flatten()(pool)
       dense = Dense(units=classes, kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay), name='{}_dense'.format(block_name))(flatten)
       return dense
+    return f
+
+# ALL functions below are from the original VGG FCN code, but they are hard-coded in many ways (filters, # of layers, etc...)
+# Only really kept here for posterity
+
+def vgg_conv(filters, convs, padding=False, weight_decay=0., block_name='blockx'):
+    """A VGG convolutional block for encoding.
+    # NOTE: All kernels are 3x3 hard-coded!
+
+    :param filters: Integer, number of filters per conv layer
+    :param convs: Integer, number of conv layers in the block
+    :param block_name: String, the name of the block, e.g., block1
+
+    >>> from keras_fcn.blocks import vgg_conv
+    >>> x = vgg_conv(filters=64, convs=2, block_name='block1')(x)
+
+    """
+    def f(x):
+        for i in range(convs):
+            if block_name == 'block1' and i == 0:
+                if padding is True:
+                    x = ZeroPadding2D(padding=(100, 100))(x)
+                x = Conv2D(filters, (3, 3), activation='relu', padding='same',
+                           kernel_initializer='he_normal',
+                           kernel_regularizer=l2(weight_decay),
+                           name='{}_conv{}'.format(block_name, int(i + 1)))(x)
+            else:
+                x = Conv2D(filters, (3, 3), activation='relu', padding='same',
+                           kernel_initializer='he_normal',
+                           kernel_regularizer=l2(weight_decay),
+                           name='{}_conv{}'.format(block_name, int(i + 1)))(x)
+
+        pool = MaxPooling2D((2, 2), strides=(2, 2), padding='same',
+                            name='{}_pool'.format(block_name))(x)
+        return pool
+    return f
+
+
+def vgg_fc(filters, weight_decay=0., block_name='block5'):
+    """A fully convolutional block for encoding.
+
+    :param filters: Integer, number of filters per fc layer
+
+    >>> from keras_fcn.blocks import vgg_fc
+    >>> x = vgg_fc(filters=4096)(x)
+
+    """
+    def f(x):
+        fc6 = Conv2D(filters, kernel_size=(7, 7),
+                     activation='relu', padding='same',
+                     dilation_rate=(2, 2),
+                     kernel_initializer='he_normal',
+                     kernel_regularizer=l2(weight_decay),
+                     name='{}_fc6'.format(block_name))(x)
+        drop6 = Dropout(0.5)(fc6)
+        fc7 = Conv2D(filters, kernel_size=(1, 1),
+                     activation='relu', padding='same',
+                     kernel_initializer='he_normal',
+                     kernel_regularizer=l2(weight_decay),
+                     name='{}_fc7'.format(block_name))(drop6)
+        drop7 = Dropout(0.5)(fc7)
+        return drop7
     return f
 
 def vgg_deconv(classes, scale=1, kernel_size=(4, 4), strides=(2, 2),

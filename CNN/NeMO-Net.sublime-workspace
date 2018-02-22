@@ -1,0 +1,666 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/keras/preprocessing/image.py",
+			"settings":
+			{
+				"buffer_size": 43854,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "utils/loadcoraldata_utils.py",
+			"settings":
+			{
+				"buffer_size": 26661,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "utils/NeMO_generator.py",
+			"settings":
+			{
+				"buffer_size": 25956,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "utils/NeMO_layers.py",
+			"settings":
+			{
+				"buffer_size": 5869,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "utils/NeMO_blocks.py",
+			"settings":
+			{
+				"buffer_size": 18474,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "utils/NeMO_encoders.py",
+			"settings":
+			{
+				"buffer_size": 24546,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "utils/NeMO_decoders.py",
+			"settings":
+			{
+				"buffer_size": 4915,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "utils/NeMO_models.py",
+			"settings":
+			{
+				"buffer_size": 5556,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "AL_NeMO_hyperparamopt_VGG16FCN_64.py",
+			"settings":
+			{
+				"buffer_size": 4946,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "prv",
+		"selected_items":
+		[
+			[
+				"prv",
+				"PackageResourceViewer: Open Resource"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 412.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/F/faceswap-GAN-master/utils.py",
+		"/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/tensorflow/contrib/framework/__init__.py",
+		"/F/face-swap/model.py",
+		"/F/face-swap/image_augmentation.py",
+		"/F/face-swap/pixel_shuffler.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/NeMO_FCN.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/AL_NeMO_hyperparamopt_4AlexNetParallel.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMO_layers.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/Test_NeMO_generator.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/init_args - VGG16FCN_Raster.yml",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/Test_NeMO_generator",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMO_callbacks.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/Keras_FCNHyperOpt_FullVisualization.ipynb",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/Keras_AlexNetHyperOpt_FullVisualization.ipynb",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/NeMO_hyperparamopt_4FCN.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/tests/test_encoders.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/tests/test_models.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/AL_NeMO_hyperparamopt_4AlexNet.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/NeMO_hyperparamopt_4AlexNet.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/init_args - AlexNetParallel_Raster.yml",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMO_blocks.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/Keras_AlexNet.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/tests/test_blocks.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/NeMO_AlexNet.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/NeMO_ResNet34.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/output/hyperas_NeMO_AlexNettest_log.csv",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/hyperparamopt_utils/train2opt.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/Keras_AlexNetFullVisualize.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/TestCoralUtil.ipynb",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMO_models.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/init_args - AlexNet.yml",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMO_generator.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/hyperparamopt_utils/hyperas_example_with_fit_generator.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMO_encoders.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/AL_NeMO_hyperopt_AlexNet.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/.gitignore",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/hyperparamopt_utils/temp_model.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/hyperparamopt_utils/lstm.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/output/hyperas_AlexNet_hyperopttest_log.csv",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/globalvars.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/Untitled.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/temp_model.py",
+		"/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/keras/preprocessing/image.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/hyperparamopt_utils/hyperopt_example.py",
+		"/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/hyperopt/pyll/base.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/loadcoraldata_utils.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMO_AlexNet.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/alignUAVtoSat/cvk2.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMO_backend.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/alignUAVtoSat/Match_Images.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/voc2011/train.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/voc2011/score.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMOgenerator.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/tests/test_models.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/tests/test_NeMOgenerator.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/voc2011/test_voc_generator.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMO_decoders.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/loadcoraldata_utils.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/tests/test_decoders.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/tests/test_losses.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/common.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/keras_fcn/backend/tensorflow_backend.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/keras_fcn/losses.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/keras_fcn/callbacks.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/keras_fcn/backend/common.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/keras_fcn/encoders.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/keras_fcn/__init__.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMO_losses.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/tests/test_layers.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/callbacks.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/losses.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/models.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/blocks.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/test_layers.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/test_NeMOgenerator.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMOlayers.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/layers.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/encoders.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/setup.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/test_sample.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/voc2011/voc_generator.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/test_NeMO_voc_generator.py",
+		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMO_voc_generator.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/keras_fcn/models.py",
+		"/C/Users/Rechant/Documents/GitHub/keras-fcn/voc2011/__init__.py",
+		"/C/Users/Rechant/Documents/MachineLearning/mnist_mlp.py",
+		"/C/Users/Rechant/AppData/Roaming/Sublime Text 3/Packages/Color Scheme - Default/Monokai.tmTheme",
+		"/C/Users/Rechant/AppData/Roaming/Sublime Text 3/Packages/Theme - Default/Default.sublime-theme"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 104.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"pool_concat",
+			"scaling",
+			"labelkey",
+			"summary",
+			"img_to_array",
+			"classifyback",
+			"data_format",
+			"_rescale",
+			"uint8",
+			"str(lr)",
+			"optModel",
+			"input_shape",
+			"numpy",
+			"except",
+			"HEAD",
+			"classes",
+			"n",
+			"space",
+			"optModel",
+			"space",
+			"numpy",
+			"trials",
+			"batch_size",
+			"iterator",
+			"img_to_array",
+			"temp.tif",
+			"directoryIterator",
+			"flow_from_direc",
+			"flow_from",
+			"fname",
+			"index_array",
+			"self.index_generator",
+			"uint",
+			"f.write",
+			"get_file",
+			"gray",
+			"counter",
+			"get_file",
+			"load_seg",
+			"datagen",
+			"image_resample",
+			"rescale",
+			"offset",
+			"index_generator",
+			"IndexIterator",
+			"IndexGenerator",
+			"load_seg",
+			"keras_fcn",
+			"keras_func",
+			"NeMO",
+			"increment_var",
+			"FCN",
+			"index_generator",
+			"IndexI",
+			"indexiterator"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"np"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 6,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/keras/preprocessing/image.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 43854,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								35767,
+								35767
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 12774.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "utils/loadcoraldata_utils.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 26661,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6620,
+								6620
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1775.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "utils/NeMO_generator.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 25956,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								18739,
+								18739
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5848.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "utils/NeMO_layers.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5869,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "utils/NeMO_blocks.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 18474,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6503,
+								6503
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5568.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "utils/NeMO_encoders.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 24546,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2957,
+								2957
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 910.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "utils/NeMO_decoders.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4915,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3668,
+								3668
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1176.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "utils/NeMO_models.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5556,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2665,
+								2665
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 309.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "AL_NeMO_hyperparamopt_VGG16FCN_64.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4946,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4130,
+								4130
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1135.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "NeMO-Net.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
