@@ -160,7 +160,9 @@ class CoralData:
 		for k in self.class_labels:
 			self.consol_labels = dict((k,self.PB_consolidated_classes[self.PB_LOF2consolclass[k]]) for k in self.class_labels)
 
-		# will rewrite truthimage as consol_labels
+		self.truthimage_consolidated = np.copy(self.truthimage)
+		for i in range(len(self.class_labels)):
+			self.truthimage_consolidated[self.truthimage_consolidated == i] = self.PB_consolidated_classes[self.PB_LOF2consolclass[self.class_labels[i]]]
 
 
 #### Load Image
