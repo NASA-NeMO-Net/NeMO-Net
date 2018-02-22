@@ -29,7 +29,7 @@ from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 150
 batch_size = 72
-model_name = 'FCN_Raster_TestRun'
+model_name = 'FCN_Raster_Consolidated_TestRun'
 
 imgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tif'
 tfwpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tfw'
@@ -38,7 +38,7 @@ PerosBanhos = coralutils.CoralData(imgpath, Truthpath=truthpath, load_type="rast
 PerosBanhos.load_PB_consolidated_classes()
 
 #labelkey = PerosBanhos.class_labels
-labelkey = PerosBanhos.consol_labels
+labelkey = PerosBanhos.consol_labels    # use consolidated classes dictionary
 num_classes = len(PerosBanhos.PB_consolidated_classes)
 
 with open("init_args - VGG16FCN_Raster.yml", 'r') as stream:
