@@ -105,7 +105,7 @@ class CoralData:
 				tempband = target_ds.GetRasterBand(1)
 				self.truthimage = tempband.ReadAsArray()
 
-				truth_classes = np.unique(self.truthimage)
+				num_classes = len(self.class_labels)
 				# print("truth classes: ", truth_classes)
 				# for c in truth_classes:
 				# 	print('Class {c} contains {n} pixels'.format(c=c, n=(self.truthimage == c).sum()))
@@ -123,6 +123,7 @@ class CoralData:
 
 				self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
 				self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
+				self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in range(num_classes))
 		else:
 			print("Load type error: specify either PIL, cv2, or raster")
 			return None
@@ -163,6 +164,8 @@ class CoralData:
 		self.truthimage_consolidated = np.copy(self.truthimage)
 		for i in range(len(self.class_labels)):
 			self.truthimage_consolidated[self.truthimage_consolidated == i] = self.PB_consolidated_classes[self.PB_LOF2consolclass[self.class_labels[i]]]
+
+		self.consolclass_weights = dict((i, (self.truthimage_consolidated.shape[0]*self.truthimage_consolidated.shape[1])/(self.truthimage_consolidated==i).sum()) for i in range(len(self.PB_consolidated_classes)))
 
 
 #### Load Image

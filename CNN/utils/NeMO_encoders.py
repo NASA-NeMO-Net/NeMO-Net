@@ -213,20 +213,37 @@ class Alex_Encoder(Res_Encoder):
 
         super(Alex_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
+def load_specific_param(num_layers, default_conv_params, conv_params, specific_param):
+    default_param = default_conv_params[specific_param]
+    try:
+        param = conv_params[specific_param]
+        if len(param) != num_layers:
+            print("Found {} layers but {} {}, will only replace initial {} {}...".format(num_layers, len(param), specific_param, len(param), specific_param))
+            for i in range(len(param), num_layers):
+                param.append(default_param[i])
+        print("{}: {}".format(specific_param, param[:num_layers]))
+    except:
+        print("{} not found, reverting to default: {}".format(specific_param,default_param[:num_layers]))
+        param = default_param
+
+    return param
+
 def load_conv_params(conv_layers, full_layers, default_conv_params, conv_params):
     print("ENCODER CONVOLUTIONAL PARAMETERS:")
 
-    default_filters = default_conv_params["filters"]
-    try:
-        filters = conv_params["filters"]
-        if len(filters) != conv_layers:
-            print("Found %d convolutional layers but %d filters, will only replace initial %d filters..." %(conv_layers,len(filters),len(filters)))
-            for i in range(len(filters), conv_layers):
-                filters.append(default_filters[i])
-        print("filters: ", filters[:conv_layers])
-    except:
-        print("filters not found, reverting to default: ", default_filters[:conv_layers])
-        filters = default_filters
+    filters = load_specific_param(conv_layers, default_conv_params, conv_params, "filters")
+
+    # default_filters = default_conv_params["filters"]
+    # try:
+    #     filters = conv_params["filters"]
+    #     if len(filters) != conv_layers:
+    #         print("Found %d convolutional layers but %d filters, will only replace initial %d filters..." %(conv_layers,len(filters),len(filters)))
+    #         for i in range(len(filters), conv_layers):
+    #             filters.append(default_filters[i])
+    #     print("filters: ", filters[:conv_layers])
+    # except:
+    #     print("filters not found, reverting to default: ", default_filters[:conv_layers])
+    #     filters = default_filters
 
     default_conv_size = default_conv_params["conv_size"]
     try:

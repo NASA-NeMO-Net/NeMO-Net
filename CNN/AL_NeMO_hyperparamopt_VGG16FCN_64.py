@@ -105,7 +105,7 @@ validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
 
 conv_layers = 5
 full_layers = 0
-conv_params = {"filters": [64,128,256,384,512],
+conv_params = {"filters": [64,128,256],
     "conv_size": [(3,3),(3,3),(3,3),(2,2),(2,2)],
     "padding": ['same','same','same','same','same'],
     "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(1,1)],
@@ -128,12 +128,12 @@ fcn_vgg16 = VGG_Hyperopt_FCN(input_shape=(y, x, num_channels), classes=num_class
 optimizer = keras.optimizers.Adam(1e-4)
 
 fcn_vgg16.summary()
-fcn_vgg16.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+# fcn_vgg16.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
 
-fcn_vgg16.fit_generator(train_generator,
-    steps_per_epoch=200,
-    epochs=100,
-    validation_data=validation_generator,
-    validation_steps=10,
-    verbose=1,
-    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+# fcn_vgg16.fit_generator(train_generator,
+#     steps_per_epoch=200,
+#     epochs=100,
+#     validation_data=validation_generator,
+#     validation_steps=10,
+#     verbose=1,
+#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
