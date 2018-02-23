@@ -512,7 +512,7 @@ class VGGEncoder(Encoder):
             blocks.append(block)
 
         # Fully Convolutional block
-        fc_block = vgg_fc(filters=512, weight_decay=weight_decay)
+        fc_block = vgg_fc(filters=1024, weight_decay=weight_decay)
         # fc_block = vgg_fc(filters=4096, weight_decay=weight_decay)
 
         blocks.append(fc_block)
