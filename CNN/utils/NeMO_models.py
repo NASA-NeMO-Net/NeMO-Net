@@ -50,6 +50,7 @@ def VGG_Hyperopt_FCN(input_shape, classes, decoder_index, weight_decay=0., train
     outputs = VGG_DecoderBlock(feat_pyramid,  classes=classes, weight_decay=weight_decay, deconv_params=deconv_params)
 
     scores = Activation('softmax')(outputs)
+    scores = Reshape((input_shape[0]*input_shape[1], classes))(scores)
 
     # return model
     return Model(inputs=inputs, outputs=scores)

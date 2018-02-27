@@ -17,6 +17,7 @@ from NeMO_blocks import (
     vgg_upsampling,
     vgg_deconvblock
 )
+from NeMO_encoders import load_specific_param
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
 def Decoder(pyramid, blocks):
@@ -44,69 +45,16 @@ def Decoder(pyramid, blocks):
     return decoded
 
 def load_deconv_params(deconv_layers, default_deconv_params, deconv_params):
+    print("---------------------------------------------------------")
     print("DECODER DECONVOLUTIONAL PARAMETERS:")
 
-    default_convs = default_deconv_params["convs"]
-    try:
-        convs = deconv_params["convs"]
-        if len(convs) != deconv_layers:
-            print("Found %d deconvolutional layers but %d convs, will only replace initial %d convs..." %(deconv_layers, len(convs), len(convs)))
-            for i in range(len(convs), deconv_layers):
-                convs.append(default_convs[i])
-        print("convs: ", convs[:deconv_layers])
-    except:
-        print("convs not found, reverting to default: ", default_convs[:deconv_layers])
-        convs = default_convs
+    # convs = load_specific_param(deconv_layers, default_deconv_params, deconv_params, "convs", layer_str="deconvolutional")
+    scales = load_specific_param(deconv_layers, default_deconv_params, deconv_params, "scales", layer_str="deconvolutional")
+    filters = load_specific_param(deconv_layers, default_deconv_params, deconv_params, "filters", layer_str="deconvolutional")
+    conv_size = load_specific_param(deconv_layers, default_deconv_params, deconv_params, "conv_size", layer_str="deconvolutional")
+    layercombo = load_specific_param(deconv_layers, default_deconv_params, deconv_params, "layercombo", layer_str="deconvolutional")
 
-    default_scales = default_deconv_params["scales"]
-    try:
-        scales = deconv_params["scales"]
-        if len(scales) != deconv_layers:
-            print("Found %d deconvolutional layers but %d scales, will only replace initial %d scales..." %(deconv_layers, len(scales), len(scales)))
-            for i in range(len(scales), deconv_layers):
-                scales.append(default_scales[i])
-        print("scales: ", scales[:deconv_layers])
-    except:
-        print("scales not found, reverting to default: ", default_scales[:deconv_layers])
-        scales = default_scales
-
-    default_filters = default_deconv_params["filters"]
-    try:
-        filters = deconv_params["filters"]
-        if len(filters) != deconv_layers:
-            print("Found %d deconvolutional layers but %d filters, will only replace initial %d filters..." %(deconv_layers, len(filters), len(filters)))
-            for i in range(len(filters), deconv_layers):
-                filters.append(default_filters[i])
-        print("filters: ", filters[:deconv_layers])
-    except:
-        print("filters not found, reverting to default: ", default_filters[:deconv_layers])
-        filters = default_filters
-
-    default_conv_size = default_deconv_params["conv_size"]
-    try:
-        conv_size = deconv_params["conv_size"]
-        if len(conv_size) != deconv_layers:
-            print("Found %d deconvolutional layers but %d conv_size, will only replace initial %d conv_size..." %(deconv_layers,len(conv_size),len(conv_size)))
-            for i in range(len(conv_size), deconv_layers):
-                conv_size.append(default_conv_size[i])
-        print("conv_size: ", conv_size[:deconv_layers])
-    except:
-        print("conv_size not found, reverting to default: ", default_conv_size[:deconv_layers])
-        conv_size = default_conv_size
-
-    default_batchnorm_bool = default_deconv_params["batchnorm_bool"]
-    try:
-        batchnorm_bool  = deconv_params["batchnorm_bool"]
-        if len(batchnorm_bool) != deconv_layers:
-            print("Found %d deconvolutional layers but %d batchnorm_bool, will only replace initial %d batchnorm_bool..." %(deconv_layers,len(batchnorm_bool),len(batchnorm_bool)))
-            for i in range(len(batchnorm_bool), deconv_layers):
-                batchnorm_bool.append(default_batchnorm_bool[i])
-        print("batchnorm_bool: ", batchnorm_bool[:deconv_layers])
-    except:
-        print("batchnorm_bool not found, reverting to default: ", default_batchnorm_bool[:deconv_layers])
-        batchnorm_bool = default_batchnorm_bool
-
-    return convs, scales, filters, conv_size, batchnorm_bool
+    return scales, filters, conv_size, layercombo
 
 
 def VGGDecoder(pyramid, scales, classes):
@@ -176,22 +124,25 @@ def VGGUpsampler(pyramid, scales, classes, weight_decay=0.):
 def VGG_DecoderBlock(pyramid, classes, weight_decay=0., deconv_params=None):
 
     p_filters=[]
+    for k in deconv_params:
+        if len(deconv_params[k]) != len(pyramid)-1:
+            print("Error: Deconvolution parameter {} is not the same length as pyramid-1".format(k))
+            raise ValueError
     # remember that pyramid must have 1 extra, for target_shape purposes
     for p in pyramid:
         p_filters.append(p.shape[0])
 
-    default_deconv_params = {"convs": [2,2,2,2,2],
-        "scales": [1,1,1,1,1],
+    default_deconv_params = {"scales": [1,1,1,1,1],
         "filters": p_filters[:-1],
         "conv_size": [(2,2),(2,2),(2,2),(2,2),(2,2)],
-        "batchnorm_bool": [True,True,True,True,True]}
+        "layercombo": ["cacab","cacab","cacab","cacab","cacab"]}
 
-    convs, scales, filters, conv_size, batchnorm_bool = load_deconv_params(len(pyramid)-1, default_deconv_params, deconv_params)
+    scales, filters, conv_size, layercombo = load_deconv_params(len(pyramid)-1, default_deconv_params, deconv_params)
 
     blocks = []
     for i in range(len(pyramid)-1):
         block_name = 'vgg_deconvblock{}'.format(i+1)
-        block = vgg_deconvblock(filters[i], conv_size[i], convs[i], classes, batchnorm_bool=batchnorm_bool[i], target_shape=K.int_shape(pyramid[i+1]), 
+        block = vgg_deconvblock(filters[i], conv_size[i], classes, layercombo=layercombo[i], target_shape=K.int_shape(pyramid[i+1]), 
             scale=scales[i], weight_decay=weight_decay, block_name=block_name)
         blocks.append(block)
 

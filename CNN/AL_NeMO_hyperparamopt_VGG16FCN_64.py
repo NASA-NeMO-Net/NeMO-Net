@@ -60,7 +60,7 @@ x = train_loader.target_size[0]
 pixel_mean =1023.5*np.ones(num_channels)
 pixel_std = 1023.5*np.ones(num_channels)
 
-checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, monitor='val_acc', mode='max', save_best_only=True)
 lr_reducer = ReduceLROnPlateau(monitor='val_loss',
                                factor=np.sqrt(0.1),
                                cooldown=0,
@@ -90,6 +90,7 @@ train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     target_size=(x,y),
     color_mode=train_loader.color_mode,
     classes = labelkey,
+    class_weights = PerosBanhos.consolclass_weights,
     class_mode = 'categorical',
     batch_size = batch_size,
     shuffle=True)
@@ -99,6 +100,7 @@ validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
     target_size=(x,y),
     color_mode=val_loader.color_mode,
     classes = labelkey,
+    class_weights = PerosBanhos.consolclass_weights,
     class_mode = 'categorical',
     batch_size = batch_size,
     shuffle=True)
@@ -111,15 +113,14 @@ conv_params = {"filters": [64,128,256],
     "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(1,1)],
     "pool_size": [(2,2),(2,2),(2,2),(2,2),(2,2)],
     "pad_size": [(0,0),(0,0),(0,0),(0,0),(0,0)],
-    "batchnorm_bool": [True,True,True,True,True],
+    "layercombo": ["cacapb","cacapba","cacacapb","cacacapb","cacacapb"],
     "full_filters": [1024,1024],
     "dropout": [0,0]}
 
-deconv_params = {"convs": [2,2,2,2,2],
-    "scales": [1,1e-1,1e-2,1e-3,1e-4],
+deconv_params = {"scales": [1,1e-1,1e-2,1e-3,1e-4],
     "filters": [1024,1024,1024,1024,1024],
     "conv_size": [(1,1),(1,1),(1,1),(1,1),(1,1)],
-    "batchnorm_bool": [False,False,False,False,False]}
+    "layercombo": ["cacab","cacab","cacab","cacab","cacab"]}
 
 decoder_index = [0,1,2,3,4]
 
@@ -128,12 +129,12 @@ fcn_vgg16 = VGG_Hyperopt_FCN(input_shape=(y, x, num_channels), classes=num_class
 optimizer = keras.optimizers.Adam(1e-4)
 
 fcn_vgg16.summary()
-# fcn_vgg16.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+fcn_vgg16.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'], sample_weight_mode='temporal')
 
-# fcn_vgg16.fit_generator(train_generator,
-#     steps_per_epoch=200,
-#     epochs=100,
-#     validation_data=validation_generator,
-#     validation_steps=10,
-#     verbose=1,
-#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+fcn_vgg16.fit_generator(train_generator,
+    steps_per_epoch=200,
+    epochs=100,
+    validation_data=validation_generator,
+    validation_steps=10,
+    verbose=1,
+    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])

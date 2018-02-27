@@ -83,21 +83,15 @@ class NeMOImageGenerator(ImageDataGenerator):
     def flow_from_NeMOdirectory(self, directory, FCN_directory=None,
                             target_size=(256, 256), color_mode='rgb',
                             classes=None, class_mode='categorical',
-                            batch_size=32, shuffle=True, seed=None,
+                            batch_size=32, class_weights = None, shuffle=True, seed=None,
                             save_to_dir=None,
                             save_prefix='',
                             save_format='png',
                             follow_links=False):
         return NeMODirectoryIterator(
-            directory, self, FCN_directory=FCN_directory,
-            target_size=target_size, color_mode=color_mode,
-            classes=classes, class_mode=class_mode,
-            data_format=self.data_format,
-            batch_size=batch_size, shuffle=shuffle, seed=seed,
-            save_to_dir=save_to_dir,
-            save_prefix=save_prefix,
-            save_format=save_format,
-            follow_links=follow_links)
+            directory, self, FCN_directory=FCN_directory, target_size=target_size, color_mode=color_mode, classes=classes, class_mode=class_mode,
+            data_format=self.data_format, batch_size=batch_size, class_weights=class_weights, shuffle=shuffle, seed=seed,
+            save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format, follow_links=follow_links)
 
 class IndexIterator(Iterator):
     """Iterator over index."""
@@ -188,7 +182,7 @@ class NeMODirectoryIterator(Iterator):
     def __init__(self, directory, image_data_generator, FCN_directory=None,
                  target_size=(256, 256), color_mode='rgb',
                  classes=None, class_mode='categorical',
-                 batch_size=32, shuffle=True, seed=None,
+                 batch_size=32, class_weights=None, shuffle=True, seed=None,
                  data_format=None,
                  save_to_dir=None, save_prefix='', save_format='png',
                  follow_links=False):
@@ -228,6 +222,7 @@ class NeMODirectoryIterator(Iterator):
         self.save_to_dir = save_to_dir
         self.save_prefix = save_prefix
         self.save_format = save_format
+        self.class_weights = class_weights
 
         white_list_formats = {'png', 'jpg', 'jpeg', 'bmp', 'ppm', 'tif'}
 
@@ -354,18 +349,26 @@ class NeMODirectoryIterator(Iterator):
             elif self.class_mode == 'binary':
                 batch_y = self.classes[index_array].astype(K.floatx())
             elif self.FCN_directory is not None:
-                batch_y = np.zeros((len(batch_x),) + self.label_shape, dtype=np.int8)
+                batch_y = np.zeros((len(batch_x),) + self.label_shape, dtype=np.int8) # N x R x C x D
+                batch_weights = np.zeros((len(batch_x), self.image_shape[0], self.image_shape[1]), dtype=np.float)
                 for i, j in enumerate(index_array):
                     fname = self.FCN_filenames[j]
                     y = self._load_seg(fname)
+                    if self.class_weights is not None:
+                        weights = np.zeros((self.image_shape[0], self.image_shape[1]), dtype=np.float)
+                        for k in self.class_weights:
+                            weights[y == k] = self.class_weights[k]
+                        batch_weights[i] = weights
                     y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
                     batch_y[i] = y
+
             elif self.class_mode == 'categorical':
                 batch_y = np.zeros((len(batch_x), self.num_consolclass), dtype=K.floatx())
                 for i, label in enumerate(self.classes[index_array]):
                     batch_y[i, label] = 1.
             else:
                 return batch_x
+
         else:
             grayscale = self.color_mode == 'grayscale'
             # build batch of image data
@@ -400,7 +403,14 @@ class NeMODirectoryIterator(Iterator):
                     batch_y[i, label] = 1.
             else:
                 return batch_x
-        return batch_x, batch_y
+
+        quick_shape1 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2],z.shape[3]))
+        quick_shape2 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2]))
+
+        if self.class_weights is None:
+            return batch_x, batch_y
+        else:
+            return batch_x, quick_shape1(batch_y), quick_shape2(batch_weights)
 
     def _load_seg(self, fn):
         """Segmentation load method.
@@ -417,7 +427,7 @@ class NeMODirectoryIterator(Iterator):
         if img.size != wh_tuple:
             img = img.resize(wh_tuple)
         y = img_to_array(img, data_format=self.data_format)
-        # Need to add correction for consol_class
+        y = y.reshape(wh_tuple)
 
         item_counter = 0
         for item in self.labelkey:

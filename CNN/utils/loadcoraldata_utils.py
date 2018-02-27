@@ -7,6 +7,7 @@ from osgeo import gdal, ogr, osr
 from matplotlib import pyplot as plt
 from PIL import Image as pil_image
 from keras.preprocessing.image import img_to_array
+import keras.backend as K
 
 # Class of coral data, consisting of an image and possibly a corresponding truth map
 class CoralData:
@@ -471,9 +472,9 @@ class CoralData:
 					
 					for predict_mat in temp_predict: 	# this is incorrect if temp_predict has more than 1 prediction (e.g. cols>1, lines>1)
 						whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = \
-							whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + predict_mat
+							whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.reshape(predict_mat, (image_size,image_size))
 						num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = \
-							num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones(predict_mat.shape)
+							num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones((image_size,image_size))
 					print("Line: " + str(offset-crop_len) + " Col: " + str(cols-crop_len) + '/ ' + str(self.testimage.shape[1]-image_size+1) + ' completed', end='\r')
 		else:
 			if num_lines is None:
