@@ -10,7 +10,7 @@ from keras.models import Model
 from keras.utils.data_utils import get_file
 from keras.utils import layer_utils
 
-from keras.layers import Cropping2D
+from keras.layers import Cropping2D, Concatenate, Add
 from NeMO_blocks import (
     alex_conv,
     alex_fc,
@@ -112,26 +112,25 @@ class Res_Encoder(Model):
     # weights: weights to be loaded (if any)
     # traininable: Trainable layers
     # name: Name of encoder
-    def __init__(self, inputs, blocks, crop_shapes=None, weights=None,
-                 trainable=True, name='encoder'):
+    def __init__(self, inputs, blocks, weights=None, trainable=True, name='encoder'):
         inverse_pyramid = []
 
-        split_inputs = None 
-        if crop_shapes is not None:             # used for multi-input models
-            split_inputs = []
-            for shape in crop_shapes:
-                crop_len = (int(inputs.shape[1])-shape[0])/2
-                if (int(inputs.shape[1]) - shape[0])%2 == 0:
-                    crop_len = int(crop_len)
-                    split_inputs.append(Cropping2D(cropping=((crop_len,crop_len), (crop_len,crop_len)))(inputs))
-                else:
-                    crop_len_lo = int(np.trunc(crop_len))
-                    crop_len_hi = int(np.ceil(crop_len))
-                    split_inputs.append(Cropping2D(cropping=((crop_len_lo,crop_len_hi), (crop_len_lo,crop_len_hi)))(inputs))
+        # split_inputs = None 
+        # if crop_shapes is not None:             # used for multi-input models
+        #     split_inputs = []
+        #     for shape in crop_shapes:
+        #         crop_len = (int(inputs.shape[1])-shape[0])/2
+        #         if (int(inputs.shape[1]) - shape[0])%2 == 0:
+        #             crop_len = int(crop_len)
+        #             split_inputs.append(Cropping2D(cropping=((crop_len,crop_len), (crop_len,crop_len)))(inputs))
+        #         else:
+        #             crop_len_lo = int(np.trunc(crop_len))
+        #             crop_len_hi = int(np.ceil(crop_len))
+        #             split_inputs.append(Cropping2D(cropping=((crop_len_lo,crop_len_hi), (crop_len_lo,crop_len_hi)))(inputs))
 
         # all parallel blocks
-        if split_inputs is not None:
-            inputs_copy = list(split_inputs)
+        if type(inputs) is list:
+            inputs_copy = [np.copy(input) for input in inputs]
         else:
             inputs_copy = inputs
 
@@ -140,10 +139,13 @@ class Res_Encoder(Model):
                 x = block(inputs_copy)
             else:
                 x = block(x)
+
             if type(x) is list:
                 inverse_pyramid.append(list(x))
+                # print([xi.shape for xi in x])
             else:
                 inverse_pyramid.append(x)
+                # print(x.shape)
 
         pyramid = reversed(inverse_pyramid)
         outputs = []
@@ -156,6 +158,7 @@ class Res_Encoder(Model):
         # outputs = list(reversed(inverse_pyramid))
 
         super(Res_Encoder, self).__init__(inputs=inputs, outputs=outputs)
+        print(self.summary())
 
         # load pre-trained weights
         if weights is not None:
@@ -213,120 +216,39 @@ class Alex_Encoder(Res_Encoder):
 
         super(Alex_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
+def load_specific_param(num_layers, default_conv_params, conv_params, specific_param, layer_str="convolutional"):
+    default_param = default_conv_params[specific_param]
+    try:
+        param = conv_params[specific_param]
+        if len(param) != num_layers:
+            print("Found {} {} layers but {} {}, will only replace initial {} {}...".format(num_layers, layer_str, len(param), specific_param, len(param), specific_param))
+            for i in range(len(param), num_layers):
+                param.append(default_param[i])
+        print("{}: {}".format(specific_param, param[:num_layers]))
+    except:
+        print("{} not found, reverting to default: {}".format(specific_param,default_param[:num_layers]))
+        param = default_param
+
+    return param
+
 def load_conv_params(conv_layers, full_layers, default_conv_params, conv_params):
+    print("---------------------------------------------------------")
     print("ENCODER CONVOLUTIONAL PARAMETERS:")
 
-    default_filters = default_conv_params["filters"]
-    try:
-        filters = conv_params["filters"]
-        if len(filters) != conv_layers:
-            print("Found %d convolutional layers but %d filters, will only replace initial %d filters..." %(conv_layers,len(filters),len(filters)))
-            for i in range(len(filters), conv_layers):
-                filters.append(default_filters[i])
-        print("filters: ", filters[:conv_layers])
-    except:
-        print("filters not found, reverting to default: ", default_filters[:conv_layers])
-        filters = default_filters
+    filters = load_specific_param(conv_layers, default_conv_params, conv_params, "filters")
+    conv_size = load_specific_param(conv_layers, default_conv_params, conv_params, "conv_size")
+    conv_strides = load_specific_param(conv_layers, default_conv_params, conv_params, "conv_strides")
+    padding = load_specific_param(conv_layers, default_conv_params, conv_params, "padding")
+    dilation_rate = load_specific_param(conv_layers, default_conv_params, conv_params, "dilation_rate")
+    pool_size = load_specific_param(conv_layers, default_conv_params, conv_params, "pool_size")
+    pool_strides = load_specific_param(conv_layers, default_conv_params, conv_params, "pool_strides")
+    pad_size = load_specific_param(conv_layers, default_conv_params, conv_params, "pad_size")
+    layercombo = load_specific_param(conv_layers, default_conv_params, conv_params, "layercombo")
+    # batchnorm_pos = load_specific_param(conv_layers, default_conv_params, conv_params, "batchnorm_pos") #old version has batchnorm_bool
+    full_filters = load_specific_param(full_layers, default_conv_params, conv_params, "full_filters", layer_str="fully connected")
+    dropout = load_specific_param(full_layers, default_conv_params, conv_params, "dropout", layer_str="fully connected")
 
-    default_conv_size = default_conv_params["conv_size"]
-    try:
-        conv_size = conv_params["conv_size"]
-        if len(conv_size) != conv_layers:
-            print("Found %d convolutional layers but %d conv_size, will only replace initial %d conv_size..." %(conv_layers,len(conv_size),len(conv_size)))
-            for i in range(len(conv_size), conv_layers):
-                conv_size.append(default_conv_size[i])
-        print("conv_size: ", conv_size[:conv_layers])
-    except:
-        print("conv_size not found, reverting to default: ", default_conv_size[:conv_layers])
-        conv_size = default_conv_size
-
-    default_padding = default_conv_params["padding"]
-    try:
-        padding = conv_params["padding"]
-        if len(padding) != conv_layers:
-            print("Found %d convolutional layers but %d padding, will only replace initial %d padding..." %(conv_layers,len(padding),len(padding)))
-            for i in range(len(padding), conv_layers):
-                padding.append(default_padding[i])
-        print("padding: ", padding[:conv_layers])
-    except:
-        print("padding not found, reverting to default: ", default_padding[:conv_layers])
-        padding = default_padding
-
-    default_dilation_rate = default_conv_params["dilation_rate"]
-    try:
-        dilation_rate = conv_params["dilation_rate"]
-        if len(dilation_rate) != conv_layers:
-            print("Found %d convolutional layers but %d dilation_rate, will only replace initial %d dilation_rate..." %(conv_layers,len(dilation_rate),len(dilation_rate)))
-            for i in range(len(dilation_rate), conv_layers):
-                dilation_rate.append(default_dilation_rate[i])
-        print("dilation_rate: ", dilation_rate[:conv_layers])
-    except:
-        print("dilation_rate not found, reverting to default: ", default_dilation_rate[:conv_layers])
-        dilation_rate = default_dilation_rate
-
-    default_pool_size = default_conv_params["pool_size"]
-    try:
-        pool_size = conv_params["pool_size"]
-        if len(pool_size) != conv_layers:
-            print("Found %d convolutional layers but %d pool_size, will only replace initial %d pool_size..." %(conv_layers,len(pool_size),len(pool_size)))
-            for i in range(len(pool_size), conv_layers):
-                pool_size.append(default_pool_size[i])
-        print("pool_size: ", pool_size[:conv_layers])
-    except:
-        print("pool_size not found, reverting to default: ", default_pool_size[:conv_layers])
-        pool_size = default_pool_size
-    pool_stride = pool_size     # usually true
-
-    default_pad_size = default_conv_params["pad_size"]
-    try:
-        pad_size  = conv_params["pad_size"]
-        if len(pad_size) != conv_layers:
-            print("Found %d convolutional layers but %d pad_size, will only replace initial %d pad_size..." %(conv_layers,len(pad_size),len(pad_size)))
-            for i in range(len(pad_size), conv_layers):
-                pad_size.append(default_pad_size[i])
-        print("pad_size: ", pad_size[:conv_layers])
-    except:
-        print("pad_size not found, reverting to default: ", default_pad_size[:conv_layers])
-        pad_size = default_pad_size
-
-    default_batchnorm_bool = default_conv_params["batchnorm_bool"]
-    try:
-        batchnorm_bool  = conv_params["batchnorm_bool"]
-        if len(batchnorm_bool) != conv_layers:
-            print("Found %d convolutional layers but %d batchnorm_bool, will only replace initial %d batchnorm_bool..." %(conv_layers,len(batchnorm_bool),len(batchnorm_bool)))
-            for i in range(len(batchnorm_bool), conv_layers):
-                batchnorm_bool.append(default_batchnorm_bool[i])
-        print("batchnorm_bool: ", batchnorm_bool[:conv_layers])
-    except:
-        print("batchnorm_bool not found, reverting to default: ", default_batchnorm_bool[:conv_layers])
-        batchnorm_bool = default_batchnorm_bool
-
-    default_full_filters = default_conv_params["full_filters"]
-    try:
-        full_filters  = conv_params["full_filters"]
-        if len(full_filters) != full_layers:
-            print("Found %d fully connected layers but %d full_filters, will only replace initial %d full_filters..." %(full_layers,len(full_filters),len(full_filters)))
-            for i in range(len(full_filters), full_layers):
-                full_filters.append(default_full_filters[i])
-        print("full_filters: ", full_filters[:full_layers])
-    except:
-        print("full_filters not found, reverting to default: ", default_full_filters[:full_layers])
-        full_filters = default_full_filters
-
-
-    default_dropout = default_conv_params["dropout"]
-    try:
-        dropout  = conv_params["dropout"]
-        if len(dropout) != full_layers:
-            print("Found %d fully connected layers but %d dropout, will only replace initial %d dropout..." %(full_layers,len(dropout),len(dropout)))
-            for i in range(len(dropout), full_layers):
-                dropout.append(default_dropout[i])
-        print("dropout: ", dropout[:full_layers])
-    except:
-        print("dropout not found, reverting to default: ", default_dropout[:full_layers])
-        dropout = default_dropout
-
-    return filters, conv_size, padding, dilation_rate, pool_size, pad_size, batchnorm_bool, full_filters, dropout
+    return filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, layercombo, full_filters, dropout
 
 
 class Alex_Hyperopt_Encoder(Res_Encoder):
@@ -334,22 +256,23 @@ class Alex_Hyperopt_Encoder(Res_Encoder):
 
         default_conv_params = {"filters": [96,256,384,384,256],
             "conv_size": [(7,7),(5,5),(3,3),(3,3),(3,3)],
+            "conv_strides": [(1,1),(1,1),(1,1),(1,1),(1,1)],
             "padding": ['valid','valid','valid','valid','valid'],
             "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(1,1)],
             "pool_size": [(2,2),(2,2),(1,1),(1,1),(2,2)],
             "pad_size": [(0,0),(0,0),(0,0),(0,0),(0,0)],
-            "batchnorm_bool": [True,True,False,False,False],
+            "layercombo": ["capb","capb","capb","capb","capb"],
             "full_filters": [4096,4096],
             "dropout": [0.5,0.5]}
-        filters, conv_size, padding, dilation_rate, pool_size, pad_size, batchnorm_bool, full_filters, dropout = \
+        filters, conv_size, padding, dilation_rate, pool_size, pad_size, layercombo, full_filters, dropout = \
             load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
 
         # actual start of CNN
         blocks = []
         for i in range(conv_layers):
             block_name = 'alexblock{}'.format(i + 1)
-            block = alex_conv(filters[i], conv_size[i], padding=padding[i], pad_bool=True, pool_bool=True, batchnorm_bool=batchnorm_bool[i], pad_size=pad_size[i],
-                pool_size=pool_size[i], pool_strides=pool_size[i], dilation_rate=dilation_rate[i], weight_decay=weight_decay, block_name=block_name)
+            block = alex_conv(filters[i], conv_size[i], conv_strides=(1,1), padding=padding[i], pad_bool=True, pad_size=pad_size[i], pool_size=pool_size[i],
+                pool_strides=pool_size[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
         for i in range(full_layers):
@@ -363,68 +286,85 @@ class Alex_Hyperopt_Encoder(Res_Encoder):
         super(Alex_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
 class Alex_Parallel_Hyperopt_Encoder(Res_Encoder):
-    def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, conv_layers=3, full_layers=2, conv_params=None):
+    def __init__(self, inputs, classes, parallel_layers=4, combine_method='concat', conv_params=None, weight_decay=0., weights=None, trainable=True):
 
-        default_conv_params = {"filters": [64,128,256,384,512],
-            "conv_size": [(7,7),(3,3),(3,3),(3,3),(3,3)],
-            "padding": ['valid','valid','valid','valid','valid'],
-            "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(1,1)],
-            "pool_size": [(2,2),(2,2),(1,1),(1,1),(1,1)],
-            "pad_size": [(0,0),(0,0),(0,0),(0,0),(0,0)],
-            "batchnorm_bool": [True,True,True,True,True],
+        # double brackets to signify all parallel filters follow same parameters
+        default_conv_params = {"filters": [[1024,1024,classes]],
+            "conv_size": [[(3,3),(1,1),(1,1)]],
+            "conv_strides":  [[(3,3),(1,1),(1,1)]],
+            "padding": ['same','same','same','same'],
+            "dilation_rate": [[(6,6),(1,1),(1,1)], [(12,12),(1,1),(1,1)], [(18,18),(1,1),(1,1)], [(24,24),(1,1),(1,1)]],
+            "pool_size": [[(2,2),(2,2),(2,2)]],
+            "pool_strides": [[(2,2),(2,2),(2,2)]],
+            "pad_size": [(6,6), (12,12), (18,18), (24,24)],
+            "layercombo": ["zcadcadc","zcadcadc","zcadcadc","zcadcadc"],
             "full_filters": [4096,2048],
             "dropout": [0.5,0.5]}
-        filters, conv_size, padding, dilation_rate, pool_size, pad_size, batchnorm_bool, full_filters, dropout = \
-            load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
+        filters = conv_params["filters"]
+        conv_size = conv_params["conv_size"]
+        conv_strides = conv_params["conv_strides"]
+        padding = conv_params["padding"]
+        dilation_rate = conv_params["dilation_rate"]
+        pool_size = conv_params["pool_size"]
+        pool_strides = conv_params["pool_strides"]
+        pad_size = conv_params["pad_size"]
+        layercombo = conv_params["layercombo"]
 
-            # actual start of CNN
+        # f = lambda input,c_count: input[0] if len(input)==1 else input[c_count]
+        # actual start of CNN
         blocks = []
-        for i in range(conv_layers):
-            block_name = 'parallel_block{}'.format(i + 1)
-            block = parallel_conv(filters[i], conv_size[i], padding=padding[i], pad_size=pad_size[i], pool_size=pool_size[i], dilation_rate=dilation_rate[i],
-                batchnorm_bool=batchnorm_bool[i], weight_decay=weight_decay, block_name=block_name)
-            blocks.append(block)
-
-        block_name = 'poolconcat_block'
-        block = pool_concat(pool_size=(1,1), batchnorm_bool=True, block_name=block_name)
+        block_name = 'parallel_block'
+        block = parallel_conv(filters, conv_size, conv_strides=conv_strides, padding=padding, pad_bool=True, pad_size=pad_size, 
+            pool_size=pool_size, pool_strides=pool_strides, dilation_rate=dilation_rate, dropout=[0.5], layercombo=layercombo,
+            weight_decay=weight_decay, block_name=block_name)
         blocks.append(block)
 
-        for i in range(full_layers):
-            block_name='alexfc{}'.format(i + 1)
-            if i==0:
-                block = alex_fc(full_filters[i], flatten_bool=True, dropout_bool=True, dropout=dropout[i], weight_decay=weight_decay, block_name=block_name)
-            else:
-                block = alex_fc(full_filters[i], flatten_bool=False, dropout_bool=True, dropout=dropout[i], weight_decay=weight_decay, block_name=block_name)
+        if combine_method == "concat":
+            block = Concatenate(axis=-1)
+            blocks.append(block)
+        elif combine_method == "add":
+            block = Add()
             blocks.append(block)
 
-        super(Alex_Parallel_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, crop_shapes=None, weights=weights, trainable = trainable)
+
+        # block_name = 'poolconcat_block'
+        # block = pool_concat(pool_size=(1,1), batchnorm_bool=True, block_name=block_name)
+        # blocks.append(block)
+
+        # for i in range(full_layers):
+        #     block_name='alexfc{}'.format(i + 1)
+        #     if i==0:
+        #         block = alex_fc(full_filters[i], flatten_bool=True, dropout_bool=True, dropout=dropout[i], weight_decay=weight_decay, block_name=block_name)
+        #     else:
+        #         block = alex_fc(full_filters[i], flatten_bool=False, dropout_bool=True, dropout=dropout[i], weight_decay=weight_decay, block_name=block_name)
+        #     blocks.append(block)
+
+        super(Alex_Parallel_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
 class VGG_Hyperopt_Encoder(Res_Encoder):
-    def __init__(self, inputs, classes, convs=[2,2,3,3,3], weight_decay=0., weights=None, trainable=True, 
+    def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, 
         conv_layers=5, full_layers=2, conv_params=None):
 
-        if len(convs) != conv_layers:
-            print("Error: Number of convs per block (%d) does not match conv_layers (%d)" %(len(convs),conv_layers))
-            raise ValueError
-
-        default_conv_params = {"filters": [64,128,256,512,1024],
+        default_conv_params = {"filters": [64,128,256,512,512],
             "conv_size": [(3,3),(3,3),(3,3),(3,3),(3,3)],
+            "conv_strides": [(1,1),(1,1),(1,1),(1,1),(1,1)],
             "padding": ['same','same','same','same','same'],
             "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(1,1)],
             "pool_size": [(2,2),(2,2),(2,2),(2,2),(2,2)],
+            "pool_strides": [(2,2),(2,2),(1,1),(1,1),(1,1)],
             "pad_size": [(0,0),(0,0),(0,0),(0,0),(0,0)],
-            "batchnorm_bool": [True,True,True,True,True],
+            "layercombo": ["cacapb","cacapba","cacacapb","cacacapb","cacacapb"],
             "full_filters": [2048,2048],
             "dropout": [0.5,0.5]}
-        filters, conv_size, padding, dilation_rate, pool_size, pad_size, batchnorm_bool, full_filters, dropout = \
+        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, layercombo, full_filters, dropout = \
             load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
 
         # actual start of CNN
         blocks = []
         for i in range(conv_layers):
             block_name = 'vgg_convblock{}'.format(i + 1)
-            block = vgg_convblock(filters[i], conv_size[i], convs=convs[i], padding=padding[i], batchnorm_bool=batchnorm_bool[i], pad_size=pad_size[i], 
-                pool_size=pool_size[i], dilation_rate=dilation_rate[i], weight_decay=weight_decay, block_name=block_name)
+            block = alex_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], pool_size=pool_size[i],
+                pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
         if full_layers > 0:
@@ -432,7 +372,7 @@ class VGG_Hyperopt_Encoder(Res_Encoder):
             block = vgg_fcblock(full_filters, full_layers, dropout_bool=True, dropout=dropout, weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
-        super(VGG_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, crop_shapes=None, weights=weights, trainable = trainable)
+        super(VGG_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
 class Res34_Encoder(Res_Encoder):
     def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, fcflag = False):

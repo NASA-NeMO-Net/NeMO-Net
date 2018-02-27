@@ -17,7 +17,7 @@ K.set_session(_SESSION)
 import sys
 sys.path.append("./utils/") # Adds higher directory to python modules path.
 import loadcoraldata_utils as coralutils
-from NeMO_models import VGG_Hyperopt_FCN
+from NeMO_models import VGG16_DeepLabV2
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 from keras.callbacks import (
     ReduceLROnPlateau,
@@ -27,9 +27,9 @@ from keras.callbacks import (
     TerminateOnNaN)
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
-image_size = 64
+image_size = 256
 batch_size = 72
-model_name = 'FCN_Raster64_TestRun_withweights'
+model_name = 'VGG16DeepLab_Raster256'
 
 imgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tif'
 tfwpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tfw'
@@ -41,7 +41,7 @@ PerosBanhos.load_PB_consolidated_classes()
 labelkey = PerosBanhos.consol_labels
 num_classes = len(PerosBanhos.PB_consolidated_classes)
 
-with open("init_args - VGG16FCN_Raster64.yml", 'r') as stream:
+with open("init_args - VGG16DeepLab_Raster256.yml", 'r') as stream:
     try:
         init_args = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -107,35 +107,42 @@ validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
 
 conv_layers = 5
 full_layers = 0
-conv_params = {"filters": [64,128,256],
-    "conv_size": [(3,3),(3,3),(3,3),(2,2),(2,2)],
+
+conv_params = {"filters": [64,128,256,512,512],
+    "conv_size": [(3,3),(3,3),(3,3),(3,3),(3,3)],
+    "conv_strides": [(1,1),(1,1),(1,1),(1,1),(1,1)],
     "padding": ['same','same','same','same','same'],
-    "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(1,1)],
-    "pool_size": [(2,2),(2,2),(2,2),(2,2),(2,2)],
-    "pad_size": [(0,0),(0,0),(0,0),(0,0),(0,0)],
-    "layercombo": ["cacapb","cacapba","cacacapb","cacacapb","cacacapb"],
+    "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(2,2)],
+    "pool_size": [(2,2),(2,2),(2,2),(3,3),(3,3)],
+    "pool_strides": [(2,2),(2,2),(2,2),(1,1),(1,1)],
+    "pad_size": [(0,0),(0,0),(1,1),(1,1),(1,1)],
+    "layercombo": ["cacap","cacap","cacacap","cacacazp","cacacazp"],
     "full_filters": [1024,1024],
     "dropout": [0,0]}
 
-deconv_params = {"scales": [1,1e-1,1e-2,1e-3,1e-4],
-    "filters": [1024,1024,1024,1024,1024],
-    "conv_size": [(1,1),(1,1),(1,1),(1,1),(1,1)],
-    "layercombo": ["cacab","cacab","cacab","cacab","cacab"]}
+parallelconv_params = {"filters": [[1024,1024,num_classes]],
+    "conv_size": [[(3,3),(1,1),(1,1)]],
+    "conv_strides":  [[(1,1),(1,1),(1,1)]],
+    "padding": ['valid','valid','valid','valid'],
+    "dilation_rate": [[(6,6),(1,1),(1,1)], [(12,12),(1,1),(1,1)], [(18,18),(1,1),(1,1)], [(24,24),(1,1),(1,1)]],
+    "pool_size": [[(2,2),(2,2),(2,2)]], #doesn't matter
+    "pool_strides": [[(2,2),(2,2),(2,2)]], #doesn't matter
+    "pad_size": [[(6,6),(0,0),(0,0)], [(12,12),(0,0),(0,0)], [(18,18),(0,0),(0,0)], [(24,24),(0,0),(0,0)]],
+    "layercombo": ["zcadcadc","zcadcadc","zcadcadc","zcadcadc"],
+    "full_filters": [4096,2048],
+    "dropout": [0.5,0.5]}
 
-decoder_index = [0,1,2,3,4]
-
-fcn_vgg16 = VGG_Hyperopt_FCN(input_shape=(y, x, num_channels), classes=num_classes, decoder_index = decoder_index, weight_decay=3e-3,
-                weights=None, trainable_encoder=True, conv_layers=5, full_layers=0, conv_params=conv_params, deconv_params=deconv_params)
+VGG16_DeepLab = VGG16_DeepLabV2(input_shape=(y, x, num_channels), classes=num_classes, weight_decay=3e-3,
+                weights=None, trainable_encoder=True, conv_layers=5, full_layers=0, conv_params=conv_params, parallel_layers=4, parallelconv_params=parallelconv_params)
 optimizer = keras.optimizers.Adam(1e-4)
 
-fcn_vgg16.summary()
-fcn_vgg16.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'], sample_weight_mode='temporal')
+VGG16_DeepLab.summary()
+# fcn_vgg16.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'], sample_weight_mode='temporal')
 
-print(PerosBanhos.consolclass_weights)
-fcn_vgg16.fit_generator(train_generator,
-    steps_per_epoch=200,
-    epochs=100,
-    validation_data=validation_generator,
-    validation_steps=10,
-    verbose=1,
-    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+# fcn_vgg16.fit_generator(train_generator,
+#     steps_per_epoch=200,
+#     epochs=100,
+#     validation_data=validation_generator,
+#     validation_steps=10,
+#     verbose=1,
+#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
