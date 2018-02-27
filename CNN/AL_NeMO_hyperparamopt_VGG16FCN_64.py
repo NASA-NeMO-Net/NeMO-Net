@@ -29,7 +29,7 @@ from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 64
 batch_size = 72
-model_name = 'FCN_Raster64_TestRun'
+model_name = 'FCN_Raster64_TestRun_withweights'
 
 imgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tif'
 tfwpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tfw'
@@ -130,6 +130,7 @@ optimizer = keras.optimizers.Adam(1e-4)
 fcn_vgg16.summary()
 fcn_vgg16.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
 
+print(PerosBanhos.consolclass_weights)
 fcn_vgg16.fit_generator(train_generator,
     steps_per_epoch=200,
     epochs=100,
