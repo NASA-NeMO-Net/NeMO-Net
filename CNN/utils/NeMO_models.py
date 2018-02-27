@@ -23,13 +23,33 @@ def AlexNet(input_shape, classes, weight_decay=0., trainable_encoder=True, weigh
 
     return Model(inputs=inputs, outputs=scores)
 
-def Alex_Hyperopt_ParallelNet(input_shape, crop_shapes, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=3, full_layers=1, conv_params=None):
-    inputs=Input(shape=input_shape)
+# def Alex_Hyperopt_ParallelNet(input_shape, crop_shapes, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=3, full_layers=1, conv_params=None):
+#     inputs=Input(shape=input_shape)
 
-    encoder = Alex_Parallel_Hyperopt_Encoder(inputs, crop_shapes=crop_shapes, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder,
-        conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
-    encoder_output = encoder.outputs[0]
-    scores = Dense(classes, activation = 'softmax')(encoder_output)
+#     encoder = Alex_Parallel_Hyperopt_Encoder(inputs, crop_shapes=crop_shapes, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder,
+#         conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
+#     encoder_output = encoder.outputs[0]
+#     scores = Dense(classes, activation = 'softmax')(encoder_output)
+
+#     return Model(inputs=inputs, outputs=scores)
+
+def VGG16_DeepLabV2(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, full_layers=0, conv_params=None, 
+    parallel_layers=4, parallelconv_params=None):
+    inputs1 = Input(shape=input_shape)
+    encoder1 = VGG_Hyperopt_Encoder(inputs1, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, conv_layers=conv_layers,
+        full_layers=full_layers, conv_params=conv_params)
+
+    tempoutput = encoder1.outputs[0]
+    output1shape = tuple([int(tempoutput.shape[i]) for i in range(1,len(tempoutput.shape))])
+
+    inputs2 = Input(shape=output1shape)
+    encoder2 = Alex_Parallel_Hyperopt_Encoder(inputs2, classes=classes, parallel_layers=parallel_layers, combine_method='add', 
+        conv_params=parallelconv_params, weight_decay = weight_decay, weights=weights, trainable = trainable_encoder)
+
+    inputs = Input(shape=input_shape)
+    x = encoder1(inputs)
+    predictions = encoder2(x[0])
+    scores = Activation('softmax')(predictions[0])
 
     return Model(inputs=inputs, outputs=scores)
 
