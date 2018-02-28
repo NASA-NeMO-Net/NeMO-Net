@@ -10,8 +10,10 @@ import keras.backend as K
 from keras.models import Model
 from keras.layers import Input, Flatten, Activation, Reshape, Dense, Cropping2D
 
+from NeMO_layers import CroppingLike2D, BilinearUpSampling2D
 from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Res34_Encoder, Alex_Parallel_Hyperopt_Encoder, VGG_Hyperopt_Encoder
 from NeMO_decoders import VGGDecoder, VGGUpsampler, VGG_DecoderBlock
+from NeMO_backend import get_model_memory_usage
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
 def AlexNet(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None):
@@ -38,6 +40,7 @@ def VGG16_DeepLabV2(input_shape, classes, weight_decay=0., trainable_encoder=Tru
     inputs1 = Input(shape=input_shape)
     encoder1 = VGG_Hyperopt_Encoder(inputs1, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, conv_layers=conv_layers,
         full_layers=full_layers, conv_params=conv_params)
+    print("Memory required (GB): ", get_model_memory_usage(12, encoder1))
 
     tempoutput = encoder1.outputs[0]
     output1shape = tuple([int(tempoutput.shape[i]) for i in range(1,len(tempoutput.shape))])
@@ -45,11 +48,15 @@ def VGG16_DeepLabV2(input_shape, classes, weight_decay=0., trainable_encoder=Tru
     inputs2 = Input(shape=output1shape)
     encoder2 = Alex_Parallel_Hyperopt_Encoder(inputs2, classes=classes, parallel_layers=parallel_layers, combine_method='add', 
         conv_params=parallelconv_params, weight_decay = weight_decay, weights=weights, trainable = trainable_encoder)
+    print("Memory required (GB): ", get_model_memory_usage(12, encoder2))
 
     inputs = Input(shape=input_shape)
     x = encoder1(inputs)
     predictions = encoder2(x[0])
-    scores = Activation('softmax')(predictions[0])
+    upscore = BilinearUpSampling2D(target_shape=K.int_shape(inputs1), name='BilinearUpsample')(predictions[0])
+
+    scores = Activation('softmax')(upscore)
+    scores = Reshape((input_shape[0]*input_shape[1], classes))(scores) # for class weight purposes
 
     return Model(inputs=inputs, outputs=scores)
 
@@ -70,7 +77,7 @@ def VGG_Hyperopt_FCN(input_shape, classes, decoder_index, weight_decay=0., train
     outputs = VGG_DecoderBlock(feat_pyramid,  classes=classes, weight_decay=weight_decay, deconv_params=deconv_params)
 
     scores = Activation('softmax')(outputs)
-    scores = Reshape((input_shape[0]*input_shape[1], classes))(scores)
+    scores = Reshape((input_shape[0]*input_shape[1], classes))(scores)  # for class weight purposes
 
     # return model
     return Model(inputs=inputs, outputs=scores)

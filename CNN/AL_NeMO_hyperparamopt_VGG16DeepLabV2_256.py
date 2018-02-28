@@ -19,6 +19,7 @@ sys.path.append("./utils/") # Adds higher directory to python modules path.
 import loadcoraldata_utils as coralutils
 from NeMO_models import VGG16_DeepLabV2
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
+from NeMO_backend import get_model_memory_usage
 from keras.callbacks import (
     ReduceLROnPlateau,
     CSVLogger,
@@ -28,7 +29,7 @@ from keras.callbacks import (
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 256
-batch_size = 72
+batch_size = 12
 model_name = 'VGG16DeepLab_Raster256'
 
 imgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tif'
@@ -116,7 +117,7 @@ conv_params = {"filters": [64,128,256,512,512],
     "pool_size": [(2,2),(2,2),(2,2),(3,3),(3,3)],
     "pool_strides": [(2,2),(2,2),(2,2),(1,1),(1,1)],
     "pad_size": [(0,0),(0,0),(1,1),(1,1),(1,1)],
-    "layercombo": ["cacap","cacap","cacacap","cacacazp","cacacazp"],
+    "layercombo": ["cacapb","cacapb","cacacapb","cacacazpb","cacacazp"],
     "full_filters": [1024,1024],
     "dropout": [0,0]}
 
@@ -137,12 +138,14 @@ VGG16_DeepLab = VGG16_DeepLabV2(input_shape=(y, x, num_channels), classes=num_cl
 optimizer = keras.optimizers.Adam(1e-4)
 
 VGG16_DeepLab.summary()
-# fcn_vgg16.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'], sample_weight_mode='temporal')
+VGG16_DeepLab.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'], sample_weight_mode='temporal')
 
-# fcn_vgg16.fit_generator(train_generator,
-#     steps_per_epoch=200,
-#     epochs=100,
-#     validation_data=validation_generator,
-#     validation_steps=10,
-#     verbose=1,
-#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+# print("Memory required (GB): ", get_model_memory_usage(batch_size, VGG16_DeepLab))
+
+VGG16_DeepLab.fit_generator(train_generator,
+    steps_per_epoch=200,
+    epochs=100,
+    validation_data=validation_generator,
+    validation_steps=10,
+    verbose=1,
+    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])

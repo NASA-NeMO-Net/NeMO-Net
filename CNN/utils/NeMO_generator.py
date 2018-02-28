@@ -234,7 +234,6 @@ class NeMODirectoryIterator(Iterator):
             for subdir in sorted(os.listdir(directory)):
                 if os.path.isdir(os.path.join(directory, subdir)):
                     classes.append(subdir)
-        self.num_class = len(classes)
 
         if type(classes) is dict:
             self.class_indices = classes
@@ -242,7 +241,8 @@ class NeMODirectoryIterator(Iterator):
             classes = [k for k in self.class_indices] #redefine classes as a list
         else:
             self.class_indices = dict(zip(classes, range(len(classes))))
-            self.num_consolclass = self.num_class
+            self.num_consolclass = len(classes) # number of consolidated classes, which classes is a dictionary of
+        self.num_class = len(classes) # sets num_class to TOTAL number of classes (NOT consolidate classes)
 
         pool = multiprocessing.pool.ThreadPool()
         function_partial = partial(_count_valid_files_in_directory,
@@ -294,9 +294,9 @@ class NeMODirectoryIterator(Iterator):
 
         pool.close()
         pool.join()
-        super(NeMODirectoryIterator, self).__init__(self.samples, batch_size, shuffle, seed)
+        super(NeMODirectoryIterator, self).__init__(self.samples, batch_size, shuffle, seed) #n, batch_size, shuffle, seed
 
-    def _flow_index(self, n, batch_size=32, shuffle=False, seed=None):
+    def _flow_index(self, n, batch_size=32, shuffle=False, seed=None): #n = total number of images in all folders
         # Ensure self.batch_index is 0.
         self.reset()
         div = n/self.num_class
@@ -305,17 +305,22 @@ class NeMODirectoryIterator(Iterator):
             np.asarray(index_array)
             if seed is not None:
                 np.random.seed(seed + self.total_batches_seen)
-            for c in range(self.num_class):
-                index_array = np.append(index_array, np.random.randint(int(np.round(c*div)),int(np.round(c*div+div)),size=int(np.round(batch_size/self.num_class))))
 
-            current_index = (self.batch_index * batch_size) % n
+            leftover = batch_size % self.num_class #remainder in case num_class doesn't divide into batch_size
+            random_c = np.random.choice(self.num_class,leftover,replace=False)
+            for c in range(self.num_class):
+                index_array = np.append(index_array, np.random.randint(int(np.round(c*div)),int(np.round(c*div+div)),size=int(batch_size//self.num_class)))
+            for c in random_c: #choose random folders to pick from
+                index_array = np.append(index_array, np.random.randint(int(np.round(c*div)),int(np.round(c*div+div)),size=1))
+
+            current_index = (self.batch_index * batch_size) % n # remainder
             if n > current_index + batch_size:
                 current_batch_size = batch_size
-                self.batch_index += 1
+                self.batch_index += 1  # batch number within n images
             else:
                 # current_batch_size = n - current_index
                 current_batch_size = batch_size
-                self.batch_index = 0
+                self.batch_index = 0 # has gone through all n images, reset batch_index to 0
             self.total_batches_seen += 1
             index_array = index_array.astype(np.int64)
             yield (index_array, current_index, current_batch_size)

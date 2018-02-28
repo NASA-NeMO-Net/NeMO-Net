@@ -54,7 +54,7 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_boo
 
       for layer_char in layercombo:
         if layer_char == "z":
-          x = ZeroPadding2D(padding=f(pad_size,z_count))(x)
+          x = ZeroPadding2D(padding=f(pad_size,z_count), name="{}_Padding{}".format(block_name,z_count+1))(x)
           z_count +=1
 
         if layer_char == "c":
