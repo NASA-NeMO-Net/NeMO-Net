@@ -29,7 +29,7 @@ from keras.callbacks import (
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 256
-batch_size = 12
+batch_size = 6
 model_name = 'VGG16DeepLab_Raster256'
 
 imgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tif'
@@ -133,7 +133,7 @@ parallelconv_params = {"filters": [[1024,1024,num_classes]],
     "full_filters": [4096,2048],
     "dropout": [0.5,0.5]}
 
-VGG16_DeepLab = VGG16_DeepLabV2(input_shape=(y, x, num_channels), classes=num_classes, weight_decay=3e-3,
+VGG16_DeepLab = VGG16_DeepLabV2(input_shape=(y, x, num_channels), classes=num_classes, weight_decay=3e-3, batch_size=batch_size, 
                 weights=None, trainable_encoder=True, conv_layers=5, full_layers=0, conv_params=conv_params, parallel_layers=4, parallelconv_params=parallelconv_params)
 optimizer = keras.optimizers.Adam(1e-4)
 
@@ -143,9 +143,9 @@ VGG16_DeepLab.compile(optimizer=optimizer, loss='categorical_crossentropy', metr
 # print("Memory required (GB): ", get_model_memory_usage(batch_size, VGG16_DeepLab))
 
 VGG16_DeepLab.fit_generator(train_generator,
-    steps_per_epoch=200,
+    steps_per_epoch=100,
     epochs=100,
     validation_data=validation_generator,
-    validation_steps=10,
+    validation_steps=100,
     verbose=1,
     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])

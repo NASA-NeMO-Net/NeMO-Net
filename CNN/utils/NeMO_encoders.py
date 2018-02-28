@@ -3,10 +3,12 @@ from __future__ import (
     unicode_literals
 )
 import numpy as np
+import copy
 import keras
 import keras.backend as K
 
-from keras.models import Model
+#from keras.models import Model
+from keras.engine.training import Model
 from keras.utils.data_utils import get_file
 from keras.utils import layer_utils
 
@@ -130,7 +132,7 @@ class Res_Encoder(Model):
 
         # all parallel blocks
         if type(inputs) is list:
-            inputs_copy = [np.copy(input) for input in inputs]
+            inputs_copy = [np.copy(inp) for inp in inputs]
         else:
             inputs_copy = inputs
 
@@ -326,19 +328,6 @@ class Alex_Parallel_Hyperopt_Encoder(Res_Encoder):
             block = Add()
             blocks.append(block)
 
-
-        # block_name = 'poolconcat_block'
-        # block = pool_concat(pool_size=(1,1), batchnorm_bool=True, block_name=block_name)
-        # blocks.append(block)
-
-        # for i in range(full_layers):
-        #     block_name='alexfc{}'.format(i + 1)
-        #     if i==0:
-        #         block = alex_fc(full_filters[i], flatten_bool=True, dropout_bool=True, dropout=dropout[i], weight_decay=weight_decay, block_name=block_name)
-        #     else:
-        #         block = alex_fc(full_filters[i], flatten_bool=False, dropout_bool=True, dropout=dropout[i], weight_decay=weight_decay, block_name=block_name)
-        #     blocks.append(block)
-
         super(Alex_Parallel_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
 class VGG_Hyperopt_Encoder(Res_Encoder):
@@ -373,6 +362,7 @@ class VGG_Hyperopt_Encoder(Res_Encoder):
             blocks.append(block)
 
         super(VGG_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
+
 
 class Res34_Encoder(Res_Encoder):
     def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, fcflag = False):
