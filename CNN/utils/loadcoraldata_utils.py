@@ -442,7 +442,7 @@ class CoralData:
 #   num_predict: Number of times per prediction in array
 # 	truth_predict: Original truth image (cropped)
 # 	accuracy: Overall accuracy of entire prediction
-	def predict_on_whole_image(self, model, image_size, num_lines = None, spacing = (1,1), predict_size = 1, lastchannelremove = True):
+	def predict_on_whole_image(self, model, image_size, num_classes, num_lines = None, spacing = (1,1), predict_size = 1, lastchannelremove = True):
 		crop_len = int(np.floor(image_size/2)) # lengths from sides to not take into account in the calculation of num_lines
 		offstart = crop_len-int(np.floor(predict_size/2))
 
@@ -456,6 +456,7 @@ class CoralData:
 
 			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
 			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
+			prob_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size, num_classes))
 
 			truth_predict = self.truthimage[offstart:offstart+whole_predict.shape[0], offstart:offstart+whole_predict.shape[1]]
 
@@ -465,14 +466,16 @@ class CoralData:
 						temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1, toremove=3)
 					else:
 						temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1)
-					temp_predict = model.predict_on_batch(temp_dataset)
-					temp_predict = self._classifyback(temp_predict)
+					temp_prob_predict = model.predict_on_batch(temp_dataset)
+					temp_predict = self._classifyback(temp_prob_predict)
 					
 					for predict_mat in temp_predict: 	# this is incorrect if temp_predict has more than 1 prediction (e.g. cols>1, lines>1)
 						whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = \
-							whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.reshape(predict_mat, (image_size,image_size))
+							whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.reshape(predict_mat, (predict_size,predict_size))
 						num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = \
-							num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones((image_size,image_size))
+							num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones((predict_size,predict_size))
+						prob_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size,:] = \
+							prob_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size,:] + np.reshape(temp_prob_predict, (predict_size,predict_size,num_classes))
 					print("Line: " + str(offset-crop_len) + " Col: " + str(cols-crop_len) + '/ ' + str(self.testimage.shape[1]-image_size+1) + ' completed', end='\r')
 		else:
 			if num_lines is None:
@@ -533,8 +536,9 @@ class CoralData:
 		
 		# whole_predict = np.round(whole_predict.astype(np.float)/num_predict.astype(np.float)).astype(np.uint8)
 		whole_predict = np.round(whole_predict.astype(np.float)/num_predict.astype(np.float))
+		prob_predict = prob_predict/np.dstack([num_predict.astype(np.float)]*num_classes)
 		accuracy = 100*np.asarray((whole_predict == truth_predict)).astype(np.float32).sum()/(whole_predict.shape[0]*whole_predict.shape[1])
 
-		return whole_predict, num_predict, truth_predict, accuracy
+		return whole_predict, num_predict, prob_predict, truth_predict, accuracy
 
 
