@@ -36,11 +36,12 @@ imgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2
 tfwpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tfw'
 truthpath = '../Images/BIOT-PerosBanhos-sample-habitat-map/BIOT-PerosBanhos-sample-habitat-map.shp'
 PerosBanhos = coralutils.CoralData(imgpath, Truthpath=truthpath, load_type="raster", tfwpath=tfwpath)
-PerosBanhos.load_PB_consolidated_classes()
+# PerosBanhos.load_PB_consolidated_classes()
 
-#labelkey = PerosBanhos.class_labels
-labelkey = PerosBanhos.consol_labels
-num_classes = len(PerosBanhos.PB_consolidated_classes)
+labelkey = PerosBanhos.class_labels
+num_classes = len(labelkey)
+# labelkey = PerosBanhos.consol_labels
+# num_classes = len(PerosBanhos.PB_consolidated_classes)
 
 with open("init_args - VGG16DeepLab_Raster256.yml", 'r') as stream:
     try:
@@ -91,7 +92,7 @@ train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     target_size=(x,y),
     color_mode=train_loader.color_mode,
     classes = labelkey,
-    class_weights = PerosBanhos.consolclass_weights,
+    class_weights = PerosBanhos.class_weights,
     class_mode = 'categorical',
     batch_size = batch_size,
     shuffle=True)
@@ -101,7 +102,7 @@ validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
     target_size=(x,y),
     color_mode=val_loader.color_mode,
     classes = labelkey,
-    class_weights = PerosBanhos.consolclass_weights,
+    class_weights = PerosBanhos.class_weights,
     class_mode = 'categorical',
     batch_size = batch_size,
     shuffle=True)

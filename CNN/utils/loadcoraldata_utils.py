@@ -25,21 +25,21 @@ class CoralData:
 	projection = None
 	depth = 255
 
-	def __init__(self, Imagepath, Truthpath=None, Testpath = None, truth_key=None, load_type="cv2", tfwpath=None):
+	def __init__(self, Imagepath, Truthpath=None, Testpath = None, Bathypath=None, truth_key=None, load_type="cv2", tfwpath=None):
 		# Load images
 		self.load_type = load_type
 		if load_type == "PIL":
 			self.image = img_to_array(pil_image.open(Imagepath))
 			if Truthpath is not None:
 				self.truthimage = cv2.imread(Truthpath, cv2.IMREAD_UNCHANGED)
-			if Testpath is not None:
-				self.testimage = img_to_array(pil_image.open(Testpath))
+			# if Testpath is not None:
+			# 	self.testimage = img_to_array(pil_image.open(Testpath))
 		elif load_type == "cv2":
 			self.image = cv2.imread(Imagepath,cv2.IMREAD_UNCHANGED)
 			if Truthpath is not None:
 				self.truthimage = cv2.imread(Truthpath,cv2.IMREAD_UNCHANGED)
-			if Testpath is not None:
-				self.testimage = cv2.imread(Testpath, cv2.IMREAD_UNCHANGED)
+			# if Testpath is not None:
+			# 	self.testimage = cv2.imread(Testpath, cv2.IMREAD_UNCHANGED)
 		elif load_type == "raster":
 			img = gdal.Open(Imagepath)
 			try:
@@ -64,8 +64,12 @@ class CoralData:
 				band += 1
 				imgband = img.GetRasterBand(band)
 				self.image[:,:,band-1] = imgband.ReadAsArray()
+		else:
+			print("Load type error: specify either PIL, cv2, or raster")
+			return None
 
-			if Truthpath is not None:
+		if Truthpath is not None:
+			if Truthpath.endswith('.shp'):
 				NoData_value = -1
 				class_labels = []
 				labelmap = None
@@ -125,9 +129,14 @@ class CoralData:
 				self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
 				self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
 				self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in range(num_classes))
-		else:
-			print("Load type error: specify either PIL, cv2, or raster")
-			return None
+			if Truthpath.endswith('.tif'):
+				self.truthimage = cv2.imread(Truthpath,cv2.IMREAD_UNCHANGED)
+				class_indices = np.unique(self.truthimage)
+				num_classes = len(class_indices)
+				self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in class_indices)
+		if Bathypath is not None:
+			self.bathyimage = cv2.imread(Bathypath, cv2.IMREAD_UNCHANGED)
+			self.bathyimage[self.bathyimage == np.min(self.bathyimage)] = -1
 
 	    # Set labels from 0 to item_counter based upon input truth_key
 		if truth_key is not None:
@@ -442,7 +451,7 @@ class CoralData:
 #   num_predict: Number of times per prediction in array
 # 	truth_predict: Original truth image (cropped)
 # 	accuracy: Overall accuracy of entire prediction
-	def predict_on_whole_image(self, model, image_size, num_lines = None, spacing = (1,1), predict_size = 1, lastchannelremove = True):
+	def predict_on_whole_image(self, model, image_size, num_classes, num_lines = None, spacing = (1,1), predict_size = 1, lastchannelremove = True):
 		crop_len = int(np.floor(image_size/2)) # lengths from sides to not take into account in the calculation of num_lines
 		offstart = crop_len-int(np.floor(predict_size/2))
 
@@ -456,6 +465,7 @@ class CoralData:
 
 			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
 			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
+			prob_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size, num_classes))
 
 			truth_predict = self.truthimage[offstart:offstart+whole_predict.shape[0], offstart:offstart+whole_predict.shape[1]]
 
@@ -465,14 +475,16 @@ class CoralData:
 						temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1, toremove=3)
 					else:
 						temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1)
-					temp_predict = model.predict_on_batch(temp_dataset)
-					temp_predict = self._classifyback(temp_predict)
+					temp_prob_predict = model.predict_on_batch(temp_dataset)
+					temp_predict = self._classifyback(temp_prob_predict)
 					
 					for predict_mat in temp_predict: 	# this is incorrect if temp_predict has more than 1 prediction (e.g. cols>1, lines>1)
 						whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = \
-							whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.reshape(predict_mat, (image_size,image_size))
+							whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.reshape(predict_mat, (predict_size,predict_size))
 						num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = \
-							num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones((image_size,image_size))
+							num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones((predict_size,predict_size))
+						prob_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size,:] = \
+							prob_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size,:] + np.reshape(temp_prob_predict, (predict_size,predict_size,num_classes))
 					print("Line: " + str(offset-crop_len) + " Col: " + str(cols-crop_len) + '/ ' + str(self.testimage.shape[1]-image_size+1) + ' completed', end='\r')
 		else:
 			if num_lines is None:
@@ -533,8 +545,9 @@ class CoralData:
 		
 		# whole_predict = np.round(whole_predict.astype(np.float)/num_predict.astype(np.float)).astype(np.uint8)
 		whole_predict = np.round(whole_predict.astype(np.float)/num_predict.astype(np.float))
+		prob_predict = prob_predict/np.dstack([num_predict.astype(np.float)]*num_classes)
 		accuracy = 100*np.asarray((whole_predict == truth_predict)).astype(np.float32).sum()/(whole_predict.shape[0]*whole_predict.shape[1])
 
-		return whole_predict, num_predict, truth_predict, accuracy
+		return whole_predict, num_predict, prob_predict, truth_predict, accuracy
 
 
