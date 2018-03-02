@@ -143,7 +143,7 @@ VGG16_DeepLab.compile(optimizer=optimizer, loss='categorical_crossentropy', metr
 # print("Memory required (GB): ", get_model_memory_usage(batch_size, VGG16_DeepLab))
 
 VGG16_DeepLab.fit_generator(train_generator,
-    steps_per_epoch=100,
+    steps_per_epoch=4000,
     epochs=100,
     validation_data=validation_generator,
     validation_steps=100,
