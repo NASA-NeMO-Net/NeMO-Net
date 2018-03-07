@@ -34,7 +34,10 @@
 			}
 		},
 		{
+			"contents": "from __future__ import (\n    absolute_import,\n    unicode_literals\n)\nimport numpy as np\nimport copy\nimport keras\nimport keras.backend as K\n\n#from keras.models import Model\nfrom keras.engine.training import Model\nfrom keras.utils.data_utils import get_file\nfrom keras.utils import layer_utils\n\nfrom keras.layers import Cropping2D, Concatenate, Add\nfrom NeMO_blocks import (\n    alex_conv,\n    alex_fc,\n    parallel_conv,\n    vgg_convblock,\n    vgg_fcblock,\n    pool_concat,\n    res_initialconv,\n    res_basicconv,\n    res_megaconv,\n    res_1b1conv,\n    res_fc,\n    vgg_conv,\n    vgg_fc\n)\nfrom NeMO_backend import load_weights\n\nfrom hyperopt import fmin, tpe, hp, STATUS_OK, Trials\n\n\nclass Encoder(Model):\n    \"\"\"Encoder for Fully Convolutional Networks.\n    :param inputs: 4D Tensor, the input tensor\n    :param blocks: 1D array, list of functional convolutional blocks\n\n    :return A Keras Model with outputs including the output of\n    each block except the final conv block (using the encoder's top instead)\n\n    >>> from keras.layers import Input\n    >>> from keras_fcn.encoders import Encoder\n    >>> from keras_fcn.blocks import (vgg_conv, vgg_fc)\n    >>> inputs = Input(shape=(224, 224, 3))\n    >>> blocks = [vgg_conv(64, 2, 'block1'),\n    >>>           vgg_conv(128, 2, 'block2'),\n    >>>           vgg_conv(256, 3, 'block3'),\n    >>>           vgg_conv(512, 3, 'block4'),\n    >>>           vgg_conv(512, 3, 'block5'),\n    >>>           vgg_fc(4096)]\n    >>> encoder = Encoder(inputs, blocks, weights='imagenet',\n    >>>                   trainable=True)\n    >>> feat_pyramid = encoder.outputs   # A feature pyramid with 5 scales\n\n    \"\"\"\n\n    def __init__(self, inputs, blocks, weights=None,\n                 trainable=True, name='encoder'):\n        inverse_pyramid = []\n\n        # convolutional block\n        conv_blocks = blocks[:-1]\n        for i, block in enumerate(conv_blocks):\n            if i == 0:\n                x = block(inputs)\n                inverse_pyramid.append(x)\n            elif i < len(conv_blocks) - 1:\n                x = block(x)\n                inverse_pyramid.append(x)\n            else:\n                x = block(x)\n\n        # fully convolutional block\n        fc_block = blocks[-1]\n        y = fc_block(x)\n        inverse_pyramid.append(y)\n\n        outputs = list(reversed(inverse_pyramid))\n\n        super(Encoder, self).__init__(\n            inputs=inputs, outputs=outputs)\n\n        # load pre-trained weights\n        if weights is not None:\n            weights_path = get_file(\n                '{}_weights_tf_dim_ordering_tf_kernels.h5'.format(name),\n                weights,\n                cache_subdir='models')\n            layer_names = load_weights(self, weights_path)\n            if K.image_data_format() == 'channels_first':\n                layer_utils.convert_all_kernels_in_model(self)\n\n        # Freezing basenet weights\n        if trainable is False:\n            for layer in self.layers:\n                if layer.name in layer_names:\n                    layer.trainable = False\n\n\nclass Res_Encoder(Model):\n    \"\"\"Same as Encoder, but does not get rid of any output blocks\n    :param inputs: 4D Tensor, the input tensor\n    :param blocks: 1D array, list of functional convolutional blocks\n\n    :return A Keras Model with outputs\n    \"\"\"\n\n    # inputs: normal input\n    # blocks: blocks that make up the encoder\n    # crop_shapes: list of tuples indicating shapes to be cropped out of the center of inputs (e.g. [(5,5),(10,10)])\n    # weights: weights to be loaded (if any)\n    # traininable: Trainable layers\n    # name: Name of encoder\n    def __init__(self, inputs, blocks, weights=None, trainable=True, name='encoder'):\n        inverse_pyramid = []\n\n        # split_inputs = None \n        # if crop_shapes is not None:             # used for multi-input models\n        #     split_inputs = []\n        #     for shape in crop_shapes:\n        #         crop_len = (int(inputs.shape[1])-shape[0])/2\n        #         if (int(inputs.shape[1]) - shape[0])%2 == 0:\n        #             crop_len = int(crop_len)\n        #             split_inputs.append(Cropping2D(cropping=((crop_len,crop_len), (crop_len,crop_len)))(inputs))\n        #         else:\n        #             crop_len_lo = int(np.trunc(crop_len))\n        #             crop_len_hi = int(np.ceil(crop_len))\n        #             split_inputs.append(Cropping2D(cropping=((crop_len_lo,crop_len_hi), (crop_len_lo,crop_len_hi)))(inputs))\n\n        # all parallel blocks\n        if type(inputs) is list:\n            inputs_copy = [np.copy(inp) for inp in inputs]\n        else:\n            inputs_copy = inputs\n\n        for i, block in enumerate(blocks):\n            if i == 0:\n                x = block(inputs_copy)\n            else:\n                x = block(x)\n\n            if type(x) is list:\n                inverse_pyramid.append(list(x))\n                # print([xi.shape for xi in x])\n            else:\n                inverse_pyramid.append(x)\n                # print(x.shape)\n\n        pyramid = reversed(inverse_pyramid)\n        outputs = []\n        for item in pyramid:\n            if type(item) is list:\n                for miniitem in item:\n                    outputs.append(miniitem)\n            else:\n                outputs.append(item)\n        # outputs = list(reversed(inverse_pyramid))\n\n        super(Res_Encoder, self).__init__(inputs=inputs, outputs=outputs)\n        print(self.summary())\n\n        # load pre-trained weights\n        if weights is not None:\n            weights_path = get_file(\n                '{}_weights_tf_dim_ordering_tf_kernels.h5'.format(name),\n                weights,\n                cache_subdir='models')\n            layer_names = load_weights(self, weights_path)\n            if K.image_data_format() == 'channels_first':\n                layer_utils.convert_all_kernels_in_model(self)\n\n        # Freezing basenet weights\n        if trainable is False:\n            for layer in self.layers:\n                if layer.name in layer_names:\n                    layer.trainable = False\n\nclass Alex_Encoder(Res_Encoder):\n    def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True):\n        # filters = [64, 128, 256, 384, 512]\n        # conv_size = [(7,7),(5,5),(3,3),(3,3),(3,3)]\n        # pool_size = [(2,2),(2,2),(1,1),(1,1),(2,2)]\n        # pool_stride = [(2,2),(2,2),(1,1),(1,1),(2,2)]\n        # pool_bool = [True, True, False, False, True]\n        # pad_bool = [False, False, True, True, True]\n        # batchnorm_bool = [True, True, False, False, False]\n        filters = [64, 128]\n        conv_size = [(7,7),(5,5)]\n        pool_size = [(2,2),(2,2)]\n        pool_stride = [(2,2),(2,2)]\n        pool_bool = [True, True]\n        pad_bool = [False, False]\n        batchnorm_bool = [True, True]\n\n        full_filters = [256]\n        drop_bool = [True]\n        drop_val = [0.5]\n        \n        blocks = []\n        for i in range(len(filters)):\n            block_name = 'alexblock{}'.format(i + 1)\n            block = alex_conv(filters[i], conv_size[i], pad_bool=pad_bool[i], pool_bool=pool_bool[i], batchnorm_bool=batchnorm_bool[i], \n                pool_size=pool_size[i], pool_strides=pool_stride[i], weight_decay=weight_decay, block_name=block_name)\n            blocks.append(block)\n\n        for i in range(len(full_filters)):\n            block_name='alexfc{}'.format(i + 1)\n            if i==0:\n                block = alex_fc(full_filters[i], flatten_bool=True, dropout_bool=drop_bool[i], dropout=drop_val[i], weight_decay=weight_decay, \n                    block_name=block_name)\n            else:\n                block = alex_fc(full_filters[i], flatten_bool=False, dropout_bool=drop_bool[i], dropout=drop_val[i], weight_decay=weight_decay, \n                    block_name=block_name)\n            blocks.append(block)\n\n        super(Alex_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)\n\ndef load_specific_param(num_layers, default_conv_params, conv_params, specific_param, layer_str=\"convolutional\"):\n    default_param = default_conv_params[specific_param]\n    try:\n        param = conv_params[specific_param]\n        if len(param) != num_layers:\n            print(\"Found {} {} layers but {} {}, will only replace initial {} {}...\".format(num_layers, layer_str, len(param), specific_param, len(param), specific_param))\n            for i in range(len(param), num_layers):\n                param.append(default_param[i])\n        print(\"{}: {}\".format(specific_param, param[:num_layers]))\n    except:\n        print(\"{} not found, reverting to default: {}\".format(specific_param,default_param[:num_layers]))\n        param = default_param\n\n    return param\n\ndef load_conv_params(conv_layers, full_layers, default_conv_params, conv_params):\n    print(\"---------------------------------------------------------\")\n    print(\"ENCODER CONVOLUTIONAL PARAMETERS:\")\n\n    filters = load_specific_param(conv_layers, default_conv_params, conv_params, \"filters\")\n    conv_size = load_specific_param(conv_layers, default_conv_params, conv_params, \"conv_size\")\n    conv_strides = load_specific_param(conv_layers, default_conv_params, conv_params, \"conv_strides\")\n    padding = load_specific_param(conv_layers, default_conv_params, conv_params, \"padding\")\n    dilation_rate = load_specific_param(conv_layers, default_conv_params, conv_params, \"dilation_rate\")\n    pool_size = load_specific_param(conv_layers, default_conv_params, conv_params, \"pool_size\")\n    pool_strides = load_specific_param(conv_layers, default_conv_params, conv_params, \"pool_strides\")\n    pad_size = load_specific_param(conv_layers, default_conv_params, conv_params, \"pad_size\")\n    layercombo = load_specific_param(conv_layers, default_conv_params, conv_params, \"layercombo\")\n    # batchnorm_pos = load_specific_param(conv_layers, default_conv_params, conv_params, \"batchnorm_pos\") #old version has batchnorm_bool\n    full_filters = load_specific_param(full_layers, default_conv_params, conv_params, \"full_filters\", layer_str=\"fully connected\")\n    dropout = load_specific_param(full_layers, default_conv_params, conv_params, \"dropout\", layer_str=\"fully connected\")\n\n    return filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, layercombo, full_filters, dropout\n\n\nclass Alex_Hyperopt_Encoder(Res_Encoder):\n    def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, conv_layers=5, full_layers=2, conv_params=None):\n\n        default_conv_params = {\"filters\": [96,256,384,384,256],\n            \"conv_size\": [(7,7),(5,5),(3,3),(3,3),(3,3)],\n            \"conv_strides\": [(1,1),(1,1),(1,1),(1,1),(1,1)],\n            \"padding\": ['valid','valid','valid','valid','valid'],\n            \"dilation_rate\": [(1,1),(1,1),(1,1),(1,1),(1,1)],\n            \"pool_size\": [(2,2),(2,2),(1,1),(1,1),(2,2)],\n            \"pad_size\": [(0,0),(0,0),(0,0),(0,0),(0,0)],\n            \"layercombo\": [\"capb\",\"capb\",\"capb\",\"capb\",\"capb\"],\n            \"full_filters\": [4096,4096],\n            \"dropout\": [0.5,0.5]}\n        filters, conv_size, padding, dilation_rate, pool_size, pad_size, layercombo, full_filters, dropout = \\\n            load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)\n\n        # actual start of CNN\n        blocks = []\n        for i in range(conv_layers):\n            block_name = 'alexblock{}'.format(i + 1)\n            block = alex_conv(filters[i], conv_size[i], conv_strides=(1,1), padding=padding[i], pad_bool=True, pad_size=pad_size[i], pool_size=pool_size[i],\n                pool_strides=pool_size[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)\n            blocks.append(block)\n\n        for i in range(full_layers):\n            block_name='alexfc{}'.format(i + 1)\n            if i==0:\n                block = alex_fc(full_filters[i], flatten_bool=True, dropout_bool=True, dropout=dropout[i], weight_decay=weight_decay, block_name=block_name)\n            else:\n                block = alex_fc(full_filters[i], flatten_bool=False, dropout_bool=True, dropout=dropout[i], weight_decay=weight_decay, block_name=block_name)\n            blocks.append(block)\n\n        super(Alex_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)\n\nclass Alex_Parallel_Hyperopt_Encoder(Res_Encoder):\n    def __init__(self, inputs, classes, parallel_layers=4, combine_method='concat', conv_params=None, weight_decay=0., weights=None, trainable=True):\n\n        # double brackets to signify all parallel filters follow same parameters\n        default_conv_params = {\"filters\": [[1024,1024,classes]],\n            \"conv_size\": [[(3,3),(1,1),(1,1)]],\n            \"conv_strides\":  [[(3,3),(1,1),(1,1)]],\n            \"padding\": ['same','same','same','same'],\n            \"dilation_rate\": [[(6,6),(1,1),(1,1)], [(12,12),(1,1),(1,1)], [(18,18),(1,1),(1,1)], [(24,24),(1,1),(1,1)]],\n            \"pool_size\": [[(2,2),(2,2),(2,2)]],\n            \"pool_strides\": [[(2,2),(2,2),(2,2)]],\n            \"pad_size\": [(6,6), (12,12), (18,18), (24,24)],\n            \"layercombo\": [\"zcadcadc\",\"zcadcadc\",\"zcadcadc\",\"zcadcadc\"],\n            \"full_filters\": [4096,2048],\n            \"dropout\": [0.5,0.5]}\n        filters = conv_params[\"filters\"]\n        conv_size = conv_params[\"conv_size\"]\n        conv_strides = conv_params[\"conv_strides\"]\n        padding = conv_params[\"padding\"]\n        dilation_rate = conv_params[\"dilation_rate\"]\n        pool_size = conv_params[\"pool_size\"]\n        pool_strides = conv_params[\"pool_strides\"]\n        pad_size = conv_params[\"pad_size\"]\n        layercombo = conv_params[\"layercombo\"]\n\n        # f = lambda input,c_count: input[0] if len(input)==1 else input[c_count]\n        # actual start of CNN\n        blocks = []\n        block_name = 'parallel_block'\n        block = parallel_conv(filters, conv_size, conv_strides=conv_strides, padding=padding, pad_bool=True, pad_size=pad_size, \n            pool_size=pool_size, pool_strides=pool_strides, dilation_rate=dilation_rate, dropout=[0.5], layercombo=layercombo,\n            weight_decay=weight_decay, block_name=block_name)\n        blocks.append(block)\n\n        if combine_method == \"concat\":\n            block = Concatenate(axis=-1)\n            blocks.append(block)\n        elif combine_method == \"add\":\n            block = Add()\n            blocks.append(block)\n\n        super(Alex_Parallel_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)\n\nclass VGG_Hyperopt_Encoder(Res_Encoder):\n    def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, \n        conv_layers=5, full_layers=2, conv_params=None):\n\n        default_conv_params = {\"filters\": [64,128,256,512,512],\n            \"conv_size\": [(3,3),(3,3),(3,3),(3,3),(3,3)],\n            \"conv_strides\": [(1,1),(1,1),(1,1),(1,1),(1,1)],\n            \"padding\": ['same','same','same','same','same'],\n            \"dilation_rate\": [(1,1),(1,1),(1,1),(1,1),(1,1)],\n            \"pool_size\": [(2,2),(2,2),(2,2),(2,2),(2,2)],\n            \"pool_strides\": [(2,2),(2,2),(1,1),(1,1),(1,1)],\n            \"pad_size\": [(0,0),(0,0),(0,0),(0,0),(0,0)],\n            \"layercombo\": [\"cacapb\",\"cacapba\",\"cacacapb\",\"cacacapb\",\"cacacapb\"],\n            \"full_filters\": [2048,2048],\n            \"dropout\": [0.5,0.5]}\n        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, layercombo, full_filters, dropout = \\\n            load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)\n\n        # actual start of CNN\n        blocks = []\n        for i in range(conv_layers):\n            block_name = 'vgg_convblock{}'.format(i + 1)\n            block = alex_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], pool_size=pool_size[i],\n                pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)\n            blocks.append(block)\n\n        if full_layers > 0:\n            block_name = 'vgg_fcblock'\n            block = vgg_fcblock(full_filters, full_layers, dropout_bool=True, dropout=dropout, weight_decay=weight_decay, block_name=block_name)\n            blocks.append(block)\n\n        super(VGG_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)\n\n\nclass Res34_Encoder(Res_Encoder):\n    def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, fcflag = False):\n        weights = None\n        filters = [64, 128, 256, 512]\n        convs = [2,2,2,2]\n        reps = [3,4,6,3]\n        blocks = []\n\n        init_block = res_initialconv(filters=64, weight_decay = weight_decay)\n        blocks.append(init_block)\n\n        for i, (fltr, conv) in enumerate(zip(filters, convs)):\n            block_name = 'megablock{}'.format(i + 1)\n            if i==0:\n                block = res_megaconv(fltr, conv, reps[i], init_strides=(1,1), weight_decay=weight_decay, block_name=block_name)\n            else:\n                block = res_megaconv(fltr, conv, reps[i], init_strides=(2,2), weight_decay=weight_decay, block_name=block_name)\n            blocks.append(block)\n\n        if fcflag:\n            fc_block = res_fc(classes=classes, weight_decay=weight_decay)\n        else:\n            fc_block = res_1b1conv(filters=512, convs=1, weight_decay = weight_decay)\n        blocks.append(fc_block)\n\n        super(Res34_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable=trainable)\n\nclass VGGEncoder(Encoder):\n    \"\"\"VGG VGGEncoder.\n\n    :param inputs: 4D Tensor, the input tensor\n    :param filters: 1D array, number of filters per block\n    :param convs: 1D array, number of convolutional layers per block, with\n    length the same as `filters`.\n\n    :return A Keras Model with outputs including the output of\n    each block except `pool5` (using drop7 from `pool5` instead)\n\n    >>> from keras_fcn.encoders import VGGEncoder\n    >>> from keras.layers import Input\n    >>> x = Input(shape=(224, 224, 3))\n    >>> encoder = VGGEncoder(Input(x),\n    >>>                  filters=[64, 128, 256, 512, 512],\n    >>>                  convs=[2, 2, 3, 3, 3])\n    >>> feat_pyramid = encoder.outputs\n\n    \"\"\"\n\n    def __init__(self, inputs, filters, convs, weight_decay=0.,\n            weights=None, trainable=True):\n        blocks = []\n\n        # Convolutional blocks\n        for i, (fltr, conv) in enumerate(zip(filters, convs)):\n            block_name = 'block{}'.format(i + 1)\n            block = vgg_conv(filters=fltr, convs=conv, padding=False,\n                             weight_decay=weight_decay,\n                             block_name=block_name)\n            blocks.append(block)\n\n        # Fully Convolutional block\n        fc_block = vgg_fc(filters=1024, weight_decay=weight_decay)\n        # fc_block = vgg_fc(filters=4096, weight_decay=weight_decay)\n\n        blocks.append(fc_block)\n\n        super(VGGEncoder, self).__init__(inputs=inputs, blocks=blocks,\n                                         weights=weights, trainable=trainable)\n\n\nclass VGG16(VGGEncoder):\n    \"\"\"A VGG16 feature encoder.\n\n    >>> from keras_fcn.encoders import VGG16\n    >>> from keras.layers import Input\n    >>> x = Input(shape=(224, 224, 3))\n    >>> encoder = VGG16(x)\n    >>> feat_pyramid = encoder.outputs\n\n    \"\"\"\n\n    def __init__(self, inputs, weight_decay=0.,\n            weights='imagenet', trainable=True):\n        if weights == 'imagenet':\n            weights = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5'\n        else:\n            weights = None\n\n        super(VGG16, self).__init__(inputs,\n                                    filters=[64, 128, 196, 256, 384],\n                                    convs=[2, 2, 3, 3, 3],\n                                    weight_decay=weight_decay,\n                                    weights=weights,\n                                    trainable=trainable)\n\n        # super(VGG16, self).__init__(inputs,\n        #                             filters=[64, 128, 256, 512, 512],\n        #                             convs=[2, 2, 3, 3, 3],\n        #                             weight_decay=weight_decay,\n        #                             weights=weights,\n        #                             trainable=trainable)\n\n\nclass VGG19(VGGEncoder):\n    \"\"\"VGG19 net.\n\n    >>> from keras_fcn.encoders import VGG19\n    >>> from keras.layers import Input\n    >>> x = Input(shape=(224, 224, 3))\n    >>> encoder = VGG19(x)\n    >>> feat_pyramids = encoder.outputs\n\n    \"\"\"\n\n    def __init__(self, inputs, weight_decay=0.,\n            weights='imagenet', trainable=True):\n        if weights == 'imagenet':\n            weights = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5'\n        else:\n            weights = None\n\n        super(VGG19, self).__init__(inputs,\n                                    filters=[64, 128, 256, 512, 512],\n                                    convs=[2, 2, 4, 4, 4],\n                                    weight_decay=weight_decay,\n                                    weights=weights,\n                                    trainable=trainable)\n",
 			"file": "utils/NeMO_encoders.py",
+			"file_size": 21854,
+			"file_write_time": 131643242833031458,
 			"settings":
 			{
 				"buffer_size": 21361,
@@ -61,10 +64,13 @@
 			}
 		},
 		{
+			"contents": "import os\nimport yaml\nimport datetime\nimport numpy as np\nimport keras\nimport keras.backend as K\nimport tensorflow as tf\n\nos.environ[\"CUDA_VISIBLE_DEVICES\"] = \"0\"\n\nglobal _SESSION\nconfig = tf.ConfigProto(allow_soft_placement=True)\nconfig.gpu_options.allow_growth = True\n_SESSION = tf.Session(config=config)\nK.set_session(_SESSION)\n\nimport sys\nsys.path.append(\"./utils/\") # Adds higher directory to python modules path.\nimport loadcoraldata_utils as coralutils\nfrom NeMO_models import VGG16_DeepLabV2\nfrom NeMO_generator import NeMOImageGenerator, ImageSetLoader\nfrom NeMO_backend import get_model_memory_usage\nfrom keras.callbacks import (\n    ReduceLROnPlateau,\n    CSVLogger,\n    EarlyStopping,\n    ModelCheckpoint,\n    TerminateOnNaN)\nfrom NeMO_callbacks import CheckNumericsOps, WeightsSaver\n\nimage_size = 256\nbatch_size = 6\nmodel_name = 'VGG16DeepLab_Raster256'\n\nimgpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tif'\ntfwpath = '../Images/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI/BTPB-WV2-2012-15-8Band-mosaic-GeoTiff-Sample-AOI.tfw'\ntruthpath = '../Images/BIOT-PerosBanhos-sample-habitat-map/BIOT-PerosBanhos-sample-habitat-map.shp'\nPerosBanhos = coralutils.CoralData(imgpath, Truthpath=truthpath, load_type=\"raster\", tfwpath=tfwpath)\n# PerosBanhos.load_PB_consolidated_classes()\n\nlabelkey = PerosBanhos.class_labels\nnum_classes = len(labelkey)\n# labelkey = PerosBanhos.consol_labels\n# num_classes = len(PerosBanhos.PB_consolidated_classes)\n\nwith open(\"init_args - VGG16DeepLab_Raster256.yml\", 'r') as stream:\n    try:\n        init_args = yaml.load(stream)\n    except yaml.YAMLError as exc:\n        print(exc)\n\ntrain_loader = ImageSetLoader(**init_args['image_set_loader']['train'])\nval_loader = ImageSetLoader(**init_args['image_set_loader']['val'])\n\nif train_loader.color_mode == 'rgb':\n    num_channels = 3\nelif train_loader.color_mode == '8channel':\n    num_channels = 8\n\ny = train_loader.target_size[1]\nx = train_loader.target_size[0]\npixel_mean =1023.5*np.ones(num_channels)\npixel_std = 1023.5*np.ones(num_channels)\n\ncheckpointer = ModelCheckpoint(filepath=\"./tmp/\" + model_name + \".h5\", verbose=1, monitor='val_acc', mode='max', save_best_only=True)\nlr_reducer = ReduceLROnPlateau(monitor='val_loss',\n                               factor=np.sqrt(0.1),\n                               cooldown=0,\n                               patience=10, min_lr=1e-12)\nearly_stopper = EarlyStopping(monitor='val_loss',\n                              min_delta=0.001,\n                              patience=30)\nnan_terminator = TerminateOnNaN()\nSaveWeights = WeightsSaver(filepath='./weights/', model_name=model_name, N=10)\n#csv_logger = CSVLogger('output/tmp_fcn_vgg16.csv')\n    #'output/{}_fcn_vgg16.csv'.format(datetime.datetime.now().isoformat()))\n\n#check_num = CheckNumericsOps(validation_data=[np.random.random((1, 224, 224, 3)), 1],\n#                             histogram_freq=100)\n\n# log history during model fit\ncsv_logger = CSVLogger('output/log.csv', append=True, separator=';')\n\ndatagen = NeMOImageGenerator(image_shape=[y, x, num_channels],\n                                    image_resample=True,\n                                    pixelwise_center=True,\n                                    pixel_mean=pixel_mean,\n                                    pixelwise_std_normalization=True,\n                                    pixel_std=pixel_std)\ntrain_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,\n    FCN_directory=train_loader.label_dir,\n    target_size=(x,y),\n    color_mode=train_loader.color_mode,\n    classes = labelkey,\n    class_weights = PerosBanhos.class_weights,\n    class_mode = 'categorical',\n    batch_size = batch_size,\n    shuffle=True)\n\nvalidation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,\n    FCN_directory=val_loader.label_dir,\n    target_size=(x,y),\n    color_mode=val_loader.color_mode,\n    classes = labelkey,\n    class_weights = PerosBanhos.class_weights,\n    class_mode = 'categorical',\n    batch_size = batch_size,\n    shuffle=True)\n\nconv_layers = 5\nfull_layers = 0\n\nconv_params = {\"filters\": [64,128,256,512,512],\n    \"conv_size\": [(3,3),(3,3),(3,3),(3,3),(3,3)],\n    \"conv_strides\": [(1,1),(1,1),(1,1),(1,1),(1,1)],\n    \"padding\": ['same','same','same','same','same'],\n    \"dilation_rate\": [(1,1),(1,1),(1,1),(1,1),(2,2)],\n    \"pool_size\": [(2,2),(2,2),(2,2),(3,3),(3,3)],\n    \"pool_strides\": [(2,2),(2,2),(2,2),(1,1),(1,1)],\n    \"pad_size\": [(0,0),(0,0),(1,1),(1,1),(1,1)],\n    \"layercombo\": [\"cacapb\",\"cacapb\",\"cacacapb\",\"cacacazpb\",\"cacacazp\"],\n    \"full_filters\": [1024,1024],\n    \"dropout\": [0,0]}\n\nparallelconv_params = {\"filters\": [[1024,1024,num_classes]],\n    \"conv_size\": [[(3,3),(1,1),(1,1)]],\n    \"conv_strides\":  [[(1,1),(1,1),(1,1)]],\n    \"padding\": ['valid','valid','valid','valid'],\n    \"dilation_rate\": [[(6,6),(1,1),(1,1)], [(12,12),(1,1),(1,1)], [(18,18),(1,1),(1,1)], [(24,24),(1,1),(1,1)]],\n    \"pool_size\": [[(2,2),(2,2),(2,2)]], #doesn't matter\n    \"pool_strides\": [[(2,2),(2,2),(2,2)]], #doesn't matter\n    \"pad_size\": [[(6,6),(0,0),(0,0)], [(12,12),(0,0),(0,0)], [(18,18),(0,0),(0,0)], [(24,24),(0,0),(0,0)]],\n    \"layercombo\": [\"zcadcadc\",\"zcadcadc\",\"zcadcadc\",\"zcadcadc\"],\n    \"full_filters\": [4096,2048],\n    \"dropout\": [0.5,0.5]}\n\nVGG16_DeepLab = VGG16_DeepLabV2(input_shape=(y, x, num_channels), classes=num_classes, weight_decay=3e-3, batch_size=batch_size, \n                weights=None, trainable_encoder=True, conv_layers=5, full_layers=0, conv_params=conv_params, parallel_layers=4, parallelconv_params=parallelconv_params)\noptimizer = keras.optimizers.Adam(1e-4)\n\nVGG16_DeepLab.summary()\nVGG16_DeepLab.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'], sample_weight_mode='temporal')\n\n# print(\"Memory required (GB): \", get_model_memory_usage(batch_size, VGG16_DeepLab))\n\nVGG16_DeepLab.fit_generator(train_generator,\n    steps_per_epoch=4000,\n    epochs=100,\n    validation_data=validation_generator,\n    validation_steps=100,\n    verbose=1,\n    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])",
 			"file": "AL_NeMO_hyperparamopt_VGG16DeepLabV2_256.py",
+			"file_size": 6289,
+			"file_write_time": 131644429102385120,
 			"settings":
 			{
-				"buffer_size": 6116,
+				"buffer_size": 6138,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -73,28 +79,9 @@
 			"file": "utils/loadcoraldata_utils.py",
 			"settings":
 			{
-				"buffer_size": 27718,
+				"buffer_size": 28256,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "import numpy as np\nfrom numbers import Number\nfrom logging import warning\n\n\ndef unary_from_labels(labels, n_labels, gt_prob, zero_unsure=True):\n    \"\"\"\n    Simple classifier that is 50% certain that the annotation is correct.\n    (same as in the inference example).\n\n\n    Parameters\n    ----------\n    labels: numpy.array\n        The label-map, i.e. an array of your data's shape where each unique\n        value corresponds to a label.\n    n_labels: int\n        The total number of labels there are.\n        If `zero_unsure` is True (the default), this number should not include\n        `0` in counting the labels, since `0` is not a label!\n    gt_prob: float\n        The certainty of the ground-truth (must be within (0,1)).\n    zero_unsure: bool\n        If `True`, treat the label value `0` as meaning \"could be anything\",\n        i.e. entries with this value will get uniform unary probability.\n        If `False`, do not treat the value `0` specially, but just as any\n        other class.\n    \"\"\"\n    assert 0 < gt_prob < 1, \"`gt_prob must be in (0,1).\"\n\n    labels = labels.flatten()\n\n    n_energy = -np.log((1.0 - gt_prob) / (n_labels - 1))\n    p_energy = -np.log(gt_prob)\n\n    # Note that the order of the following operations is important.\n    # That's because the later ones overwrite part of the former ones, and only\n    # after all of them is `U` correct!\n    U = np.full((n_labels, len(labels)), n_energy, dtype='float32')\n    U[labels - 1 if zero_unsure else labels, np.arange(U.shape[1])] = p_energy\n\n    # Overwrite 0-labels using uniform probability, i.e. \"unsure\".\n    if zero_unsure:\n        U[:, labels == 0] = -np.log(1.0 / n_labels)\n\n    return U\n\n\ndef compute_unary(labels, M, GT_PROB=0.5):\n    \"\"\"Deprecated, use `unary_from_labels` instead.\"\"\"\n    warning(\"pydensecrf.compute_unary is deprecated, use unary_from_labels instead.\")\n    return unary_from_labels(labels, M, GT_PROB)\n\nAuburn, California\ndef unary_from_softmax(sm, scale=None, clip=1e-5):\n    \"\"\"Converts softmax class-probabilities to unary potentials (NLL per node).\n\n    Parameters\n    ----------\n    sm: numpy.array\n        Output of a softmax where the first dimension is the classes,\n        all others will be flattend. This means `sm.shape[0] == n_classes`.\n    scale: float\n        The certainty of the softmax output (default is None).\n        If not None, the softmax outputs are scaled to range from uniform\n        probability for 0 outputs to `scale` probability for 1 outputs.\n    clip: float\n        Minimum value to which probability should be clipped.\n        This is because the unary is the negative log of the probability, and\n        log(0) = inf, so we need to clip 0 probabilities to a positive value.\n    \"\"\"\n    num_cls = sm.shape[0]\n    if scale is not None:\n        assert 0 < scale <= 1, \"`scale` needs to be in (0,1]\"\n        uniform = np.ones(sm.shape) / num_cls\n        sm = scale * sm + (1 - scale) * uniform\n    if clip is not None:\n        sm = np.clip(sm, clip, 1.0)\n    return -np.log(sm).reshape([num_cls, -1]).astype(np.float32)\n\n\ndef softmax_to_unary(sm, GT_PROB=1):\n    \"\"\"Deprecated, use `unary_from_softmax` instead.\"\"\"\n    warning(\"pydensecrf.softmax_to_unary is deprecated, use unary_from_softmax instead.\")\n    scale = None if GT_PROB == 1 else GT_PROB\n    return unary_from_softmax(sm, scale, clip=None)\n\n\ndef create_pairwise_gaussian(sdims, shape):\n    \"\"\"\n    Util function that create pairwise gaussian potentials. This works for all\n    image dimensions. For the 2D case does the same as\n    `DenseCRF2D.addPairwiseGaussian`.\n\n    Parameters\n    ----------\n    sdims: list or tuple\n        The scaling factors per dimension. This is referred to `sxy` in\n        `DenseCRF2D.addPairwiseGaussian`.\n    shape: list or tuple\n        The shape the CRF has.\n\n    \"\"\"\n    # create mesh\n    hcord_range = [range(s) for s in shape]\n    mesh = np.array(np.meshgrid(*hcord_range, indexing='ij'), dtype=np.float32)\n\n    # scale mesh accordingly\n    for i, s in enumerate(sdims):\n        mesh[i] /= s\n    return mesh.reshape([len(sdims), -1])\n\n\ndef create_pairwise_bilateral(sdims, schan, img, chdim=-1):\n    \"\"\"\n    Util function that create pairwise bilateral potentials. This works for\n    all image dimensions. For the 2D case does the same as\n    `DenseCRF2D.addPairwiseBilateral`.\n\n    Parameters\n    ----------\n    sdims: list or tuple\n        The scaling factors per dimension. This is referred to `sxy` in\n        `DenseCRF2D.addPairwiseBilateral`.\n    schan: list or tuple\n        The scaling factors per channel in the image. This is referred to\n        `srgb` in `DenseCRF2D.addPairwiseBilateral`.\n    img: numpy.array\n        The input image.\n    chdim: int, optional\n        This specifies where the channel dimension is in the image. For\n        example `chdim=2` for a RGB image of size (240, 300, 3). If the\n        image has no channel dimension (e.g. it has only one channel) use\n        `chdim=-1`.\n\n    \"\"\"\n    # Put channel dim in right position\n    if chdim == -1:\n        # We don't have a channel, add a new axis\n        im_feat = img[np.newaxis].astype(np.float32)\n    else:\n        # Put the channel dim as axis 0, all others stay relatively the same\n        im_feat = np.rollaxis(img, chdim).astype(np.float32)\n\n    # scale image features per channel\n    # Allow for a single number in `schan` to broadcast across all channels:\n    if isinstance(schan, Number):\n        im_feat /= schan\n    else:\n        for i, s in enumerate(schan):\n            im_feat[i] /= s\n\n    # create a mesh\n    cord_range = [range(s) for s in im_feat.shape[1:]]\n    mesh = np.array(np.meshgrid(*cord_range, indexing='ij'), dtype=np.float32)\n\n    # scale mesh accordingly\n    for i, s in enumerate(sdims):\n        mesh[i] /= s\n\n    feats = np.concatenate([mesh, im_feat])\n    return feats.reshape([feats.shape[0], -1])\n\n\ndef _create_pairwise_gaussian_2d(sx, sy, shape):\n    \"\"\"\n    A simple reference implementation for the 2D case. The ND implementation\n    is faster.\n    \"\"\"\n    feat_size = 2\n    feats = np.zeros((feat_size, shape[0], shape[1]), dtype=np.float32)\n    for i in range(shape[0]):\n        for j in range(shape[1]):\n            feats[0, i, j] = i / sx\n            feats[1, i, j] = j / sy\n    return feats.reshape([feat_size, -1])\n\n\ndef _create_pairwise_bilateral_2d(sx, sy, sr, sg, sb, img):\n    \"\"\"\n    A simple reference implementation for the 2D case. The ND implementation\n    is faster.\n    \"\"\"\n    feat_size = 5\n    feats = np.zeros((feat_size, img.shape[0], img.shape[1]), dtype=np.float32)\n    for i in range(img.shape[0]):\n        for j in range(img.shape[1]):\n            feats[0, i, j] = i / sx\n            feats[1, i, j] = j / sy\n            feats[2, i, j] = img[i, j, 0] / sr\n            feats[3, i, j] = img[i, j, 1] / sg\n            feats[4, i, j] = img[i, j, 2] / sb\n    return feats.reshape([feat_size, -1])\n\n",
-			"file": "/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/pydensecrf-1.0rc2-py3.6-win-amd64.egg/pydensecrf/utils.py",
-			"file_size": 6852,
-			"file_write_time": 131641632432448737,
-			"settings":
-			{
-				"buffer_size": 6870,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/C/Users/Rechant/Documents/pydensecrf-master/examples/inference.py",
-			"settings":
-			{
-				"buffer_size": 5138,
-				"line_ending": "Unix"
 			}
 		}
 	],
@@ -138,14 +125,14 @@
 	},
 	"file_history":
 	[
+		"/C/Users/Rechant/Documents/pydensecrf-master/examples/inference.py",
+		"/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/pydensecrf-1.0rc2-py3.6-win-amd64.egg/pydensecrf/utils.py",
 		"/C/Users/Rechant/Documents/pydensecrf-master/tests/test_utils.py",
 		"/C/Users/Rechant/Documents/pydensecrf-master/pydensecrf/utils.py",
 		"/C/Users/Rechant/Documents/pydensecrf-master/pydensecrf/test_eigen.py",
 		"/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/pydensecrf-1.0rc2-py3.6-win-amd64.egg/pydensecrf/eigen.cp36-win_amd64.pyd",
 		"/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/pydensecrf-1.0rc2-py3.6-win-amd64.egg/pydensecrf/densecrf.py",
 		"/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/pydensecrf-1.0rc2-py3.6-win-amd64.egg/pydensecrf/eigen.py",
-		"/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/pydensecrf-1.0rc2-py3.6-win-amd64.egg/pydensecrf/utils.py",
-		"/C/Users/Rechant/Documents/pydensecrf-master/examples/inference.py",
 		"/C/Users/Rechant/Documents/GitHub/NeMO-NET/CNN/utils/NeMO_functional_encoders.py",
 		"/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/keras/engine/training.py",
 		"/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/keras/utils/generic_utils.py",
@@ -261,6 +248,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"num_classes",
+			"class_weights",
 			"convert_all",
 			"classifyback",
 			"deepcopy",
@@ -345,7 +334,7 @@
 	"groups":
 	[
 		{
-			"selected": 9,
+			"selected": 6,
 			"sheets":
 			[
 				{
@@ -361,8 +350,8 @@
 						"selection":
 						[
 							[
-								14048,
-								14048
+								2666,
+								2666
 							]
 						],
 						"settings":
@@ -372,10 +361,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 796.0,
+						"translation.y": 29.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
@@ -421,8 +410,8 @@
 						"selection":
 						[
 							[
-								7421,
-								7426
+								4890,
+								4891
 							]
 						],
 						"settings":
@@ -431,11 +420,11 @@
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 1919.0,
+						"translation.x": 13.0,
+						"translation.y": 1320.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
@@ -451,8 +440,8 @@
 						"selection":
 						[
 							[
-								3028,
-								3028
+								12656,
+								12656
 							]
 						],
 						"settings":
@@ -461,11 +450,11 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 5320.0,
+						"translation.x": 8.0,
+						"translation.y": 4295.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
@@ -495,7 +484,7 @@
 						"translation.y": 1755.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
@@ -511,8 +500,8 @@
 						"selection":
 						[
 							[
-								3199,
-								3199
+								3021,
+								3021
 							]
 						],
 						"settings":
@@ -522,10 +511,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 540.0,
+						"translation.y": 537.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
@@ -534,15 +523,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6116,
+						"buffer_size": 6138,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6116,
-								6116
+								6138,
+								6138
 							]
 						],
 						"settings":
@@ -552,10 +541,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1843.0,
+						"translation.y": 1744.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -564,15 +553,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 27718,
+						"buffer_size": 28256,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								27495,
-								27495
+								5814,
+								5814
 							]
 						],
 						"settings":
@@ -581,70 +570,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 6507.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "/C/Users/Rechant/AppData/Local/Programs/Python/Python36/Lib/site-packages/pydensecrf-1.0rc2-py3.6-win-amd64.egg/pydensecrf/utils.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 6870,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5302,
-								5302
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2129.0,
+						"translation.y": 1686.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "/C/Users/Rechant/Documents/pydensecrf-master/examples/inference.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5138,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3803,
-								3803
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1170.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
 					"type": "text"
 				}
 			]

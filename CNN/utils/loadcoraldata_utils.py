@@ -7,7 +7,13 @@ from osgeo import gdal, ogr, osr
 from matplotlib import pyplot as plt
 from PIL import Image as pil_image
 from keras.preprocessing.image import img_to_array
+from sklearn.metrics import confusion_matrix
+from pandas_ml import ConfusionMatrix
 import keras.backend as K
+import itertools
+import matplotlib.pyplot as plt
+import pandas as pd
+
 
 # Class of coral data, consisting of an image and possibly a corresponding truth map
 class CoralData:
@@ -293,21 +299,6 @@ class CoralData:
 		datasets = self._rescale(datasets)
 		return datasets, labels
 
-	def generate_trainingset(self, image_size=25, N_train=20000, idxremove = None, figureson = False):
-		self.train_datasets = np.zeros(shape=(N_train*self.num_classes, image_size, image_size, self.image.shape[-1]))
-		self.train_labels = np.zeros(shape=(N_train*self.num_classes, 1))
-		self.train_datasets, self.train_labels = self._generate_randomized_set(image_size, N_train, idxremove, self.train_datasets, self.train_labels, figureson)
-
-	def generate_validset(self, image_size=25, N_valid=2500, idxremove  = None, figureson = False):
-		self.valid_datasets = np.zeros(shape=(N_valid*self.num_classes, image_size, image_size, self.image.shape[-1]))
-		self.valid_labels = np.zeros(shape=(N_valid*self.num_classes, 1))
-		self.valid_datasets, self.valid_labels = self._generate_randomized_set(image_size, N_valid, idxremove , self.valid_datasets, self.valid_labels, figureson)
-
-	def generate_testset(self, image_size=25, N_test=2500, idxremove  = None, figureson = False):
-		self.test_datasets = np.zeros(shape=(N_test*self.num_classes, image_size, image_size, self.image.shape[-1]))
-		self.test_labels = np.zeros(shape=(N_test*self.num_classes, 1))
-		self.test_datasets, self.test_labels = self._generate_randomized_set(image_size, N_test, idxremove , self.test_datasets, self.test_labels, figureson)
-
 # Input:
 #	exporttrainpath: Directory for exported patch images 
 # 	exportlabelpath: Directory for exported segmented images
@@ -449,6 +440,7 @@ class CoralData:
 # Output:
 # 	whole_predict: Predicted class array
 #   num_predict: Number of times per prediction in array
+# 	prob_predict: Probability of each class per pixel, as calculated by softmax
 # 	truth_predict: Original truth image (cropped)
 # 	accuracy: Overall accuracy of entire prediction
 	def predict_on_whole_image(self, model, image_size, num_classes, num_lines = None, spacing = (1,1), predict_size = 1, lastchannelremove = True):
@@ -549,5 +541,88 @@ class CoralData:
 		accuracy = 100*np.asarray((whole_predict == truth_predict)).astype(np.float32).sum()/(whole_predict.shape[0]*whole_predict.shape[1])
 
 		return whole_predict, num_predict, prob_predict, truth_predict, accuracy
+
+# Input:
+	#   cm: confusion matrix from sklearn: confusion_matrix(y_true, y_pred)
+	#   classes: a list of class labels
+	#   normalize: whether the cm is shown as number of percentage (normalized)
+	#   file2sav: unique filename identifier in case of multiple cm
+	# Output:
+	#   .png plot of cm
+def plot_confusion_matrix(cm, classes, normalize=False,
+					title='Confusion matrix',
+					cmap=plt.cm.Blues, plot_colorbar = False, file2sav = "cm"):
+	#"""
+	#This function prints and plots the confusion matrix.
+	#Normalization can be applied by setting `normalize=True`.
+	#cm can be a unique file identifier if multiple options exist
+	#"""
+	if normalize:
+		cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+		print("Normalized confusion matrix")
+		tit = "normalized"
+	else:
+		print('Confusion matrix, without normalization')
+		tit = "non_normalized"
+	# print(cm)
+
+	cm_plot = './plots/Confusion_Matrix_' + tit + file2sav + ".png"
+	plt.figure()
+	plt.imshow(cm, interpolation='nearest', cmap=cmap)
+	plt.title(title + " " + tit)
+	if plot_colorbar:
+		plt.colorbar(fraction=0.046, pad=0.04)
+	tick_marks = np.arange(len(classes))
+	plt.xticks(tick_marks, classes, rotation=90,fontsize=16)
+	plt.yticks(tick_marks, classes, fontsize=16)
+
+	fmt = '.2f' if normalize else 'd'
+	if normalize:
+		thresh = 0.5
+	else:
+		thresh = cm.max() / 2.
+	for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+		plt.text(j, i, format(cm[i, j], fmt),
+			horizontalalignment="center", fontsize=16, 
+			color="white" if cm[i, j] > thresh else "black")
+		#plt.text(j, i, r'{0:.2f}'.format(cm[i,j]), 
+	#		horizontalalignment="center", fontsize=16, 
+	#		color="white" if cm[i, j] > thresh else "black")
+
+	#plt.tight_layout()
+	plt.ylabel('True label', fontsize=16)
+	plt.xlabel('Predicted label', fontsize=16)
+	fig = plt.gcf()
+	fig.set_size_inches(20, 20, forward=True)
+	plt.show()
+	# plt.savefig(cm_plot)
+	# plt.close()
+
+
+def confusion_matrix_stats(cm, classes, file2sav = "cm_stats"):
+	#"""
+	#This function calculates stats related to the confusion matrix cm
+	#cm - confusion matrix as numpy array, can be generated or loaded (cm = np.load('./output/cm_whole_image_hyperas1.npy'))
+	#classes - a list of class labels
+	#file2save - filename (without csv extension)
+	#"""
+	TP = np.trace(cm)
+	sum_pred = cm.sum(axis=0) # summing over predicted values (each columns going over all rows)
+	sum_true = cm.sum(axis=1) # summing over true values (each row going over all columns)
+
+	total_pred = sum_pred.sum()
+	total_true = sum_true.sum()
+
+	overall_accuracy = (float(TP) / float(total_true))*100.
+	print("overall_accuracy: " + str(np.round(overall_accuracy, decimals=2)) + "%")
+
+	diag = cm.diagonal()
+	prod_acc = np.true_divide((diag), (sum_true))
+	user_acc = np.true_divide((diag), (sum_pred))
+	
+	d = {'class_label': label_list, 'prod_acc': prod_acc, 'user_acc': user_acc, 'overall_acc': overall_accuracy/100.}
+	df = pd.DataFrame(data=d)
+	
+	# df.to_csv('./output/' +file2save + '.csv')
 
 
