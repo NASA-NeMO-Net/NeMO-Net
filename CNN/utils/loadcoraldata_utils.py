@@ -59,10 +59,11 @@ class CoralData:
 				tfw_info = np.asarray([float(line.rstrip('\n')) for line in open(tfwpath)]).astype(np.float32)
 				# top left x, w-e pixel resolution, 0, top left y, 0, n-s pixel resolution (negative)
 				self.geotransform = np.asarray([tfw_info[4], tfw_info[0], tfw_info[1], tfw_info[5], tfw_info[2], tfw_info[3]])
-
-				pixel_size = self.geotransform[1]
-				img_xmin = self.geotransform[0]
-				img_ymax = self.geotransform[3]
+			else:
+				self.geotransform = img.GetGeoTransform()
+			pixel_size = self.geotransform[1]
+			img_xmin = self.geotransform[0]
+			img_ymax = self.geotransform[3]
 
 			self.image = np.zeros((ysize,xsize,img.RasterCount))
 
@@ -70,6 +71,7 @@ class CoralData:
 				band += 1
 				imgband = img.GetRasterBand(band)
 				self.image[:,:,band-1] = imgband.ReadAsArray()
+			img = None
 		else:
 			print("Load type error: specify either PIL, cv2, or raster")
 			return None
@@ -140,6 +142,24 @@ class CoralData:
 				class_indices = np.unique(self.truthimage)
 				num_classes = len(class_indices)
 				self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in class_indices)
+
+				gdal_truthimg = gdal.Open(Truthpath)
+				gdal_truthimg_gt = gdal_truthimg.GetGeoTransform()
+				x_min, x_max, y_min, y_max = gdal_truthimg_gt[0], gdal_truthimg_gt[0]+self.truthimage.shape[1]*gdal_truthimg_gt[1], \
+					gdal_truthimg_gt[3]-self.truthimage.shape[0]*gdal_truthimg_gt[1], gdal_truthimg_gt[3]
+				
+				image_xstart = np.max([0, int((x_min - self.geotransform[0])/pixel_size)])
+				truth_xstart = np.max([0, int((self.geotransform[0] - x_min)/pixel_size)])
+				image_ystart = np.max([0, int((self.geotransform[3] - y_max)/pixel_size)])
+				truth_ystart = np.max([0, int((y_max - self.geotransform[3])/pixel_size)])
+
+				total_cols = int((np.min([xsize*pixel_size + self.geotransform[0], x_max]) - np.max([self.geotransform[0], x_min]))/pixel_size)
+				total_rows = int((np.min([self.geotransform[3], y_max]) - np.max([-ysize*pixel_size + self.geotransform[3], y_min]))/pixel_size)
+
+				self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
+				self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
+
+				gdal_truthimg = None
 		if Bathypath is not None:
 			self.bathyimage = cv2.imread(Bathypath, cv2.IMREAD_UNCHANGED)
 			self.bathyimage[self.bathyimage == np.min(self.bathyimage)] = -1
