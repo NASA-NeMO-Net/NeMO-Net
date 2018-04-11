@@ -32,3 +32,4 @@ Code
   - DCNNs with CRFs: https://arxiv.org/abs/1412.7062
   - VGG: https://arxiv.org/abs/1409.1556
   - ResNet: https://arxiv.org/abs/1512.03385
+  - FCN: https://arxiv.org/abs/1411.4038
