@@ -18,6 +18,7 @@ Startup notes:
 2) Images can be downloaded per request, and are to be contained within the ./Images/ folder. If choosing a different folder, please specify locations within the .yml files
 
 3) Additional resources:
+
 Code
   - VGG16 FCN code and base level code based upon: https://github.com/JihongJu/keras-fcn
   - ResNet architecture loosely based upon: https://github.com/raghakot/keras-resnet
