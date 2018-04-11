@@ -61,6 +61,8 @@ y = train_loader.target_size[1]
 x = train_loader.target_size[0]
 pixel_mean =1023.5*np.ones(num_channels)
 pixel_std = 1023.5*np.ones(num_channels)
+channel_shift_range = [0.01]*num_channels
+rescale = np.asarray([[0.95,1.05]]*num_channels)
 
 checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, monitor='val_acc', mode='max', save_best_only=True)
 lr_reducer = ReduceLROnPlateau(monitor='val_loss',
@@ -86,7 +88,9 @@ datagen = NeMOImageGenerator(image_shape=[y, x, num_channels],
                                     pixelwise_center=True,
                                     pixel_mean=pixel_mean,
                                     pixelwise_std_normalization=True,
-                                    pixel_std=pixel_std)
+                                    pixel_std=pixel_std,
+                                    channel_shift_range = channel_shift_range,
+                                    NeMO_rescale = rescale)
 train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     FCN_directory=train_loader.label_dir,
     target_size=(x,y),

@@ -262,11 +262,12 @@ class Alex_Hyperopt_Encoder(Res_Encoder):
             "padding": ['valid','valid','valid','valid','valid'],
             "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(1,1)],
             "pool_size": [(2,2),(2,2),(1,1),(1,1),(2,2)],
+            "pool_strides": [(2,2),(2,2),(1,1),(1,1),(2,2)],
             "pad_size": [(0,0),(0,0),(0,0),(0,0),(0,0)],
             "layercombo": ["capb","capb","capb","capb","capb"],
             "full_filters": [4096,4096],
             "dropout": [0.5,0.5]}
-        filters, conv_size, padding, dilation_rate, pool_size, pad_size, layercombo, full_filters, dropout = \
+        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, layercombo, full_filters, dropout = \
             load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
 
         # actual start of CNN

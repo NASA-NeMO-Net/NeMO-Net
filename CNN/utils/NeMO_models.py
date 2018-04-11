@@ -12,7 +12,7 @@ from keras.layers import Input, Flatten, Activation, Reshape, Dense, Cropping2D
 
 from NeMO_layers import CroppingLike2D, BilinearUpSampling2D
 from keras.layers.convolutional import Conv2D, AveragePooling2D
-from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Res34_Encoder, Alex_Parallel_Hyperopt_Encoder, VGG_Hyperopt_Encoder
+from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Res34_Encoder, Alex_Hyperopt_Encoder, Alex_Parallel_Hyperopt_Encoder, VGG_Hyperopt_Encoder
 from NeMO_decoders import VGGDecoder, VGGUpsampler, VGG_DecoderBlock
 from NeMO_functional_encoders import Func_Parallel_Hyperopt_Encoder
 from NeMO_backend import get_model_memory_usage
@@ -36,6 +36,14 @@ def AlexNet(input_shape, classes, weight_decay=0., trainable_encoder=True, weigh
 #     scores = Dense(classes, activation = 'softmax')(encoder_output)
 
 #     return Model(inputs=inputs, outputs=scores)
+
+def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, full_layers=1, conv_params=None):
+    inputs = Input(shape=input_shape)
+    encoder = Alex_Hyperopt_Encoder(inputs, classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, 
+        conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
+    encoder_output = encoder.outputs[0]
+
+    return Model(inputs=inputs, output=encoder_output)
 
 def VGG16_DeepLabV2(input_shape, classes, weight_decay=0., trainable_encoder=True, batch_size=1, weights=None, conv_layers=5, full_layers=0, conv_params=None, 
     parallel_layers=4, parallelconv_params=None):

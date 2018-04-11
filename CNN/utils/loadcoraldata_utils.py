@@ -41,9 +41,9 @@ class CoralData:
 			# if Testpath is not None:
 			# 	self.testimage = img_to_array(pil_image.open(Testpath))
 		elif load_type == "cv2":
-			self.image = cv2.imread(Imagepath,cv2.IMREAD_UNCHANGED)
+			self.image = cv2.imread(Imagepath, cv2.IMREAD_UNCHANGED)
 			if Truthpath is not None:
-				self.truthimage = cv2.imread(Truthpath,cv2.IMREAD_UNCHANGED)
+				self.truthimage = cv2.imread(Truthpath, cv2.IMREAD_UNCHANGED)
 			# if Testpath is not None:
 			# 	self.testimage = cv2.imread(Testpath, cv2.IMREAD_UNCHANGED)
 		elif load_type == "raster":
@@ -137,7 +137,7 @@ class CoralData:
 				self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
 				self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
 				self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in range(num_classes))
-			if Truthpath.endswith('.tif'):
+			if Truthpath.endswith('.tif') and load_type is "raster":
 				self.truthimage = cv2.imread(Truthpath,cv2.IMREAD_UNCHANGED)
 				class_indices = np.unique(self.truthimage)
 				num_classes = len(class_indices)

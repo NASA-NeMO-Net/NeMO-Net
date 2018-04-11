@@ -6,6 +6,7 @@ import multiprocessing.pool
 import threading
 import warnings
 import loadcoraldata_utils as coralutils
+import random
 from osgeo import gdal, ogr, osr
 from functools import partial
 from keras import backend as K
@@ -22,6 +23,7 @@ from keras.preprocessing.image import (
     _list_valid_filenames_in_directory)
 
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
+from PIL import Image as pil_image
 
 class NeMOImageGenerator(ImageDataGenerator):
     """A real-time data augmentation generator for NeMO-Net Images"""
@@ -48,7 +50,7 @@ class NeMOImageGenerator(ImageDataGenerator):
                  cval=0.,
                  horizontal_flip=False,
                  vertical_flip=False,
-                 rescale=None,
+                 NeMO_rescale=None,
                  preprocessing_function=None,
                  data_format=None):
         """Init."""
@@ -58,10 +60,53 @@ class NeMOImageGenerator(ImageDataGenerator):
         self.pixel_mean = np.array(pixel_mean)
         self.pixelwise_std_normalization = pixelwise_std_normalization
         self.pixel_std = np.array(pixel_std)
-        super(NeMOImageGenerator, self).__init__()
+        self.NeMO_rescale = NeMO_rescale
+
+        # Note that the below initialization mostly works with RGB data, use with care
+        # However, rescale and channel_shift_range might be useful to multiply and shift individual channels, respectively
+        super(NeMOImageGenerator, self).__init__(featurewise_center=featurewise_center, 
+            samplewise_center = samplewise_center,
+            featurewise_std_normalization = featurewise_std_normalization,
+            samplewise_std_normalization=samplewise_std_normalization,
+            zca_whitening = zca_whitening,
+            rotation_range = rotation_range,
+            width_shift_range = width_shift_range,
+            height_shift_range = height_shift_range,
+            shear_range = shear_range,
+            zoom_range = zoom_range,
+            channel_shift_range = channel_shift_range,
+            fill_mode = fill_mode,
+            cval = cval,
+            horizontal_flip = horizontal_flip,
+            vertical_flip = vertical_flip,
+            preprocessing_function = preprocessing_function,
+            data_format = data_format)
+
+    def random_channel_shift(self, x):
+        #Perform a random channel shift.
+        # Arguments
+            # x: Input tensor. Must be 3D.
+            # intensity: Intensity, scaled to an absolute of 2
+        # Returns
+            # Numpy image tensor.
+        x = np.rollaxis(x, self.channel_axis-1, 0)
+        min_x, max_x = -1, 1
+        intensity = self.channel_shift_range
+        if type(intensity) == float:
+            channel_images = [np.clip(x_channel + np.random.uniform(-intensity, intensity), min_x, max_x) for x_channel in x]
+        else:
+            channel_images = [np.clip(x[i] + np.random.uniform(-intensity[i], intensity[i]), min_x, max_x) for i in range(x.shape[0])]
+        x = np.stack(channel_images, axis=0)
+        x = np.rollaxis(x, 0, self.channel_axis)
+        return x
 
     def standardize(self, x):
+        # x is rows x cols x n_channels
         """Standardize image."""
+        if self.NeMO_rescale is not None:
+            rescale_params = [np.random.uniform(r[0],r[1]) for r in self.NeMO_rescale] # can only rescale to something smaller, maybe can consider a range later
+            x *= rescale_params 
+            x = np.clip(x, 0, self.pixel_mean*2) # pixel_mean might change later, but is currently 1/2 the max value
         if self.pixelwise_center:
             x -= self.pixel_mean
         if self.pixelwise_std_normalization:
@@ -92,6 +137,8 @@ class NeMOImageGenerator(ImageDataGenerator):
             directory, self, FCN_directory=FCN_directory, target_size=target_size, color_mode=color_mode, classes=classes, class_mode=class_mode,
             data_format=self.data_format, batch_size=batch_size, class_weights=class_weights, shuffle=shuffle, seed=seed,
             save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format, follow_links=follow_links)
+
+
 
 class IndexIterator(Iterator):
     """Iterator over index."""
@@ -179,13 +226,9 @@ class NeMODirectoryIterator(Iterator):
             (if `save_to_dir` is set).
     """
 
-    def __init__(self, directory, image_data_generator, FCN_directory=None,
-                 target_size=(256, 256), color_mode='rgb',
-                 classes=None, class_mode='categorical',
-                 batch_size=32, class_weights=None, shuffle=True, seed=None,
-                 data_format=None,
-                 save_to_dir=None, save_prefix='', save_format='png',
-                 follow_links=False):
+    def __init__(self, directory, image_data_generator, FCN_directory=None, target_size=(256, 256), color_mode='rgb',
+                 classes=None, class_mode='categorical', batch_size=32, class_weights=None, shuffle=True, seed=None,
+                 data_format=None, save_to_dir=None, save_prefix='', save_format='png', follow_links=False):
         if data_format is None:
             data_format = K.image_data_format() #channels_last
         self.directory = directory
@@ -212,12 +255,8 @@ class NeMODirectoryIterator(Iterator):
                 self.image_shape = self.target_size + (1,)
             else:
                 self.image_shape = (1,) + self.target_size
-        if class_mode not in {'categorical', 'binary', 'sparse',
-                              'input', None}:
-            raise ValueError('Invalid class_mode:', class_mode,
-                             '; expected one of "categorical", '
-                             '"binary", "sparse", "input"'
-                             ' or None.')
+        if class_mode not in {'categorical', 'binary', 'sparse', 'input', 'fixed_RGB', None}:
+            raise ValueError('Invalid class_mode:', class_mode, '; expected one of "categorical", "binary", "sparse", "input", "fixed_RGB" or None.')
         self.class_mode = class_mode
         self.save_to_dir = save_to_dir
         self.save_prefix = save_prefix
@@ -343,8 +382,11 @@ class NeMODirectoryIterator(Iterator):
                 fname = self.filenames[j]
                 img = coralutils.CoralData(os.path.join(self.directory, fname), load_type="raster").image
                 x = img_to_array(img, data_format=self.data_format)
-                # x = self.image_data_generator.random_transform(x)
-                x = self.image_data_generator.standardize(x)
+                # x = self.image_data_generator.random_transform(x) # needed for channel_shift_range and random_brightness
+                x = self.image_data_generator.standardize(x) # standardize and rescaling is done here
+                if self.image_data_generator.channel_shift_range != 0:
+                    x = self.image_data_generator.random_channel_shift(x)
+                # print("3:",x.shape)
                 batch_x[i] = x
                 # build batch of labels
             if self.class_mode == 'input':
@@ -383,13 +425,17 @@ class NeMODirectoryIterator(Iterator):
                                grayscale=grayscale,
                                target_size=self.target_size)
                 x = img_to_array(img, data_format=self.data_format)
-                x = self.image_data_generator.random_transform(x)
-                x = self.image_data_generator.standardize(x)
+                # x = self.image_data_generator.random_transform(x) # needed for channel_shift_range and random_brightness
+                x = self.image_data_generator.standardize(x) # standardize and rescaling is done here
+                if self.image_data_generator.channel_shift_range != 0:
+                    x = self.image_data_generator.random_channel_shift(x)
                 batch_x[i] = x
             # optionally save augmented images to disk for debugging purposes
             if self.save_to_dir:
                 for i in range(current_batch_size):
-                    img = array_to_img(batch_x[i], self.data_format, scale=True)
+                    img = (batch_x[i]*self.image_data_generator.pixel_std)+self.image_data_generator.pixel_mean
+                    img = pil_image.fromarray(img.astype('uint8'), 'RGB')
+                    # img = array_to_img(batch_x[i], self.data_format, scale=True)
                     fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix,
                                                                       index=current_index + i,
                                                                       hash=index_array[i],
@@ -406,6 +452,16 @@ class NeMODirectoryIterator(Iterator):
                 batch_y = np.zeros((len(batch_x), self.num_class), dtype=K.floatx())
                 for i, label in enumerate(self.classes[index_array]):
                     batch_y[i, label] = 1.
+            elif self.class_mode == 'fixed_RGB':        # Testing for skew comparisons
+                # assert self.FCN_directory is not None
+                # Temporarily pass in FCN_directory as fixed RGB values of size [N x N_channels]
+                # batch_y = self.FCN_directory  # probably want to rethink this
+                midpoint = int(self.target_size[0]-1/2)
+                batch_y = np.zeros((len(batch_x), 3), dtype=K.floatx())
+                for i, label in enumerate(self.classes[index_array]):
+                    # print("batch_x shape: ", batch_x.shape, midpoint)
+                    batch_y[i] = batch_x[i,midpoint,midpoint,:]   # batch_x has already been standardized
+
             else:
                 return batch_x
 
