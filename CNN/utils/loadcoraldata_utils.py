@@ -488,6 +488,7 @@ class CoralData:
 					else:
 						temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1)
 					temp_prob_predict = model.predict_on_batch(temp_dataset)
+					# print(temp_prob_predict.shape)
 					temp_predict = self._classifyback(temp_prob_predict)
 					
 					for predict_mat in temp_predict: 	# this is incorrect if temp_predict has more than 1 prediction (e.g. cols>1, lines>1)
