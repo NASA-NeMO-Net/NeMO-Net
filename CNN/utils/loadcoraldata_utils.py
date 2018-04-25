@@ -33,6 +33,7 @@ class CoralData:
 
 	def __init__(self, Imagepath, Truthpath=None, Testpath = None, Bathypath=None, truth_key=None, load_type="cv2", tfwpath=None):
 		# Load images
+		self.truthimage_consolidated = None
 		self.load_type = load_type
 		if load_type == "PIL":
 			self.image = img_to_array(pil_image.open(Imagepath))
@@ -137,7 +138,7 @@ class CoralData:
 				self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
 				self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
 				self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in range(num_classes))
-			if Truthpath.endswith('.tif') and load_type is "raster":
+			if (Truthpath.endswith('.tif') or Truthpath.endswith('.TIF')) and load_type is "raster":
 				self.truthimage = cv2.imread(Truthpath,cv2.IMREAD_UNCHANGED)
 				class_indices = np.unique(self.truthimage)
 				num_classes = len(class_indices)
@@ -167,15 +168,43 @@ class CoralData:
 	    # Set labels from 0 to item_counter based upon input truth_key
 		if truth_key is not None:
 			item_counter = 0
-			for item in truth_key:
-				self.truthimage[self.truthimage == item] = item_counter
-				item_counter+=1
-			self.num_classes = len(np.unique(self.truthimage))
+			if isinstance(truth_key,(dict,)):  
+				self.class_labels = list(truth_key)
+				self.class_dict = truth_key
+				self.num_classes = len(self.class_labels)
+			else:
+				for item in truth_key: # This was explicitly designed for 4 class Samoa data that comes in different shades of gray, ignore for now
+					self.truthimage[self.truthimage == item] = item_counter
+					item_counter+=1
+				self.num_classes = len(np.unique(self.truthimage))
 		else:
 			try:
 				self.num_classes = len(self.class_labels)
+				self.class_dict = dict((self.class_labels[i],i) for i in range(self.num_classes))
 			except:
 				pass
+
+	def Consolidate_classes(self, newclassdict, transferdict):
+		print("Consolidating:")
+		if self.truthimage_consolidated is None:
+			self.truthimage_consolidated = np.copy(self.truthimage)
+			TF_labelmap = [self.truthimage_consolidated == self.class_dict[k] for k in self.class_dict]
+			counter = 0
+			for k in self.class_dict:
+				print(k + ": " + transferdict[k])
+				self.truthimage_consolidated[TF_labelmap[counter]] = newclassdict[transferdict[k]]
+			counter += 1
+		else:
+			TF_labelmap = [self.truthimage_consolidated == self.consolidated_class_dict[k] for k in self.consolidated_class_dict]
+			counter = 0
+			for k in self.consolidated_class_dict:
+				print(k + ": " + transferdict[k])
+				self.truthimage_consolidated[TF_labelmap[counter]] = newclassdict[transferdict[k]]
+			counter += 1
+
+		self.consolidated_class_dict = newclassdict
+		# Need to worry about divide by zero error
+		# self.consolclass_weights = dict((i, (self.truthimage_consolidated.shape[0]*self.truthimage_consolidated.shape[1])/(self.truthimage_consolidated==i).sum()) for i in range(len(newclassdict)))
 
 	def load_PB_consolidated_classes(self):
 		self.PB_LOF2consolclass = {"NoData": "Other", "Clouds": "Other", "deep lagoonal water": "Other", "deep ocean water": "Other", "Inland waters": "Other", 
@@ -198,6 +227,7 @@ class CoralData:
 			self.consol_labels = dict((k,self.PB_consolidated_classes[self.PB_LOF2consolclass[k]]) for k in self.class_labels)
 
 		self.truthimage_consolidated = np.copy(self.truthimage)
+		#This might have errors when reassigning labels!!!
 		for i in range(len(self.class_labels)):
 			self.truthimage_consolidated[self.truthimage_consolidated == i] = self.PB_consolidated_classes[self.PB_LOF2consolclass[self.class_labels[i]]]
 		self.consolclass_weights = dict((i, (self.truthimage_consolidated.shape[0]*self.truthimage_consolidated.shape[1])/(self.truthimage_consolidated==i).sum()) for i in range(len(self.PB_consolidated_classes)))
@@ -339,8 +369,9 @@ class CoralData:
 
 		f = open(exporttrainpath+txtfilename,'w')
 
-		for k in range(self.num_classes):
-			[i,j] = np.where(truthcrop == k)
+		counter = 0
+		for k in self.class_dict:
+			[i,j] = np.where(truthcrop == self.class_dict[k])
 			if len(i) != 0:
 				if len(i) < N:
 					idx = [count%len(i) for count in range(N)]
@@ -355,26 +386,24 @@ class CoralData:
 					if lastchannelremove:
 						tempimage = np.delete(tempimage, -1,-1) # Remove last dimension of array
 
-					if labelkey is not None:
-						if self.load_type == "raster":
-							trainstr = labelkey[k] + '_' + str(nn).zfill(8) + '.tif'
-							truthstr = labelkey[k] + '_' + str(nn).zfill(8) + '.tif'
-						else:
-							trainstr = labelkey[k] + '_' + str(nn).zfill(8) + '.png'
-							truthstr = labelkey[k] + '_' + str(nn).zfill(8) + '.png'
+					if self.load_type == "raster":
+						trainstr = k + '_' + str(nn).zfill(8) + '.tif'
+						truthstr = k + '_' + str(nn).zfill(8) + '.tif'
 					else:
-						if self.load_type == "raster":
-							trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.tif'
-							truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.tif'
-						else:
-							trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
-							truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
+						trainstr = k + '_' + str(nn).zfill(8) + '.png'
+						truthstr = k + '_' + str(nn).zfill(8) + '.png'
+					# else:
+					# 	if self.load_type == "raster":
+					# 		trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.tif'
+					# 		truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.tif'
+					# 	else:
+					# 		trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
+					# 		truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
 
 					if subdir:
-						if labelkey is not None:
-							subdirpath = '{}/'.format(labelkey[k])
-						else:
-							subdirpath = 'class' + str(k) + '/'
+						subdirpath = '{}/'.format(k)
+						# else:
+						# 	subdirpath = 'class' + str(k) + '/'
 
 						if not os.path.exists(exporttrainpath+subdirpath):
 							os.makedirs(exporttrainpath+subdirpath)
@@ -401,7 +430,8 @@ class CoralData:
 						cv2.imwrite(exporttrainpath+trainstr, tempimage)
 						cv2.imwrite(exportlabelpath+truthstr, templabel)
 						f.write('./' + trainstr+'\n')
-					print(str(k*N+nn+1) + '/ ' + str(self.num_classes*N) +' patches exported', end='\r')
+					print(str(counter*N+nn+1) + '/ ' + str(len(self.class_dict)*N) +' patches exported', end='\r')
+			counter += 1
 		f.close()
 
 #### Load entire line(s) of patches from testimage
