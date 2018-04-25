@@ -277,12 +277,12 @@ class NeMODirectoryIterator(Iterator):
 
         if type(passedclasses) is dict:
             self.class_indices = passedclasses   # Class indices will be a dictionary containing the maximum possible classes, which is passed in
-            self.num_consolclass = len(np.unique([self.class_indices[k] for k in self.class_indices]))
+            self.num_consolclass = len(passedclasses) # number of consolidated classes, which passedclasses is a dictionary of
             # classes = [k for k in self.class_indices] #redefine classes as a list
         else:
             self.class_indices = dict(zip(classes, range(len(passedclasses)))) # Class indices determined from number of directories, USE THIS ONLY AS LAST RESORT IF YOU HAVE NO PASSABLE DICTIONARY
-            self.num_consolclass = len(passedclasses) # number of consolidated classes, which passedclasses is a dictionary of
-        self.num_class = len(classes) # sets num_class to TOTAL number of existing subdirectory classes (NOT consolidated classes)
+            self.num_consolclass = len(np.unique([self.class_indices[k] for k in self.class_indices]))
+        self.num_class = len(classes) # sets num_class to number of existing subdirectory classes (NOT ALL consolidated classes)
 
         pool = multiprocessing.pool.ThreadPool()
         function_partial = partial(_count_valid_files_in_directory, white_list_formats=white_list_formats, follow_links=follow_links)
@@ -317,7 +317,8 @@ class NeMODirectoryIterator(Iterator):
         if FCN_directory is not None:
             FCN_results = []
             self.FCN_filenames = []
-            self.labelkey = [np.uint8(255/self.num_class*i) for i in range(self.num_class)]
+            self.min_labelkey = np.min([self.class_indices[k] for k in self.class_indices])
+            self.labelkey = [np.uint8(255/self.num_consolclass*i) for i in range(self.min_labelkey, self.min_labelkey+self.num_consolclass)] # Assuming labels are saved according to # of consolclass
             label_shape = list(self.image_shape)
             label_shape[self.image_data_generator.channel_axis - 1] = self.num_consolclass
             self.label_shape = tuple(label_shape)
@@ -450,7 +451,7 @@ class NeMODirectoryIterator(Iterator):
             elif self.class_mode == 'binary':
                 batch_y = self.classes[index_array].astype(K.floatx())
             elif self.class_mode == 'categorical':
-                batch_y = np.zeros((len(batch_x), self.num_class), dtype=K.floatx())
+                batch_y = np.zeros((len(batch_x), self.num_consolclass), dtype=K.floatx())
                 for i, label in enumerate(self.classes[index_array]):
                     batch_y[i, label] = 1.
             elif self.class_mode == 'fixed_RGB':        # Testing for skew comparisons
@@ -470,7 +471,7 @@ class NeMODirectoryIterator(Iterator):
         quick_shape2 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2]))
 
         if self.class_weights is None:
-            return batch_x, batch_y
+            return batch_x, quick_shape1(batch_y)
         else:
             return batch_x, quick_shape1(batch_y), quick_shape2(batch_weights)
 
@@ -492,8 +493,10 @@ class NeMODirectoryIterator(Iterator):
         y = y.reshape(wh_tuple)
 
         item_counter = 0
+        # print(np.unique(y))
+        # print(np.unique(self.labelkey))
         for item in self.labelkey:
-            y[y == item] = self.class_indices[list(self.class_indices.keys())[item_counter]]
+            y[y == item] = self.class_indices[list(self.class_indices.keys())[item_counter]] - self.min_labelkey # Set 0-255 gray level to 0-num_consolclass
             item_counter+=1
         return y
 

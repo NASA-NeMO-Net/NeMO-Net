@@ -171,7 +171,7 @@ class CoralData:
 			if isinstance(truth_key,(dict,)):  
 				self.class_labels = list(truth_key)
 				self.class_dict = truth_key
-				self.num_classes = len(self.class_labels)
+				self.num_classes = len(self.class_labels) # total number of classes, including those not found
 			else:
 				for item in truth_key: # This was explicitly designed for 4 class Samoa data that comes in different shades of gray, ignore for now
 					self.truthimage[self.truthimage == item] = item_counter
@@ -185,24 +185,22 @@ class CoralData:
 				pass
 
 	def Consolidate_classes(self, newclassdict, transferdict):
-		print("Consolidating:")
 		if self.truthimage_consolidated is None:
 			self.truthimage_consolidated = np.copy(self.truthimage)
 			TF_labelmap = [self.truthimage_consolidated == self.class_dict[k] for k in self.class_dict]
 			counter = 0
 			for k in self.class_dict:
-				print(k + ": " + transferdict[k])
 				self.truthimage_consolidated[TF_labelmap[counter]] = newclassdict[transferdict[k]]
-			counter += 1
+				counter += 1
 		else:
 			TF_labelmap = [self.truthimage_consolidated == self.consolidated_class_dict[k] for k in self.consolidated_class_dict]
 			counter = 0
 			for k in self.consolidated_class_dict:
-				print(k + ": " + transferdict[k])
 				self.truthimage_consolidated[TF_labelmap[counter]] = newclassdict[transferdict[k]]
-			counter += 1
+				counter += 1
 
 		self.consolidated_class_dict = newclassdict
+		self.consolidated_num_classes = len(self.consolidated_class_dict)
 		# Need to worry about divide by zero error
 		# self.consolclass_weights = dict((i, (self.truthimage_consolidated.shape[0]*self.truthimage_consolidated.shape[1])/(self.truthimage_consolidated==i).sum()) for i in range(len(newclassdict)))
 
@@ -359,22 +357,32 @@ class CoralData:
 # 	labelkey: Naming convention of class labels (NOTE: must be same # as the # of classes)
 # 	subdir: Create subdirectories for each class
 # 	cont: Continuously add to folder, or overwrite
-	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, lastchannelremove = True, labelkey = None, subdir=False, cont = False):
+# 	consolidated: Export consolidated classes instead
+	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, 
+		lastchannelremove = True, labelkey = None, subdir=False, cont = False, consolidated = False):
 		crop_len = int(np.floor(image_size/2))
-		try:
-			# Crop the image so that border areas are not considered
-			truthcrop = self.truthimage[crop_len:self.truthimage.shape[0]-crop_len, crop_len:self.truthimage.shape[1]-crop_len]
-		except TypeError:
-			print("Truth/Reference image improperly defined")
-			return
+
 		if cont:
 			f = open(exporttrainpath+txtfilename,'a')
 		else:
 			f = open(exporttrainpath+txtfilename,'w')
 
 		counter = 0
-		for k in self.class_dict:
-			[i,j] = np.where(truthcrop == self.class_dict[k])
+		classcounter = 0
+
+		if consolidated:
+			export_class_dict = self.consolidated_class_dict
+			truthimage = self.truthimage_consolidated
+			truthcrop = self.truthimage_consolidated[crop_len:self.truthimage_consolidated.shape[0]-crop_len, crop_len:self.truthimage_consolidated.shape[1]-crop_len]
+			num_classes = self.consolidated_num_classes
+		else:
+			export_class_dict = self.class_dict
+			truthimage = self.truthimage
+			truthcrop = self.truthimage[crop_len:self.truthimage.shape[0]-crop_len, crop_len:self.truthimage.shape[1]-crop_len]
+			num_classes = self.num_classes
+
+		for k in export_class_dict:
+			[i,j] = np.where(truthcrop == export_class_dict[k])
 			if len(i) != 0:
 				if len(i) < N:
 					idx = [count%len(i) for count in range(N)]
@@ -393,7 +401,7 @@ class CoralData:
 				for nn in range(len(idx)):
 					# Note: i,j are off of truthcrop, and hence when taken against image needs only +image_size to be centered
 					tempimage = self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :]
-					templabel = np.asarray(self.truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]*(255/self.num_classes)).astype(np.uint8)
+					templabel = np.asarray(truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]*(255/num_classes)).astype(np.uint8)
 
 					if lastchannelremove:
 						tempimage = np.delete(tempimage, -1,-1) # Remove last dimension of array
@@ -441,8 +449,10 @@ class CoralData:
 						cv2.imwrite(exporttrainpath+trainstr, tempimage)
 						cv2.imwrite(exportlabelpath+truthstr, templabel)
 						f.write('./' + trainstr+'\n')
-					print(str(counter*N+nn+1) + '/ ' + str(len(self.class_dict)*N) +' patches exported', end='\r')
+					print(str(counter*N+nn+1) + '/ ' + str(len(export_class_dict)*N) +' patches exported', end='\r')
+				classcounter += 1
 			counter += 1
+		print("{} of {} total classes found and saved".format(classcounter, len(export_class_dict)))
 		f.close()
 
 #### Load entire line(s) of patches from testimage
