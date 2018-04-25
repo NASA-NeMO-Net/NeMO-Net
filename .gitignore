@@ -24,7 +24,6 @@
 # Keras saved files #
 ###################
 *.h5
-*.json
 *.hdf5
 *.npy
 *.json
