@@ -127,14 +127,14 @@ class NeMOImageGenerator(ImageDataGenerator):
 
     def flow_from_NeMOdirectory(self, directory, FCN_directory=None,
                             target_size=(256, 256), color_mode='rgb',
-                            classes=None, class_mode='categorical',
+                            passedclasses=None, class_mode='categorical',
                             batch_size=32, class_weights = None, shuffle=True, seed=None,
                             save_to_dir=None,
                             save_prefix='',
                             save_format='png',
                             follow_links=False):
         return NeMODirectoryIterator(
-            directory, self, FCN_directory=FCN_directory, target_size=target_size, color_mode=color_mode, classes=classes, class_mode=class_mode,
+            directory, self, FCN_directory=FCN_directory, target_size=target_size, color_mode=color_mode, passedclasses=passedclasses, class_mode=class_mode,
             data_format=self.data_format, batch_size=batch_size, class_weights=class_weights, shuffle=shuffle, seed=seed,
             save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format, follow_links=follow_links)
 
@@ -227,7 +227,7 @@ class NeMODirectoryIterator(Iterator):
     """
 
     def __init__(self, directory, image_data_generator, FCN_directory=None, target_size=(256, 256), color_mode='rgb',
-                 classes=None, class_mode='categorical', batch_size=32, class_weights=None, shuffle=True, seed=None,
+                 passedclasses=None, class_mode='categorical', batch_size=32, class_weights=None, shuffle=True, seed=None,
                  data_format=None, save_to_dir=None, save_prefix='', save_format='png', follow_links=False):
         if data_format is None:
             data_format = K.image_data_format() #channels_last
@@ -268,28 +268,25 @@ class NeMODirectoryIterator(Iterator):
         # first, count the number of samples and classes
         self.samples = 0
 
-        if not classes:
-            classes = []
-            for subdir in sorted(os.listdir(directory)):
-                if os.path.isdir(os.path.join(directory, subdir)):
-                    classes.append(subdir)
+        # if not classes:
+        # Always determine number classes by the subdirectories (will not count classes that don't show up)
+        classes = []
+        for subdir in sorted(os.listdir(directory)):
+            if os.path.isdir(os.path.join(directory, subdir)):
+                classes.append(subdir)
 
-        if type(classes) is dict:
-            self.class_indices = classes
+        if type(passedclasses) is dict:
+            self.class_indices = passedclasses   # Class indices will be a dictionary containing the maximum possible classes, which is passed in
             self.num_consolclass = len(np.unique([self.class_indices[k] for k in self.class_indices]))
-            classes = [k for k in self.class_indices] #redefine classes as a list
+            # classes = [k for k in self.class_indices] #redefine classes as a list
         else:
-            self.class_indices = dict(zip(classes, range(len(classes))))
-            self.num_consolclass = len(classes) # number of consolidated classes, which classes is a dictionary of
-        self.num_class = len(classes) # sets num_class to TOTAL number of classes (NOT consolidate classes)
+            self.class_indices = dict(zip(classes, range(len(passedclasses)))) # Class indices determined from number of directories, USE THIS ONLY AS LAST RESORT IF YOU HAVE NO PASSABLE DICTIONARY
+            self.num_consolclass = len(passedclasses) # number of consolidated classes, which passedclasses is a dictionary of
+        self.num_class = len(classes) # sets num_class to TOTAL number of existing subdirectory classes (NOT consolidated classes)
 
         pool = multiprocessing.pool.ThreadPool()
-        function_partial = partial(_count_valid_files_in_directory,
-                                   white_list_formats=white_list_formats,
-                                   follow_links=follow_links)
-        self.samples = sum(pool.map(function_partial,
-                                    (os.path.join(directory, subdir)
-                                     for subdir in classes)))
+        function_partial = partial(_count_valid_files_in_directory, white_list_formats=white_list_formats, follow_links=follow_links)
+        self.samples = sum(pool.map(function_partial, (os.path.join(directory, subdir) for subdir in classes)))
         print('Found %d images belonging to %d classes, split into %d consolidated classes.' % (self.samples, self.num_class, self.num_consolclass))
 
         # Check FCN label directory if specified
@@ -303,6 +300,7 @@ class NeMODirectoryIterator(Iterator):
         results = []
         self.filenames = []
         self.classes = np.zeros((self.samples,), dtype='int32')
+        self.class_idx_startend = []
         i = 0
         for dirpath in (os.path.join(directory, subdir) for subdir in classes):
             results.append(pool.apply_async(_list_valid_filenames_in_directory,
@@ -311,6 +309,7 @@ class NeMODirectoryIterator(Iterator):
         for res in results:
             tempclasses, filenames = res.get()
             self.classes[i:i + len(tempclasses)] = tempclasses
+            self.class_idx_startend.append([i,i+len(tempclasses)])
             self.filenames += filenames
             i += len(tempclasses)
 
@@ -338,6 +337,7 @@ class NeMODirectoryIterator(Iterator):
     def _flow_index(self, n, batch_size=32, shuffle=False, seed=None): #n = total number of images in all folders
         # Ensure self.batch_index is 0.
         self.reset()
+        # This assumes same number of files per class!
         div = n/self.num_class
         while 1:
             index_array = []
@@ -347,10 +347,11 @@ class NeMODirectoryIterator(Iterator):
 
             leftover = batch_size % self.num_class #remainder in case num_class doesn't divide into batch_size
             random_c = np.random.choice(self.num_class,leftover,replace=False)
+            # Chooses same number of images per class, starting and ending with class_idx_startend in case folders contain different # of files
             for c in range(self.num_class):
-                index_array = np.append(index_array, np.random.randint(int(np.round(c*div)),int(np.round(c*div+div)),size=int(batch_size//self.num_class)))
+                index_array = np.append(index_array, np.random.randint(int(self.class_idx_startend[c][0]),int(self.class_idx_startend[c][1]),size=int(batch_size//self.num_class)))
             for c in random_c: #choose random folders to pick from
-                index_array = np.append(index_array, np.random.randint(int(np.round(c*div)),int(np.round(c*div+div)),size=1))
+                index_array = np.append(index_array, np.random.randint(int(self.class_idx_startend[c][0]),int(self.class_idx_startend[c][1]),size=1))
 
             current_index = (self.batch_index * batch_size) % n # remainder
             if n > current_index + batch_size:

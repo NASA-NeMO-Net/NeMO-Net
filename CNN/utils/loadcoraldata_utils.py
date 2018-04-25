@@ -358,7 +358,8 @@ class CoralData:
 # 	lastchannelremove: Remove last channel or not
 # 	labelkey: Naming convention of class labels (NOTE: must be same # as the # of classes)
 # 	subdir: Create subdirectories for each class
-	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, lastchannelremove = True, labelkey = None, subdir=False):
+# 	cont: Continuously add to folder, or overwrite
+	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, lastchannelremove = True, labelkey = None, subdir=False, cont = False):
 		crop_len = int(np.floor(image_size/2))
 		try:
 			# Crop the image so that border areas are not considered
@@ -366,8 +367,10 @@ class CoralData:
 		except TypeError:
 			print("Truth/Reference image improperly defined")
 			return
-
-		f = open(exporttrainpath+txtfilename,'w')
+		if cont:
+			f = open(exporttrainpath+txtfilename,'a')
+		else:
+			f = open(exporttrainpath+txtfilename,'w')
 
 		counter = 0
 		for k in self.class_dict:
@@ -378,6 +381,15 @@ class CoralData:
 				else:
 					idx = np.asarray(random.sample(range(len(i)), N)).astype(int)
 
+				subdirpath = '{}/'.format(k)
+				if cont:
+					if os.path.exists(exporttrainpath+subdirpath):
+						basecount = len([f for f in os.listdir(exporttrainpath+subdirpath)])
+					else:
+						basecount = 0
+				else:
+					basecount = 0
+
 				for nn in range(len(idx)):
 					# Note: i,j are off of truthcrop, and hence when taken against image needs only +image_size to be centered
 					tempimage = self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :]
@@ -387,11 +399,11 @@ class CoralData:
 						tempimage = np.delete(tempimage, -1,-1) # Remove last dimension of array
 
 					if self.load_type == "raster":
-						trainstr = k + '_' + str(nn).zfill(8) + '.tif'
-						truthstr = k + '_' + str(nn).zfill(8) + '.tif'
+						trainstr = k + '_' + str(basecount+nn).zfill(8) + '.tif'
+						truthstr = k + '_' + str(basecount+nn).zfill(8) + '.tif'
 					else:
-						trainstr = k + '_' + str(nn).zfill(8) + '.png'
-						truthstr = k + '_' + str(nn).zfill(8) + '.png'
+						trainstr = k + '_' + str(basecount+nn).zfill(8) + '.png'
+						truthstr = k + '_' + str(basecount+nn).zfill(8) + '.png'
 					# else:
 					# 	if self.load_type == "raster":
 					# 		trainstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.tif'
@@ -401,7 +413,6 @@ class CoralData:
 					# 		truthstr = 'class' + str(k) + '_' + str(nn).zfill(8) + '.png'
 
 					if subdir:
-						subdirpath = '{}/'.format(k)
 						# else:
 						# 	subdirpath = 'class' + str(k) + '/'
 
