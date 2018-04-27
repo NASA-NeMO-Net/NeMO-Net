@@ -184,6 +184,10 @@ class CoralData:
 			except:
 				pass
 
+#### Transfer classes from one dictionary to another (load from a json file)
+# Input:
+# 	newclassdict: new class (final) dict to transfer to
+# 	transferdict: dict that maps old classes to new classes
 	def Consolidate_classes(self, newclassdict, transferdict):
 		if self.truthimage_consolidated is None:
 			self.truthimage_consolidated = np.copy(self.truthimage)
@@ -199,7 +203,7 @@ class CoralData:
 				self.truthimage_consolidated[TF_labelmap[counter]] = newclassdict[transferdict[k]]
 				counter += 1
 
-		self.consolidated_class_dict = newclassdict
+		self.consolidated_class_dict = newclassdict 		
 		self.consolidated_num_classes = len(self.consolidated_class_dict)
 		# Need to worry about divide by zero error
 		self.consolclass_weights = dict((k, (self.truthimage_consolidated.shape[0]*self.truthimage_consolidated.shape[1])/(self.truthimage_consolidated==newclassdict[k]).sum()) for k in newclassdict)
