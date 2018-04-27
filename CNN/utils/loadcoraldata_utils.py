@@ -212,6 +212,17 @@ class CoralData:
 				self.consolclass_weights[k] = 0
 		self.consolclass_count = dict((k, (self.truthimage_consolidated == newclassdict[k]).sum()) for k in newclassdict)
 
+	def get_anchors(self, classdict, anchorlist):
+		if self.truthimage_consolidated is None:
+			TF_labelmap = [self.truthimage== classdict[k] for k in anchorlist]
+		else:
+			TF_labelmap = [self.truthimage_consolidated == classdict[k] for k in anchorlist]
+
+		anchormean = np.asarray([np.mean(self.image[TF_labelmap[i]], axis=0) for i in range(len(anchorlist))])
+		anchormin = np.asarray([np.min(self.image[TF_labelmap[i]], axis=0) for i in range(len(anchorlist))])
+		anchormax = np.asarray([np.max(self.image[TF_labelmap[i]], axis=0) for i in range(len(anchorlist))])
+		return anchormean, anchormin, anchormax
+
 	def load_PB_consolidated_classes(self):
 		self.PB_LOF2consolclass = {"NoData": "Other", "Clouds": "Other", "deep lagoonal water": "Other", "deep ocean water": "Other", "Inland waters": "Other", 
 			"mangroves": "Other", "terrestrial vegetation": "Other", "Wetlands": "Other",
@@ -367,7 +378,7 @@ class CoralData:
 # 	cont: Continuously add to folder, or overwrite
 # 	consolidated: Export consolidated classes instead
 	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, 
-		lastchannelremove = True, labelkey = None, subdir=False, cont = False, consolidated = False):
+		lastchannelremove = True, labelkey = None, subdir=False, cont = False, consolidated = False, mosaic_mean = 0, mosaic_std = 1):
 		crop_len = int(np.floor(image_size/2))
 
 		if cont:
@@ -446,7 +457,7 @@ class CoralData:
 							dataset.SetProjection(self.projection)
 
 							for chan in range(self.image.shape[2]):
-								dataset.GetRasterBand(chan+1).WriteArray(tempimage[:,:,chan])
+								dataset.GetRasterBand(chan+1).WriteArray((tempimage[:,:,chan] - mosaic_mean[chan])/mosaic_std[chan])
 								dataset.FlushCache()
 							cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
 						else:
