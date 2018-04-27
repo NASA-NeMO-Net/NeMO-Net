@@ -202,7 +202,11 @@ class CoralData:
 		self.consolidated_class_dict = newclassdict
 		self.consolidated_num_classes = len(self.consolidated_class_dict)
 		# Need to worry about divide by zero error
-		# self.consolclass_weights = dict((i, (self.truthimage_consolidated.shape[0]*self.truthimage_consolidated.shape[1])/(self.truthimage_consolidated==i).sum()) for i in range(len(newclassdict)))
+		self.consolclass_weights = dict((k, (self.truthimage_consolidated.shape[0]*self.truthimage_consolidated.shape[1])/(self.truthimage_consolidated==newclassdict[k]).sum()) for k in newclassdict)
+		for k in self.consolclass_weights:
+			if self.consolclass_weights[k] == float("inf"):
+				self.consolclass_weights[k] = 0
+		self.consolclass_count = dict((k, (self.truthimage_consolidated == newclassdict[k]).sum()) for k in newclassdict)
 
 	def load_PB_consolidated_classes(self):
 		self.PB_LOF2consolclass = {"NoData": "Other", "Clouds": "Other", "deep lagoonal water": "Other", "deep ocean water": "Other", "Inland waters": "Other", 
@@ -608,9 +612,10 @@ class CoralData:
 		# 	num_predict[offset:offset+image_size, tempcol:tempcol+image_size] = num_predict[offset:offset+image_size, tempcol:tempcol+image_size] + np.ones(predict_mat.shape)
 		
 		# whole_predict = np.round(whole_predict.astype(np.float)/num_predict.astype(np.float)).astype(np.uint8)
+		# class_dict_min = np.min([self.class_dict[k] for k in self.class_dict])
 		whole_predict = np.round(whole_predict.astype(np.float)/num_predict.astype(np.float))
 		prob_predict = prob_predict/np.dstack([num_predict.astype(np.float)]*num_classes)
-		accuracy = 100*np.asarray((whole_predict == truth_predict)).astype(np.float32).sum()/(whole_predict.shape[0]*whole_predict.shape[1])
+		accuracy = 100*np.asarray(whole_predict == truth_predict).astype(np.float32).sum()/(whole_predict.shape[0]*whole_predict.shape[1]) # this is not correct when truth_predict does not start from 0
 
 		return whole_predict, num_predict, prob_predict, truth_predict, accuracy
 

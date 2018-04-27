@@ -139,6 +139,9 @@ parallelconv_params = {"filters": [[1024,1024,num_classes]],
     "full_filters": [4096,2048],
     "dropout": [0.5,0.5]}
 
+# If loading from previous model
+# VGG_DeepLab = load_model('./tmp/VGG16DeepLab_Fiji256.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D})
+# If starting new model
 VGG16_DeepLab = VGG16_DeepLabV2(input_shape=(y, x, num_channels), classes=num_classes, weight_decay=3e-3, batch_size=batch_size, 
                 weights=None, trainable_encoder=True, conv_layers=5, full_layers=0, conv_params=conv_params, parallel_layers=4, parallelconv_params=parallelconv_params)
 optimizer = keras.optimizers.Adam(1e-4)
