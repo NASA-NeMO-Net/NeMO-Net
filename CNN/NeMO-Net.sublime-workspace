@@ -82,7 +82,7 @@
 			"file": "utils/loadcoraldata_utils.py",
 			"settings":
 			{
-				"buffer_size": 34205,
+				"buffer_size": 0,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -251,7 +251,7 @@
 	],
 	"find":
 	{
-		"height": 40.0
+		"height": 23.0
 	},
 	"find_in_files":
 	{
@@ -395,10 +395,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4891.0,
+						"translation.y": 2056.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
@@ -425,10 +425,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 585.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
@@ -617,15 +617,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 34205,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								29206,
-								29207
+								0,
+								0
 							]
 						],
 						"settings":
@@ -634,7 +634,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 8669.0,
+						"translation.y": 1.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -653,8 +653,8 @@
 						"selection":
 						[
 							[
-								5675,
-								5675
+								1463,
+								1463
 							]
 						],
 						"settings":
@@ -664,7 +664,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 495.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,

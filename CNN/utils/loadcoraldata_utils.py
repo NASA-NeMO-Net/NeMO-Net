@@ -213,15 +213,31 @@ class CoralData:
 		self.consolclass_count = dict((k, (self.truthimage_consolidated == newclassdict[k]).sum()) for k in newclassdict)
 
 	def get_anchors(self, classdict, anchorlist):
+		channels = self.image.shape[2]
 		if self.truthimage_consolidated is None:
 			TF_labelmap = [self.truthimage== classdict[k] for k in anchorlist]
 		else:
 			TF_labelmap = [self.truthimage_consolidated == classdict[k] for k in anchorlist]
 
-		anchormean = np.asarray([np.mean(self.image[TF_labelmap[i]], axis=0) for i in range(len(anchorlist))])
-		anchormin = np.asarray([np.min(self.image[TF_labelmap[i]], axis=0) for i in range(len(anchorlist))])
+		# anchormean = np.asarray([np.mean(self.image[TF_labelmap[i]], axis=0) for i in range(len(anchorlist))]) 		# This erroneously includes all the zero points of the data
+		anchormin = []
+		anchormean = []
+		anchorstd = []
+		# all values calculated inside the for loop will NOT include 0 values
+		for i in range(len(anchorlist)):
+			transpose_minmap = np.transpose(self.image[TF_labelmap[i]])
+			tempmin = np.squeeze(np.asarray([np.min(transpose_minmap[j][np.nonzero(transpose_minmap[j])]) for j in range(channels)]))
+			tempmean = np.squeeze(np.asarray([np.mean(transpose_minmap[j][np.nonzero(transpose_minmap[j])]) for j in range(channels)]))
+			tempstd = np.squeeze(np.asarray([np.std(transpose_minmap[j][np.nonzero(transpose_minmap[j])]) for j in range(channels)]))
+			anchormin.append(tempmin)
+			anchormean.append(tempmean)
+			anchorstd.append(tempstd)
+
+		anchormin = np.asarray(anchormin)
+		anchormean = np.asarray(anchormean)
+		anchorstd = np.asarray(anchorstd)
 		anchormax = np.asarray([np.max(self.image[TF_labelmap[i]], axis=0) for i in range(len(anchorlist))])
-		return anchormean, anchormin, anchormax
+		return anchormean, anchorstd, anchormin, anchormax
 
 	def load_PB_consolidated_classes(self):
 		self.PB_LOF2consolclass = {"NoData": "Other", "Clouds": "Other", "deep lagoonal water": "Other", "deep ocean water": "Other", "Inland waters": "Other", 
@@ -450,7 +466,7 @@ class CoralData:
 
 						if self.load_type == "raster":
 							driver = gdal.GetDriverByName('GTiff')
-							dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, self.image.shape[2], gdal.GDT_Int32)
+							dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, self.image.shape[2], gdal.GDT_Float32)
 							x, y = self._calculate_corner(self.geotransform, j[idx[nn]]-crop_len, i[idx[nn]]-crop_len)
 							# print(x, self.geotransform[1], y, self.geotransform[5])
 							dataset.SetGeoTransform((x, self.geotransform[1], 0, y, 0, self.geotransform[5]))

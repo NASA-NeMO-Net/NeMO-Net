@@ -45,6 +45,13 @@ with open(jsonpath) as json_file:
 
 labelkey = json_data["L3_ClassDict"]
 num_classes = len(labelkey)
+class_weights = {'Reef Crest - coralline algae ridge': 263.83293861316076, 'Fore-reef deep slope': 70.06211128410703, 'Fore-reef shallow slope': 151.81276890771184, 
+    'Fore-reef shallow terrace': 190.9951447921521, 'Fore-reef octocorals-dominated (Caribbean)': 0, 'Back-reef pavement': 23.805211835880574, 
+    'Back-reef coral framework': 504.06732475209594, 'Back-reef coral bommies': 767.9690461410341, 'Back-reef octocorals-dominated (Caribbean)': 0, 
+    'Lagoon Pinnacle reefs': 190.52354241167194, 'Lagoon Patch reefs': 2340.5541997121954, 'Lagoon Fringing reefs': 121.64149633228104, 'Lagoon Deep water': 114.45460804976489, 
+    'Fore-reef sand flats': 372.9389698456479, 'Back-reef sediment-dominated': 500.2607762487424, 'Lagoon sediment apron - Barren': 4.634798906159125, 
+    'Terrestrial Vegetated': 13.120074519621062, 'Terrestrial Mangroves': 1099.7360264110896, 'Intertidal Wetlands': 4164.279931145626, 'Beach (sand)': 1230.0551785450966, 
+    'Beach (rock)': 0, 'Seagrass Meadows': 263.06976897868566, 'Deep Ocean Water': 2.060391359758762, 'Other': 8.73977287635436}
 # labelkey = PerosBanhos.consol_labels
 # num_classes = len(PerosBanhos.PB_consolidated_classes)
 
@@ -64,8 +71,8 @@ elif train_loader.color_mode == '8channel':
 
 y = train_loader.target_size[1]
 x = train_loader.target_size[0]
-pixel_mean =250*np.ones(num_channels)
-pixel_std = 250*np.ones(num_channels)
+pixel_mean =0*np.ones(num_channels)
+pixel_std = 1*np.ones(num_channels)
 # channel_shift_range = [0.01]*num_channels
 # rescale = np.asarray([[0.95,1.05]]*num_channels)
 
@@ -99,6 +106,7 @@ train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     target_size=(x,y),
     color_mode=train_loader.color_mode,
     passedclasses = labelkey,
+    class_weights = class_weights,
     class_mode = 'categorical',
     batch_size = batch_size,
     shuffle=True)
@@ -108,6 +116,7 @@ validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
     target_size=(x,y),
     color_mode=val_loader.color_mode,
     passedclasses = labelkey,
+    class_weights = class_weights,
     class_mode = 'categorical',
     batch_size = batch_size,
     shuffle=True)

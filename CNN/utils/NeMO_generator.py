@@ -406,7 +406,7 @@ class NeMODirectoryIterator(Iterator):
                     if self.class_weights is not None:
                         weights = np.zeros((self.image_shape[0], self.image_shape[1]), dtype=np.float)
                         for k in self.class_weights:
-                            weights[y == k] = self.class_weights[k]
+                            weights[y == self.class_indices[k]] = self.class_weights[k]             #class_weights must be a dictionary
                         batch_weights[i] = weights
                     y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
                     batch_y[i] = y
