@@ -2,16 +2,24 @@ from __future__ import (
     absolute_import,
     unicode_literals
 )
+import numpy as np
+import copy
 import keras
 import keras.backend as K
 
-from keras.models import Model
+#from keras.models import Model
+from keras.engine.training import Model
 from keras.utils.data_utils import get_file
 from keras.utils import layer_utils
 
+from keras.layers import Cropping2D, Concatenate, Add
 from NeMO_blocks import (
     alex_conv,
     alex_fc,
+    parallel_conv,
+    vgg_convblock,
+    vgg_fcblock,
+    pool_concat,
     res_initialconv,
     res_basicconv,
     res_megaconv,
@@ -100,23 +108,59 @@ class Res_Encoder(Model):
     :return A Keras Model with outputs
     """
 
-    def __init__(self, inputs, blocks, weights=None,
-                 trainable=True, name='encoder'):
+    # inputs: normal input
+    # blocks: blocks that make up the encoder
+    # crop_shapes: list of tuples indicating shapes to be cropped out of the center of inputs (e.g. [(5,5),(10,10)])
+    # weights: weights to be loaded (if any)
+    # traininable: Trainable layers
+    # name: Name of encoder
+    def __init__(self, inputs, blocks, weights=None, trainable=True, name='encoder'):
         inverse_pyramid = []
 
-        # all blocks
+        # split_inputs = None 
+        # if crop_shapes is not None:             # used for multi-input models
+        #     split_inputs = []
+        #     for shape in crop_shapes:
+        #         crop_len = (int(inputs.shape[1])-shape[0])/2
+        #         if (int(inputs.shape[1]) - shape[0])%2 == 0:
+        #             crop_len = int(crop_len)
+        #             split_inputs.append(Cropping2D(cropping=((crop_len,crop_len), (crop_len,crop_len)))(inputs))
+        #         else:
+        #             crop_len_lo = int(np.trunc(crop_len))
+        #             crop_len_hi = int(np.ceil(crop_len))
+        #             split_inputs.append(Cropping2D(cropping=((crop_len_lo,crop_len_hi), (crop_len_lo,crop_len_hi)))(inputs))
+
+        # all parallel blocks
+        if type(inputs) is list:
+            inputs_copy = [np.copy(inp) for inp in inputs]
+        else:
+            inputs_copy = inputs
+
         for i, block in enumerate(blocks):
             if i == 0:
-                x = block(inputs)
-                inverse_pyramid.append(x)
+                x = block(inputs_copy)
             else:
                 x = block(x)
+
+            if type(x) is list:
+                inverse_pyramid.append(list(x))
+                # print([xi.shape for xi in x])
+            else:
                 inverse_pyramid.append(x)
+                # print(x.shape)
 
-        outputs = list(reversed(inverse_pyramid))
+        pyramid = reversed(inverse_pyramid)
+        outputs = []
+        for item in pyramid:
+            if type(item) is list:
+                for miniitem in item:
+                    outputs.append(miniitem)
+            else:
+                outputs.append(item)
+        # outputs = list(reversed(inverse_pyramid))
 
-        super(Res_Encoder, self).__init__(
-            inputs=inputs, outputs=outputs)
+        super(Res_Encoder, self).__init__(inputs=inputs, outputs=outputs)
+        print(self.summary())
 
         # load pre-trained weights
         if weights is not None:
@@ -136,33 +180,189 @@ class Res_Encoder(Model):
 
 class Alex_Encoder(Res_Encoder):
     def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True):
-        filters = [96, 256, 384, 384, 256]
-        conv_size = [(7,7),(5,5),(3,3),(3,3),(3,3)]
-        pool_size = [(2,2),(2,2),(1,1),(1,1),(2,2)]
-        pool_stride = [(2,2),(2,2),(1,1),(1,1),(2,2)]
-        pool_bool = [True, True, False, False, True]
-        pad_bool = [False, False, True, True, True]
-        batchnorm_bool = [True, True, False, False, False]
+        # filters = [64, 128, 256, 384, 512]
+        # conv_size = [(7,7),(5,5),(3,3),(3,3),(3,3)]
+        # pool_size = [(2,2),(2,2),(1,1),(1,1),(2,2)]
+        # pool_stride = [(2,2),(2,2),(1,1),(1,1),(2,2)]
+        # pool_bool = [True, True, False, False, True]
+        # pad_bool = [False, False, True, True, True]
+        # batchnorm_bool = [True, True, False, False, False]
+        filters = [64, 128]
+        conv_size = [(7,7),(5,5)]
+        pool_size = [(2,2),(2,2)]
+        pool_stride = [(2,2),(2,2)]
+        pool_bool = [True, True]
+        pad_bool = [False, False]
+        batchnorm_bool = [True, True]
 
-        full_filters = [4096, 4096]
-        drop_bool = [True, True]
-        drop_val = [0.5, 0.5]
+        full_filters = [256]
+        drop_bool = [True]
+        drop_val = [0.5]
         
         blocks = []
         for i in range(len(filters)):
             block_name = 'alexblock{}'.format(i + 1)
-            block = alex_conv(filters[i], conv_size[i], pad_bool=pad_bool[i], pool_bool=pool_bool[i], batchnorm_bool=batchnorm_bool[i], pool_size=pool_size[i], pool_strides=pool_stride[i], weight_decay=weight_decay, block_name=block_name)
+            block = alex_conv(filters[i], conv_size[i], pad_bool=pad_bool[i], pool_bool=pool_bool[i], batchnorm_bool=batchnorm_bool[i], 
+                pool_size=pool_size[i], pool_strides=pool_stride[i], weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
         for i in range(len(full_filters)):
             block_name='alexfc{}'.format(i + 1)
             if i==0:
-                block = alex_fc(full_filters[i], flatten_bool=True, dropout_bool=drop_bool[i], dropout=drop_val[i], weight_decay=weight_decay, block_name=block_name)
+                block = alex_fc(full_filters[i], flatten_bool=True, dropout_bool=drop_bool[i], dropout=drop_val[i], weight_decay=weight_decay, 
+                    block_name=block_name)
             else:
-                block = alex_fc(full_filters[i], flatten_bool=False, dropout_bool=drop_bool[i], dropout=drop_val[i], weight_decay=weight_decay, block_name=block_name)
+                block = alex_fc(full_filters[i], flatten_bool=False, dropout_bool=drop_bool[i], dropout=drop_val[i], weight_decay=weight_decay, 
+                    block_name=block_name)
             blocks.append(block)
 
         super(Alex_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
+
+def load_specific_param(num_layers, default_conv_params, conv_params, specific_param, layer_str="convolutional"):
+    default_param = default_conv_params[specific_param]
+    try:
+        param = conv_params[specific_param]
+        if len(param) != num_layers:
+            print("Found {} {} layers but {} {}, will only replace initial {} {}...".format(num_layers, layer_str, len(param), specific_param, len(param), specific_param))
+            for i in range(len(param), num_layers):
+                param.append(default_param[i])
+        print("{}: {}".format(specific_param, param[:num_layers]))
+    except:
+        print("{} not found, reverting to default: {}".format(specific_param,default_param[:num_layers]))
+        param = default_param
+
+    return param
+
+def load_conv_params(conv_layers, full_layers, default_conv_params, conv_params):
+    print("---------------------------------------------------------")
+    print("ENCODER CONVOLUTIONAL PARAMETERS:")
+
+    filters = load_specific_param(conv_layers, default_conv_params, conv_params, "filters")
+    conv_size = load_specific_param(conv_layers, default_conv_params, conv_params, "conv_size")
+    conv_strides = load_specific_param(conv_layers, default_conv_params, conv_params, "conv_strides")
+    padding = load_specific_param(conv_layers, default_conv_params, conv_params, "padding")
+    dilation_rate = load_specific_param(conv_layers, default_conv_params, conv_params, "dilation_rate")
+    pool_size = load_specific_param(conv_layers, default_conv_params, conv_params, "pool_size")
+    pool_strides = load_specific_param(conv_layers, default_conv_params, conv_params, "pool_strides")
+    pad_size = load_specific_param(conv_layers, default_conv_params, conv_params, "pad_size")
+    layercombo = load_specific_param(conv_layers, default_conv_params, conv_params, "layercombo")
+    # batchnorm_pos = load_specific_param(conv_layers, default_conv_params, conv_params, "batchnorm_pos") #old version has batchnorm_bool
+    full_filters = load_specific_param(full_layers, default_conv_params, conv_params, "full_filters", layer_str="fully connected")
+    dropout = load_specific_param(full_layers, default_conv_params, conv_params, "dropout", layer_str="fully connected")
+
+    return filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, layercombo, full_filters, dropout
+
+
+class Alex_Hyperopt_Encoder(Res_Encoder):
+    def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, conv_layers=5, full_layers=2, conv_params=None):
+
+        default_conv_params = {"filters": [96,256,384,384,256],
+            "conv_size": [(7,7),(5,5),(3,3),(3,3),(3,3)],
+            "conv_strides": [(1,1),(1,1),(1,1),(1,1),(1,1)],
+            "padding": ['valid','valid','valid','valid','valid'],
+            "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(1,1)],
+            "pool_size": [(2,2),(2,2),(1,1),(1,1),(2,2)],
+            "pool_strides": [(2,2),(2,2),(1,1),(1,1),(2,2)],
+            "pad_size": [(0,0),(0,0),(0,0),(0,0),(0,0)],
+            "layercombo": ["capb","capb","capb","capb","capb"],
+            "full_filters": [4096,4096],
+            "dropout": [0.5,0.5]}
+        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, layercombo, full_filters, dropout = \
+            load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
+
+        # actual start of CNN
+        blocks = []
+        for i in range(conv_layers):
+            block_name = 'alexblock{}'.format(i + 1)
+            block = alex_conv(filters[i], conv_size[i], conv_strides=(1,1), padding=padding[i], pad_bool=True, pad_size=pad_size[i], pool_size=pool_size[i],
+                pool_strides=pool_size[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
+            blocks.append(block)
+
+        for i in range(full_layers):
+            block_name='alexfc{}'.format(i + 1)
+            if i==0:
+                block = alex_fc(full_filters[i], flatten_bool=True, dropout_bool=True, dropout=dropout[i], weight_decay=weight_decay, block_name=block_name)
+            else:
+                block = alex_fc(full_filters[i], flatten_bool=False, dropout_bool=True, dropout=dropout[i], weight_decay=weight_decay, block_name=block_name)
+            blocks.append(block)
+
+        super(Alex_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
+
+class Alex_Parallel_Hyperopt_Encoder(Res_Encoder):
+    def __init__(self, inputs, classes, parallel_layers=4, combine_method='concat', conv_params=None, weight_decay=0., weights=None, trainable=True):
+
+        # double brackets to signify all parallel filters follow same parameters
+        default_conv_params = {"filters": [[1024,1024,classes]],
+            "conv_size": [[(3,3),(1,1),(1,1)]],
+            "conv_strides":  [[(3,3),(1,1),(1,1)]],
+            "padding": ['same','same','same','same'],
+            "dilation_rate": [[(6,6),(1,1),(1,1)], [(12,12),(1,1),(1,1)], [(18,18),(1,1),(1,1)], [(24,24),(1,1),(1,1)]],
+            "pool_size": [[(2,2),(2,2),(2,2)]],
+            "pool_strides": [[(2,2),(2,2),(2,2)]],
+            "pad_size": [(6,6), (12,12), (18,18), (24,24)],
+            "layercombo": ["zcadcadc","zcadcadc","zcadcadc","zcadcadc"],
+            "full_filters": [4096,2048],
+            "dropout": [0.5,0.5]}
+        filters = conv_params["filters"]
+        conv_size = conv_params["conv_size"]
+        conv_strides = conv_params["conv_strides"]
+        padding = conv_params["padding"]
+        dilation_rate = conv_params["dilation_rate"]
+        pool_size = conv_params["pool_size"]
+        pool_strides = conv_params["pool_strides"]
+        pad_size = conv_params["pad_size"]
+        layercombo = conv_params["layercombo"]
+
+        # f = lambda input,c_count: input[0] if len(input)==1 else input[c_count]
+        # actual start of CNN
+        blocks = []
+        block_name = 'parallel_block'
+        block = parallel_conv(filters, conv_size, conv_strides=conv_strides, padding=padding, pad_bool=True, pad_size=pad_size, 
+            pool_size=pool_size, pool_strides=pool_strides, dilation_rate=dilation_rate, dropout=[0.5], layercombo=layercombo,
+            weight_decay=weight_decay, block_name=block_name)
+        blocks.append(block)
+
+        if combine_method == "concat":
+            block = Concatenate(axis=-1)
+            blocks.append(block)
+        elif combine_method == "add":
+            block = Add()
+            blocks.append(block)
+
+        super(Alex_Parallel_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
+
+class VGG_Hyperopt_Encoder(Res_Encoder):
+    def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, 
+        conv_layers=5, full_layers=2, conv_params=None):
+
+        default_conv_params = {"filters": [64,128,256,512,512],
+            "conv_size": [(3,3),(3,3),(3,3),(3,3),(3,3)],
+            "conv_strides": [(1,1),(1,1),(1,1),(1,1),(1,1)],
+            "padding": ['same','same','same','same','same'],
+            "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(1,1)],
+            "pool_size": [(2,2),(2,2),(2,2),(2,2),(2,2)],
+            "pool_strides": [(2,2),(2,2),(1,1),(1,1),(1,1)],
+            "pad_size": [(0,0),(0,0),(0,0),(0,0),(0,0)],
+            "layercombo": ["cacapb","cacapba","cacacapb","cacacapb","cacacapb"],
+            "full_filters": [2048,2048],
+            "dropout": [0.5,0.5]}
+        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, layercombo, full_filters, dropout = \
+            load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
+
+        # actual start of CNN
+        blocks = []
+        for i in range(conv_layers):
+            block_name = 'vgg_convblock{}'.format(i + 1)
+            block = alex_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], pool_size=pool_size[i],
+                pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
+            blocks.append(block)
+
+        if full_layers > 0:
+            block_name = 'vgg_fcblock'
+            block = vgg_fcblock(full_filters, full_layers, dropout_bool=True, dropout=dropout, weight_decay=weight_decay, block_name=block_name)
+            blocks.append(block)
+
+        super(VGG_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
 
 class Res34_Encoder(Res_Encoder):
@@ -226,7 +426,9 @@ class VGGEncoder(Encoder):
             blocks.append(block)
 
         # Fully Convolutional block
-        fc_block = vgg_fc(filters=4096, weight_decay=weight_decay)
+        fc_block = vgg_fc(filters=1024, weight_decay=weight_decay)
+        # fc_block = vgg_fc(filters=4096, weight_decay=weight_decay)
+
         blocks.append(fc_block)
 
         super(VGGEncoder, self).__init__(inputs=inputs, blocks=blocks,
@@ -252,11 +454,18 @@ class VGG16(VGGEncoder):
             weights = None
 
         super(VGG16, self).__init__(inputs,
-                                    filters=[64, 128, 256, 512, 512],
+                                    filters=[64, 128, 196, 256, 384],
                                     convs=[2, 2, 3, 3, 3],
                                     weight_decay=weight_decay,
                                     weights=weights,
                                     trainable=trainable)
+
+        # super(VGG16, self).__init__(inputs,
+        #                             filters=[64, 128, 256, 512, 512],
+        #                             convs=[2, 2, 3, 3, 3],
+        #                             weight_decay=weight_decay,
+        #                             weights=weights,
+        #                             trainable=trainable)
 
 
 class VGG19(VGGEncoder):

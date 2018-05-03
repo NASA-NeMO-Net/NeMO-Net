@@ -14,8 +14,10 @@ from NeMO_layers import CroppingLike2D
 from NeMO_blocks import (
     vgg_deconv,
     vgg_score,
-    vgg_upsampling
+    vgg_upsampling,
+    vgg_deconvblock
 )
+from NeMO_encoders import load_specific_param
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
 def Decoder(pyramid, blocks):
@@ -41,6 +43,18 @@ def Decoder(pyramid, blocks):
         decoded = blk(feat, decoded)
 
     return decoded
+
+def load_deconv_params(deconv_layers, default_deconv_params, deconv_params):
+    print("---------------------------------------------------------")
+    print("DECODER DECONVOLUTIONAL PARAMETERS:")
+
+    # convs = load_specific_param(deconv_layers, default_deconv_params, deconv_params, "convs", layer_str="deconvolutional")
+    scales = load_specific_param(deconv_layers, default_deconv_params, deconv_params, "scales", layer_str="deconvolutional")
+    filters = load_specific_param(deconv_layers, default_deconv_params, deconv_params, "filters", layer_str="deconvolutional")
+    conv_size = load_specific_param(deconv_layers, default_deconv_params, deconv_params, "conv_size", layer_str="deconvolutional")
+    layercombo = load_specific_param(deconv_layers, default_deconv_params, deconv_params, "layercombo", layer_str="deconvolutional")
+
+    return scales, filters, conv_size, layercombo
 
 
 def VGGDecoder(pyramid, scales, classes):
@@ -103,6 +117,33 @@ def VGGUpsampler(pyramid, scales, classes, weight_decay=0.):
                                scale=scales[i],
                                weight_decay=weight_decay,
                                block_name=block_name)
+        blocks.append(block)
+
+    return Decoder(pyramid=pyramid[:-1], blocks=blocks)
+
+def VGG_DecoderBlock(pyramid, classes, weight_decay=0., deconv_params=None):
+
+    p_filters=[]
+    for k in deconv_params:
+        if len(deconv_params[k]) != len(pyramid)-1:
+            print("Error: Deconvolution parameter {} is not the same length as pyramid-1".format(k))
+            raise ValueError
+    # remember that pyramid must have 1 extra, for target_shape purposes
+    for p in pyramid:
+        p_filters.append(p.shape[0])
+
+    default_deconv_params = {"scales": [1,1,1,1,1],
+        "filters": p_filters[:-1],
+        "conv_size": [(2,2),(2,2),(2,2),(2,2),(2,2)],
+        "layercombo": ["cacab","cacab","cacab","cacab","cacab"]}
+
+    scales, filters, conv_size, layercombo = load_deconv_params(len(pyramid)-1, default_deconv_params, deconv_params)
+
+    blocks = []
+    for i in range(len(pyramid)-1):
+        block_name = 'vgg_deconvblock{}'.format(i+1)
+        block = vgg_deconvblock(filters[i], conv_size[i], classes, layercombo=layercombo[i], target_shape=K.int_shape(pyramid[i+1]), 
+            scale=scales[i], weight_decay=weight_decay, block_name=block_name)
         blocks.append(block)
 
     return Decoder(pyramid=pyramid[:-1], blocks=blocks)
