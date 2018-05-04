@@ -212,6 +212,19 @@ class CoralData:
 				self.consolclass_weights[k] = 0
 		self.consolclass_count = dict((k, (self.truthimage_consolidated == newclassdict[k]).sum()) for k in newclassdict)
 
+	def export_consolidated_truthmap(self, filename):
+		driver = gdal.GetDriverByName('GTiff')
+		# print(self.image.shape)
+		dataset = driver.Create(filename, self.image.shape[1], self.image.shape[0], 1 , gdal.GDT_Byte)
+		dataset.SetGeoTransform(self.geotransform)
+		dataset.SetProjection(self.projection)
+		# print(self.truthimage_consolidated.shape)
+		outband = dataset.GetRasterBand(1)
+		outband.WriteArray(self.truthimage_consolidated[:,:])
+		outband.FlushCache()
+		# dataset.GetRasterBand(1).WriteArray(self.truthimage_consolidated)
+		# dataset.FlushCache()
+
 	def get_anchors(self, classdict, anchorlist):
 		channels = self.image.shape[2]
 		if self.truthimage_consolidated is None:
@@ -391,10 +404,16 @@ class CoralData:
 # 	lastchannelremove: Remove last channel or not
 # 	labelkey: Naming convention of class labels (NOTE: must be same # as the # of classes)
 # 	subdir: Create subdirectories for each class
-# 	cont: Continuously add to folder, or overwrite
+# 	cont: Continuously add to folder (True), or overwrite (False)
 # 	consolidated: Export consolidated classes instead
+# 	mosaic_mean: Channel means
+#	mosaic_std: Channl std
+#	bandstoexport: specific bands to export from raster
+#	exporttype: gdal.GDT_##### types
+
 	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, 
-		lastchannelremove = True, labelkey = None, subdir=False, cont = False, consolidated = False, mosaic_mean = 0, mosaic_std = 1):
+		lastchannelremove = True, labelkey = None, subdir=False, cont = False, consolidated = False, mosaic_mean = 0, mosaic_std = 1, 
+		bandstoexport=None, exporttype = gdal.GDT_Float32, label_cmap=None):
 		crop_len = int(np.floor(image_size/2))
 
 		if cont:
@@ -436,7 +455,16 @@ class CoralData:
 				for nn in range(len(idx)):
 					# Note: i,j are off of truthcrop, and hence when taken against image needs only +image_size to be centered
 					tempimage = self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :]
-					templabel = np.asarray(truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]*(255/num_classes)).astype(np.uint8)
+					temptruthimage = truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]
+					if label_cmap is not None:
+						templabel = np.zeros((temptruthimage.shape[0], temptruthimage.shape[1], 3))
+						counter2 = 0
+						for key in export_class_dict:
+							templabel[temptruthimage == export_class_dict[key]] = np.asarray(label_cmap(counter2)[-2::-1])*255
+							counter2 += 1
+						templabel = templabel.astype(np.uint8)
+					else:
+						templabel = np.asarray(temptruthimage*(255/num_classes)).astype(np.uint8)
 
 					if lastchannelremove:
 						tempimage = np.delete(tempimage, -1,-1) # Remove last dimension of array
@@ -466,15 +494,26 @@ class CoralData:
 
 						if self.load_type == "raster":
 							driver = gdal.GetDriverByName('GTiff')
-							dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, self.image.shape[2], gdal.GDT_Float32)
+							if bandstoexport is not None:
+								dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, len(bandstoexport), exporttype)
+							else:
+								dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, self.image.shape[2], exporttype)
 							x, y = self._calculate_corner(self.geotransform, j[idx[nn]]-crop_len, i[idx[nn]]-crop_len)
-							# print(x, self.geotransform[1], y, self.geotransform[5])
 							dataset.SetGeoTransform((x, self.geotransform[1], 0, y, 0, self.geotransform[5]))
 							dataset.SetProjection(self.projection)
 
-							for chan in range(self.image.shape[2]):
-								dataset.GetRasterBand(chan+1).WriteArray((tempimage[:,:,chan] - mosaic_mean[chan])/mosaic_std[chan])
-								dataset.FlushCache()
+							if bandstoexport is not None:
+								counter2 = 0
+								for chan in bandstoexport:
+									tempchannel = (tempimage[:,:,chan-1] - mosaic_mean[counter2])/mosaic_std[counter2]
+									tempchannel[tempchannel > 255] = 255			# Artificial ceiling of 255 for RGB ONLY!
+									dataset.GetRasterBand(counter2+1).WriteArray(tempchannel)
+									dataset.FlushCache()
+									counter2 += 1
+							else:
+								for chan in range(self.image.shape[2]):
+									dataset.GetRasterBand(chan+1).WriteArray((tempimage[:,:,chan] - mosaic_mean[chan])/mosaic_std[chan])
+									dataset.FlushCache()
 							cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
 						else:
 							cv2.imwrite(exporttrainpath+subdirpath+trainstr, tempimage)
