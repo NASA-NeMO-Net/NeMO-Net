@@ -104,7 +104,7 @@
     "Deep water": 9,
     "Other": 10
   },
-  "VedConsolidated_Classdict":{
+  "VedConsolidated_ClassDict":{
   	"Coral": 1,
   	"Sediment": 2,
   	"Beach": 3,
@@ -274,4 +274,5 @@
     "Seagrass Meadows": "Seagrass",
     "Deep Ocean Water": "Deep water",
     "Other": "Other or Unknown"
+  }
 }

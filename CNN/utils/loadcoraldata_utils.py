@@ -508,6 +508,7 @@ class CoralData:
 								for chan in bandstoexport:
 									tempchannel = (tempimage[:,:,chan-1] - mosaic_mean[counter2])/mosaic_std[counter2]
 									tempchannel[tempchannel > 255] = 255			# Artificial ceiling of 255 for RGB ONLY!
+									tempchannel[tempchannel < 0] = 0
 									dataset.GetRasterBand(counter2+1).WriteArray(tempchannel)
 									dataset.FlushCache()
 									counter2 += 1
