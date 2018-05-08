@@ -64,7 +64,7 @@
 			"file": "utils/loadcoraldata_utils.py",
 			"settings":
 			{
-				"buffer_size": 36454,
+				"buffer_size": 38500,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -248,6 +248,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"channels",
 			"self.geotransform",
 			"self.labelkey",
 			"class_weights",
@@ -542,15 +543,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 36454,
+						"buffer_size": 38500,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8840,
-								8863
+								38420,
+								38420
 							]
 						],
 						"settings":
@@ -559,7 +560,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2791.0,
+						"translation.y": 11290.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,

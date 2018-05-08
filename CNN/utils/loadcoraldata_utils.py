@@ -410,6 +410,7 @@ class CoralData:
 #	mosaic_std: Channl std
 #	bandstoexport: specific bands to export from raster
 #	exporttype: gdal.GDT_##### types
+#	label_cmap: cmap IN ORDER of export_class_dict
 
 	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, 
 		lastchannelremove = True, labelkey = None, subdir=False, cont = False, consolidated = False, mosaic_mean = 0, mosaic_std = 1, 
@@ -460,7 +461,7 @@ class CoralData:
 						templabel = np.zeros((temptruthimage.shape[0], temptruthimage.shape[1], 3))
 						counter2 = 0
 						for key in export_class_dict:
-							templabel[temptruthimage == export_class_dict[key]] = np.asarray(label_cmap(counter2)[-2::-1])*255
+							templabel[temptruthimage == export_class_dict[key]] = np.asarray(label_cmap(counter2)[-2::-1])*255 # 8bit-based cmap
 							counter2 += 1
 						templabel = templabel.astype(np.uint8)
 					else:
@@ -771,5 +772,24 @@ def confusion_matrix_stats(cm, classes, file2sav = "cm_stats"):
 	df = pd.DataFrame(data=d)
 	
 	# df.to_csv('./output/' +file2save + '.csv')
+
+# fill in remaining color on a truthmap
+# truthmap_fn: path to truthmap
+# cmap: colormap of colors that already exist in the truthmap
+# lastcolor: last color to fill in, in BGR
+def fill_in_truthmap(truthmap_fn, cmap, lastcolor):
+						# counter2 = 0
+						# for key in export_class_dict:
+						# 	templabel[temptruthimage == export_class_dict[key]] = np.asarray(label_cmap(counter2)[-2::-1])*255 # 8bit-based cmap
+						# 	counter2 += 1
+	truthmap = cv2.imread(truthmap_fn) 	# Read in as BGR
+	cmap_8bit = np.asarray([np.asarray(cmap(i)[-2::-1])*255 for i in range(len(cmap.colors))], dtype = np.uint8)	 #in BGR
+
+	replacemap = np.ones((truthmap.shape[0], truthmap.shape[1]), dtype=np.bool)
+	for color in cmap_8bit:
+		idx = np.where(np.all(truthmap==color, axis=-1))
+		replacemap[idx] = False
+	truthmap[replacemap] = lastcolor
+	return truthmap
 
 
