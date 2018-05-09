@@ -35,6 +35,8 @@ class CoralData:
 		# Load images
 		self.truthimage_consolidated = None
 		self.load_type = load_type
+		head, tail = os.path.split(Imagepath)
+		self.imagefilename = tail
 		if load_type == "PIL":
 			self.image = img_to_array(pil_image.open(Imagepath))
 			if Truthpath is not None:
@@ -344,56 +346,48 @@ class CoralData:
 	    shuffled_labels = labels[permutation,:]
 	    return shuffled_dataset, shuffled_labels 
 
-#### Generate a randomized, normalized set of images/labels from original image + reference labels
-# Note that the label data is only the central pixel label of the defined training image
+#### Generate a randomized, normalized set of points/labels from original image
 # Input:
-# 	image_size: Size of image
-# 	n: Number of images per class
-# 	idxremove: Which index to remove (NOTE: This is NOT the channel index, but is from the index of a list of datasets)
-# 	datasets: list of images, starts as empty []
-# 	labels: list of labels: starts as empty []
-# 	figureson: True/False, displays 1 image from each class
+# 	N: Number of points per class
+#	consolidated: consolidated classes
+#	bandstoexport: specific bands to export (starting at 1)
 # Output:
-# 	datasets: set of randomized, normalized images, N_images x nrow x ncol x n_channels
-# 	labels: set of randomized labels (concurrent with datasets), N_images x num_labels (num_labels = 1 for now)
-	def _generate_randomized_set(self, image_size, n, idxremove, datasets, labels, figureson):
-		crop_len = int(np.floor(image_size/2))
-		try:
-			# Crop the image so that border areas are not considered
-			truthcrop = self.truthimage[crop_len:self.truthimage.shape[0]-crop_len, crop_len:self.truthimage.shape[1]-crop_len]
-		except TypeError:
-			print("Truth/Reference image improperly defined")
-			return
+# 	points: set of randomized points, n x n_channels (defined by bandstoexport) 
+# 	labels: set of randomized labels (concurrent with points), n
+	def generate_randomized_points(self, N, consolidated = False, bandstoexport=None):
 
-		for k in range(self.num_classes):
-			[i,j] = np.where(truthcrop == k)
-			idx = np.asarray(random.sample(range(len(i)), n)).astype(int)
-			datasets[k*n:(k+1)*n,:,:,:] = [self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :] for nn in range(len(idx))]
-			labels[k*n:(k+1)*n,0] = [truthcrop[i[idx[nn]], j[idx[nn]]] for nn in range(len(idx))]
-			# datasets.append([self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :] for nn in range(len(idx))])
-			# labels.append([truthcrop[i[idx[nn]], j[idx[nn]]] for nn in range(len(idx))])
+		if consolidated:
+			export_class_dict = self.consolidated_class_dict
+			truthimage = self.truthimage_consolidated
+			num_classes = self.consolidated_num_classes
+		else:
+			export_class_dict = self.class_dict
+			truthimage = self.truthimage
+			num_classes = self.num_classes
 
-		# datasets = np.asarray(datasets) # train_datasets is in the format of num_labels x N_train x nrows x ncols x n_channels
-		# labels = np.asarray(labels) # train_labels is in the format of num_labels x N_train
-		# datasets = datasets.reshape(self.num_classes*n, image_size, image_size, self.image.shape[-1]) # flatten first 2 dimensions of train_datasets
-		# labels = labels.reshape(self.num_classes*n,1) # flatten into vector
+		points = []
+		labels = []
 
-		if idxremove is not None:
-			datasets = np.delete(datasets,idxremove,-1) # Remove specific last dimension of array
+		for k in export_class_dict:
+			[i,j] = np.where(truthimage == export_class_dict[k])
+			if len(i) != 0:
+				if len(i) < N:
+					idx = [count%len(i) for count in range(N)]
+				else:
+					idx = np.asarray(random.sample(range(len(i)), N)).astype(int)
 
-		if figureson:
-			plt.figure()
-			for i in range(self.num_classes):
-				plt.subplot(1, self.num_classes, i+1)
-				plt.imshow(datasets[i*n,:,:,0:3].astype(np.uint8))
-				# plt.imshow(cv2.cvtColor(datasets[i*n,:,:,0:3], cv2.COLOR_BGR2RGB))
-				if i > 0:
-					plt.axis("off")
-			plt.show()
+				for nn in range(len(idx)):
+					if bandstoexport is not None:
+						bandstoexport = np.asarray(bandstoexport)
+						points.append(self.image[i[idx[nn]],j[idx[nn]],bandstoexport-1])
+					else:
+						points.append(self.image[i[idx[nn]],j[idx[nn]],:])
+					labels.append(truthimage[i[idx[nn]], j[idx[nn]]])
 
-		datasets, labels = self._randomize(datasets, labels)
-		datasets = self._rescale(datasets)
-		return datasets, labels
+		points = np.asarray(points)
+		labels = np.asarray(labels)
+
+		return points, labels
 
 # Input:
 #	exporttrainpath: Directory for exported patch images 
@@ -499,8 +493,8 @@ class CoralData:
 								dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, len(bandstoexport), exporttype)
 							else:
 								dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, self.image.shape[2], exporttype)
-							x, y = self._calculate_corner(self.geotransform, j[idx[nn]]-crop_len, i[idx[nn]]-crop_len)
-							dataset.SetGeoTransform((x, self.geotransform[1], 0, y, 0, self.geotransform[5]))
+							x, y = self._calculate_corner(self.geotransform, j[idx[nn]]-crop_len, i[idx[nn]]-crop_len) # calculate the x,y coordinates
+							dataset.SetGeoTransform((x, self.geotransform[1], 0, y, 0, self.geotransform[5]))	# set geotransform at x,y coordinates
 							dataset.SetProjection(self.projection)
 
 							if bandstoexport is not None:
@@ -520,11 +514,11 @@ class CoralData:
 						else:
 							cv2.imwrite(exporttrainpath+subdirpath+trainstr, tempimage)
 							cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
-						f.write('./' + subdirpath+trainstr+'\n')
+						f.write('./' + subdirpath+trainstr + ' ' + self.imagefilename + ' ' + str(i[idx[nn]])+' '+str(j[idx[nn]]) + '\n')
 					else:
 						cv2.imwrite(exporttrainpath+trainstr, tempimage)
 						cv2.imwrite(exportlabelpath+truthstr, templabel)
-						f.write('./' + trainstr+'\n')
+						f.write('./' + trainstr + ' ' + self.imagefilename + ' ' + str(i[idx[nn]])+' '+str(j[idx[nn]]) + '\n')
 					print(str(counter*N+nn+1) + '/ ' + str(len(export_class_dict)*N) +' patches exported', end='\r')
 				classcounter += 1
 			counter += 1
@@ -793,4 +787,27 @@ def fill_in_truthmap(truthmap_fn, cmap, lastcolor):
 	truthmap[replacemap] = lastcolor
 	return truthmap
 
+# imagepath: file where raster file is located
+# specific_fn: specific patch filename of the NxN patch being loaded
+# trainfile: file where all info is stored for all NxN patches
+# image_size: Size of image (just 1 number since it is a square)
+def load_specific_patch(imagepath, specific_fn, trainfile, image_size):
+	f = open(trainfile,"r")
+	col = []
+	row = []
+	rastername = []
+	patch_name = []
+	for line in f:
+		infosplit = line.split(" ")
+		col.append(int(infosplit[-1]))
+		row.append(int(infosplit[-2]))
+		rastername.append(infosplit[-3])
+		patch_path = ' '.join(infosplit[0:-3])
+		head, tail = os.path.split(patch_path)
+		patch_name.append(tail)
+
+	idx = patch_name.index(specific_fn)
+	raster = CoralData(imagepath+'/'+rastername[idx], load_type="raster")
+	patch = raster.image[row[idx]:row[idx]+image_size, col[idx]:col[idx]+image_size, :]
+	return patch
 
