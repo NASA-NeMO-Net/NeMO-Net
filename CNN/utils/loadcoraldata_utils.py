@@ -768,11 +768,11 @@ def confusion_matrix_stats(cm, classes, file2sav = "cm_stats"):
 	
 	# df.to_csv('./output/' +file2save + '.csv')
 
-# fill in remaining color on a truthmap
+# fill in last remaining color on a truthmap
 # truthmap_fn: path to truthmap
 # cmap: colormap of colors that already exist in the truthmap
 # lastcolor: last color to fill in, in BGR
-def fill_in_truthmap(truthmap_fn, cmap, lastcolor):
+def fill_in_truthmap_lastcolor(truthmap_fn, cmap, lastcolor):
 						# counter2 = 0
 						# for key in export_class_dict:
 						# 	templabel[temptruthimage == export_class_dict[key]] = np.asarray(label_cmap(counter2)[-2::-1])*255 # 8bit-based cmap
@@ -787,11 +787,45 @@ def fill_in_truthmap(truthmap_fn, cmap, lastcolor):
 	truthmap[replacemap] = lastcolor
 	return truthmap
 
+# fill in empty pixels based upon surrounding pixel colors
+# truthmap_fn: path to truthmap (classified from people)
+# surroundingarea: square grid size arround classification pixel (pick an odd number!)
+def fill_in_truthmap(truthmap_fn, surroundingarea):
+	white = np.asarray([255,255,255])
+	if surroundingarea % 2 == 0:
+		raise ValueError('Please choose an odd number for fill_in_truthmap surroundingarea')
+	truthmap = cv2.imread(truthmap_fn)
+	y,x = np.where(np.all(truthmap == white, axis=-1))
+	for j,i in zip(y,x):
+		crop_len = int((surroundingarea-1)/2)
+		found_replace = False
+		while found_replace is False:
+			tempy_min = max(j-crop_len,0)
+			tempy_max = min(j+crop_len+1,truthmap.shape[0])
+			tempx_min = max(i-crop_len,0)
+			tempx_max = min(i+crop_len+1, truthmap.shape[1])
+			truthmap_patch = truthmap[tempy_min:tempy_max,tempx_min:tempx_max,:]
+			unq, unq_count = np.unique(truthmap_patch.reshape(-1, truthmap_patch.shape[2]), return_counts=True, axis=0)
+			idx = np.where(np.all(unq == white, axis=-1))
+
+			if len(idx[0]) > 0: 		# Get rid of white counts
+				unq = np.delete(unq, idx, axis=0)
+				unq_count = np.delete(unq_count, idx, axis=0)
+
+			if len(unq) > 0:			# Make sure there is still at least 1 unique left
+				found_replace = True
+			else:						# If no uniques left, increment area by 1
+				crop_len += 1
+		maxidx = np.argmax(unq_count)
+		truthmap[j,i] = unq[maxidx]
+	return truthmap
+
 # imagepath: file where raster file is located
 # specific_fn: specific patch filename of the NxN patch being loaded
 # trainfile: file where all info is stored for all NxN patches
 # image_size: Size of image (just 1 number since it is a square)
-def load_specific_patch(imagepath, specific_fn, trainfile, image_size):
+# offset: (y,x) offset of patch to load in tuple
+def load_specific_patch(imagepath, specific_fn, trainfile, image_size, offset=0):
 	f = open(trainfile,"r")
 	col = []
 	row = []
