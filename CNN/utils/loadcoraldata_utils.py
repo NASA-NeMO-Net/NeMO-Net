@@ -140,27 +140,30 @@ class CoralData:
 				self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
 				self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
 				self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in range(num_classes))
-			if (Truthpath.endswith('.tif') or Truthpath.endswith('.TIF')) and load_type is "raster":
-				self.truthimage = cv2.imread(Truthpath,cv2.IMREAD_UNCHANGED)
+			if ((Truthpath.endswith('.tif') or Truthpath.endswith('.TIF')) or Truthpath.endswith('.png')) and load_type is "raster":
+				self.truthimage = cv2.imread(Truthpath)
 				class_indices = np.unique(self.truthimage)
 				num_classes = len(class_indices)
-				self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in class_indices)
+				try:
+					self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in class_indices)
 
-				gdal_truthimg = gdal.Open(Truthpath)
-				gdal_truthimg_gt = gdal_truthimg.GetGeoTransform()
-				x_min, x_max, y_min, y_max = gdal_truthimg_gt[0], gdal_truthimg_gt[0]+self.truthimage.shape[1]*gdal_truthimg_gt[1], \
-					gdal_truthimg_gt[3]-self.truthimage.shape[0]*gdal_truthimg_gt[1], gdal_truthimg_gt[3]
-				
-				image_xstart = np.max([0, int((x_min - self.geotransform[0])/pixel_size)])
-				truth_xstart = np.max([0, int((self.geotransform[0] - x_min)/pixel_size)])
-				image_ystart = np.max([0, int((self.geotransform[3] - y_max)/pixel_size)])
-				truth_ystart = np.max([0, int((y_max - self.geotransform[3])/pixel_size)])
+					gdal_truthimg = gdal.Open(Truthpath)
+					gdal_truthimg_gt = gdal_truthimg.GetGeoTransform()
+					x_min, x_max, y_min, y_max = gdal_truthimg_gt[0], gdal_truthimg_gt[0]+self.truthimage.shape[1]*gdal_truthimg_gt[1], \
+						gdal_truthimg_gt[3]-self.truthimage.shape[0]*gdal_truthimg_gt[1], gdal_truthimg_gt[3]
+					
+					image_xstart = np.max([0, int((x_min - self.geotransform[0])/pixel_size)])
+					truth_xstart = np.max([0, int((self.geotransform[0] - x_min)/pixel_size)])
+					image_ystart = np.max([0, int((self.geotransform[3] - y_max)/pixel_size)])
+					truth_ystart = np.max([0, int((y_max - self.geotransform[3])/pixel_size)])
 
-				total_cols = int((np.min([xsize*pixel_size + self.geotransform[0], x_max]) - np.max([self.geotransform[0], x_min]))/pixel_size)
-				total_rows = int((np.min([self.geotransform[3], y_max]) - np.max([-ysize*pixel_size + self.geotransform[3], y_min]))/pixel_size)
+					total_cols = int((np.min([xsize*pixel_size + self.geotransform[0], x_max]) - np.max([self.geotransform[0], x_min]))/pixel_size)
+					total_rows = int((np.min([self.geotransform[3], y_max]) - np.max([-ysize*pixel_size + self.geotransform[3], y_min]))/pixel_size)
 
-				self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
-				self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
+					self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
+					self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
+				except:
+					print("Warning! Truth image not in expected format... loading directly whole image using cv2...")
 
 				gdal_truthimg = None
 		if Bathypath is not None:
@@ -354,7 +357,7 @@ class CoralData:
 # Output:
 # 	points: set of randomized points, n x n_channels (defined by bandstoexport) 
 # 	labels: set of randomized labels (concurrent with points), n
-	def generate_randomized_points(self, N, consolidated = False, bandstoexport=None):
+	def generate_randomized_points(self, N, consolidated = False, bandstoexport=None, cmap = None):
 
 		if consolidated:
 			export_class_dict = self.consolidated_class_dict
@@ -369,7 +372,11 @@ class CoralData:
 		labels = []
 
 		for k in export_class_dict:
-			[i,j] = np.where(truthimage == export_class_dict[k])
+			if cmap is None:
+				[i,j] = np.where(truthimage == export_class_dict[k])
+			else:
+				# truthimage is in BGR here
+				[i,j] = np.where(np.all(truthimage == np.asarray(np.asarray(cmap(export_class_dict[k]-1)[-2::-1])*255, dtype=np.uint8), axis=-1))
 			if len(i) != 0:
 				if len(i) < N:
 					idx = [count%len(i) for count in range(N)]
@@ -459,7 +466,7 @@ class CoralData:
 							counter2 += 1
 						templabel = templabel.astype(np.uint8)
 					else:
-						templabel = np.asarray(temptruthimage*(255/num_classes)).astype(np.uint8)
+						templabel = np.asarray(temptruthimage*(255/num_classes)).astype(np.uint8) # Scale evenly classes from 0-255 in grayscale
 
 					if lastchannelremove:
 						tempimage = np.delete(tempimage, -1,-1) # Remove last dimension of array
@@ -773,10 +780,6 @@ def confusion_matrix_stats(cm, classes, file2sav = "cm_stats"):
 # cmap: colormap of colors that already exist in the truthmap
 # lastcolor: last color to fill in, in BGR
 def fill_in_truthmap_lastcolor(truthmap_fn, cmap, lastcolor):
-						# counter2 = 0
-						# for key in export_class_dict:
-						# 	templabel[temptruthimage == export_class_dict[key]] = np.asarray(label_cmap(counter2)[-2::-1])*255 # 8bit-based cmap
-						# 	counter2 += 1
 	truthmap = cv2.imread(truthmap_fn) 	# Read in as BGR
 	cmap_8bit = np.asarray([np.asarray(cmap(i)[-2::-1])*255 for i in range(len(cmap.colors))], dtype = np.uint8)	 #in BGR
 
@@ -842,6 +845,12 @@ def load_specific_patch(imagepath, specific_fn, trainfile, image_size, offset=0)
 
 	idx = patch_name.index(specific_fn)
 	raster = CoralData(imagepath+'/'+rastername[idx], load_type="raster")
-	patch = raster.image[row[idx]:row[idx]+image_size, col[idx]:col[idx]+image_size, :]
-	return patch
+	patch = raster.image[row[idx]+offset:row[idx]+offset+image_size, col[idx]+offset:col[idx]+offset+image_size, :]
+	projection = raster.projection
+	# geotransform is organized as [top left x, w-e pixel resolution, 0, top left y, 0, n-s pixel resolution (negative)]
+	geotransform = raster.geotransform
+	geotransform[0] = geotransform[0] + offset*geotransform[1]
+	geotransform[3] = geotransform[3] + offset*geotransform[5]
+
+	return patch, projection, geotransform
 
