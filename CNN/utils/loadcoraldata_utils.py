@@ -823,6 +823,7 @@ def fill_in_truthmap(truthmap_fn, surroundingarea):
 		truthmap[j,i] = unq[maxidx]
 	return truthmap
 
+# Loads patch from mosaiced .tif file
 # imagepath: file where raster file is located
 # specific_fn: specific patch filename of the NxN patch being loaded
 # trainfile: file where all info is stored for all NxN patches
@@ -848,9 +849,29 @@ def load_specific_patch(imagepath, specific_fn, trainfile, image_size, offset=0)
 	patch = raster.image[row[idx]+offset:row[idx]+offset+image_size, col[idx]+offset:col[idx]+offset+image_size, :]
 	projection = raster.projection
 	# geotransform is organized as [top left x, w-e pixel resolution, 0, top left y, 0, n-s pixel resolution (negative)]
-	geotransform = raster.geotransform
+	# print(raster.geotransform)
+	geotransform = [g for g in raster.geotransform]
+	# geotransform = [(g[0]+offset*g[1], g[1], g[2], g[3]+offset*g[5], g[4], g[5]) for g in raster.geotransform]
+	# geotransform = raster.geotransform
 	geotransform[0] = geotransform[0] + offset*geotransform[1]
 	geotransform[3] = geotransform[3] + offset*geotransform[5]
 
 	return patch, projection, geotransform
 
+# Turns RGB cmap into dictionary-defined truthmap
+# Note: Dictionary might go from 1 to num_classes, and hence the grayscale truthmap will go from num_classes:255/num_classes:255
+# RGBpath: path to all RGB truthmaps
+# Graypath: Final path to put all Grayscale truthmaps
+# cmap: RGB cmap
+# class_dict: Dictionary associated with each color to class (make sure it's in same order as cmap!)
+def transform_RGB2Gray(RGBpath, Graypath, cmap, class_dict):
+	files = [f for f in os.listdir(RGBpath) if os.path.isfile(os.path.join(RGBpath,f))]
+	classvalues = [class_dict[k] for k in class_dict]
+	cmap_len = len(cmap.colors)
+	for f in files:
+		BGRpatch = cv2.imread(os.path.join(RGBpath,f))
+		Graypatch = np.zeros((BGRpatch.shape[0],BGRpatch.shape[1]), dtype=np.uint8)
+		for i in range(cmap_len):
+			y,x = np.where(np.all(BGRpatch == np.asarray(np.asarray(cmap(i)[-2::-1])*255, dtype=np.uint8), axis=-1))
+			Graypatch[y,x] = np.uint8(classvalues[i]*255/cmap_len)
+		cv2.imwrite(os.path.join(Graypath,f), Graypatch)
