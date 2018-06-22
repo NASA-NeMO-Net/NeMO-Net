@@ -100,6 +100,7 @@ datagen = NeMOImageGenerator(image_shape=[y, x, num_channels],
                                     pixelwise_center=True,
                                     pixel_mean=pixel_mean,
                                     pixelwise_std_normalization=True,
+                                    random_rotation=True,
                                     pixel_std=pixel_std)
 train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     FCN_directory=train_loader.label_dir,
@@ -108,6 +109,8 @@ train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     passedclasses = labelkey,
     class_mode = 'categorical',
     batch_size = batch_size,
+    save_to_dir = './tmpbatchsave',
+    save_prefix = 'Jarrett_test',
     shuffle=True)
 
 validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
@@ -159,9 +162,10 @@ VGG16_DeepLab.compile(optimizer=optimizer, loss='categorical_crossentropy', metr
 # print("Memory required (GB): ", get_model_memory_usage(batch_size, VGG16_DeepLab))
 
 VGG16_DeepLab.fit_generator(train_generator,
-    steps_per_epoch=10,
-    epochs=100,
+    steps_per_epoch=1,
+    epochs=1,
     validation_data=validation_generator,
-    validation_steps=5,
+    validation_steps=1,
     verbose=1,
-    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+    callbacks=[])
+    # callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])

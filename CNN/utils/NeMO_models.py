@@ -11,8 +11,9 @@ from keras.models import Model
 from keras.layers import Input, Flatten, Activation, Reshape, Dense, Cropping2D
 
 from NeMO_layers import CroppingLike2D, BilinearUpSampling2D
+from keras.regularizers import l2
 from keras.layers.convolutional import Conv2D, AveragePooling2D
-from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Res34_Encoder, Alex_Hyperopt_Encoder, Alex_Parallel_Hyperopt_Encoder, VGG_Hyperopt_Encoder
+from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Res34_Encoder, Alex_Hyperopt_Encoder, Alex_Parallel_Hyperopt_Encoder, VGG_Hyperopt_Encoder, Test_Hyperopt_Encoder
 from NeMO_decoders import VGGDecoder, VGGUpsampler, VGG_DecoderBlock
 from NeMO_functional_encoders import Func_Parallel_Hyperopt_Encoder
 from NeMO_backend import get_model_memory_usage
@@ -37,10 +38,18 @@ def AlexNet(input_shape, classes, weight_decay=0., trainable_encoder=True, weigh
 
 #     return Model(inputs=inputs, outputs=scores)
 
-def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, full_layers=1, conv_params=None):
+def TestModel(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, full_layers=1, conv_params=None):
     inputs = Input(shape=input_shape)
-    encoder = Alex_Hyperopt_Encoder(inputs, classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, 
+    encoder = Test_Hyperopt_Encoder(inputs, classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, 
         conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
+    encoder_output = encoder.outputs[0]
+
+    return Model(inputs=inputs, output=encoder_output)
+
+def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, convpattern = None, full_layers=1, conv_params=None):
+    inputs = Input(shape=input_shape)
+    encoder = VGG_Hyperopt_Encoder(inputs, classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, 
+        conv_layers=conv_layers, convpattern=convpattern, full_layers=full_layers, conv_params=conv_params)
     encoder_output = encoder.outputs[0]
 
     return Model(inputs=inputs, output=encoder_output)
@@ -88,6 +97,31 @@ def VGG_Hyperopt_FCN(input_shape, classes, decoder_index, weight_decay=0., train
     outputs = VGG_DecoderBlock(feat_pyramid,  classes=classes, weight_decay=weight_decay, deconv_params=deconv_params)
 
     scores = Activation('softmax')(outputs)
+    scores = Reshape((input_shape[0]*input_shape[1], classes))(scores)  # for class weight purposes
+
+    # return model
+    return Model(inputs=inputs, outputs=scores)
+
+def SharpMask_FCN(input_shape, classes, decoder_index, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, full_layers=0, conv_params=None, 
+    scales = 1, bridge_params=None, prev_params=None, next_params=None, upsample=True):
+    inputs = Input(shape=input_shape)
+    pyramid_layers = decoder_index
+
+    encoder = VGG_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, conv_layers=conv_layers,
+        full_layers=full_layers, conv_params=conv_params)
+
+
+    feat_pyramid = [encoder.outputs[index] for index in pyramid_layers]
+    # Append image to the end of feature pyramid
+    feat_pyramid.append(inputs)
+
+    # Decode feature pyramid
+    outputs = VGG_DecoderBlock(feat_pyramid,  classes=classes, scales=scales, weight_decay=weight_decay, 
+        bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, upsample=upsample)
+
+    final_1b1conv = Conv2D(classes, (1,1), padding="same", kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay), name='final_1b1conv')(outputs)
+
+    scores = Activation('softmax')(final_1b1conv)
     scores = Reshape((input_shape[0]*input_shape[1], classes))(scores)  # for class weight purposes
 
     # return model

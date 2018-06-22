@@ -92,7 +92,7 @@ class CoralData:
 
 				field_vals = list(set([feature.GetFieldAsString('Class_name') for feature in source_layer]))
 				field_vals.sort(key=lambda x: x.lower())
-				if 'NoData' not in field_vals:
+				if 'NoData' not in field_vals: 		# NoData field automatically added to .shp files (this is an artifact from PerosBanhos.shp, which is required)
 					self.class_labels = ['NoData'] + field_vals 	# all unique labels
 
 				x_min, x_max, y_min, y_max = source_layer.GetExtent()
@@ -309,12 +309,19 @@ class CoralData:
 				item_counter+=1
 			self.num_classes = len(np.unique(self.truthimage))
 
+#### Set pixel mean and std
+# Input:
+# 	mean
+#	std
+	def set_mean_std(self, mean, std):
+		self.pixelmean = mean
+		self.pixelstd = std
+
 #### Set the pixel depth (usually 8-bit = 255)
 # Input:
 # 	depth: Pixel depth
 	def set_depth(self, depth):
-		self.depth = depth
-
+		self.set_mean_std(depth/2, depth/2)
 
 	def _calculate_corner(self, geotransform, column, row):
 		x = geotransform[1]*column + geotransform[2]*row + geotransform[0]
@@ -326,7 +333,7 @@ class CoralData:
 # Output:
 # 	Set of vectorized normalized images, N_images x nrow x ncol x n_channels
 	def _rescale(self, dataset):
-		return (dataset.astype(np.float32) - self.depth/2)/(self.depth/2)
+		return (dataset.astype(np.float32) - self.pixelmean)/(self.pixelstd)
 
 #### Classify from categorical array to label
 # Input:

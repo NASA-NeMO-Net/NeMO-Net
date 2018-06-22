@@ -14,7 +14,9 @@ from keras.utils import layer_utils
 
 from keras.layers import Cropping2D, Concatenate, Add
 from NeMO_blocks import (
+    recursive_conv,
     alex_conv,
+    alex_parallelconv,
     alex_fc,
     parallel_conv,
     vgg_convblock,
@@ -160,7 +162,7 @@ class Res_Encoder(Model):
         # outputs = list(reversed(inverse_pyramid))
 
         super(Res_Encoder, self).__init__(inputs=inputs, outputs=outputs)
-        print(self.summary())
+        # print(self.summary())
 
         # load pre-trained weights
         if weights is not None:
@@ -274,8 +276,8 @@ class Alex_Hyperopt_Encoder(Res_Encoder):
         blocks = []
         for i in range(conv_layers):
             block_name = 'alexblock{}'.format(i + 1)
-            block = alex_conv(filters[i], conv_size[i], conv_strides=(1,1), padding=padding[i], pad_bool=True, pad_size=pad_size[i], pool_size=pool_size[i],
-                pool_strides=pool_size[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
+            block = alex_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=True, pad_size=pad_size[i], pool_size=pool_size[i],
+                pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
         for i in range(full_layers):
@@ -333,6 +335,51 @@ class Alex_Parallel_Hyperopt_Encoder(Res_Encoder):
 
 class VGG_Hyperopt_Encoder(Res_Encoder):
     def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, 
+        conv_layers=5, convpattern = None, full_layers=2, conv_params=None):
+
+        if convpattern is None:
+            blocktype = 'c' * conv_layers
+        else:
+            blocktype = convpattern
+
+        default_conv_params = {"filters": [64,128,256,512,512],
+            "conv_size": [(3,3),(3,3),(3,3),(3,3),(3,3)],
+            "conv_strides": [(1,1),(1,1),(1,1),(1,1),(1,1)],
+            "padding": ['same','same','same','same','same'],
+            "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(1,1)],
+            "pool_size": [(2,2),(2,2),(2,2),(2,2),(2,2)],
+            "pool_strides": [(2,2),(2,2),(1,1),(1,1),(1,1)],
+            "pad_size": [(0,0),(0,0),(0,0),(0,0),(0,0)],
+            "layercombo": ["cacapb","cacapba","cacacapb","cacacapb","cacacapb"],
+            "full_filters": [2048,2048],
+            "dropout": [0.5,0.5]}
+        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, layercombo, full_filters, dropout = \
+            load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
+
+        # actual start of CNN
+        blocks = []
+        for i in range(conv_layers):
+            block_name = 'vgg_convblock{}'.format(i + 1)
+            if blocktype[i] is 'c':
+                block = alex_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], pool_size=pool_size[i],
+                    pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
+            elif blocktype[i] is 'p':
+                block = alex_parallelconv(filters[i], len(layercombo[i]), conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], 
+                    pool_size=pool_size[i], pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
+            else:
+                print("Unrecognized symbol in convpattern... please use 'c' for straight convolution or 'p' for parallel convolution")
+                raise ValueError
+            blocks.append(block)
+
+        if full_layers > 0:
+            block_name = 'vgg_fcblock'
+            block = vgg_fcblock(full_filters, full_layers, dropout_bool=True, dropout=dropout, weight_decay=weight_decay, block_name=block_name)
+            blocks.append(block)
+
+        super(VGG_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
+
+class Test_Hyperopt_Encoder(Res_Encoder):
+    def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, 
         conv_layers=5, full_layers=2, conv_params=None):
 
         default_conv_params = {"filters": [64,128,256,512,512],
@@ -353,8 +400,8 @@ class VGG_Hyperopt_Encoder(Res_Encoder):
         blocks = []
         for i in range(conv_layers):
             block_name = 'vgg_convblock{}'.format(i + 1)
-            block = alex_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], pool_size=pool_size[i],
-                pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
+            block = recursive_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], pool_size=pool_size[i],
+                    pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
         if full_layers > 0:
@@ -362,7 +409,7 @@ class VGG_Hyperopt_Encoder(Res_Encoder):
             block = vgg_fcblock(full_filters, full_layers, dropout_bool=True, dropout=dropout, weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
-        super(VGG_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
+        super(Test_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
 
 class Res34_Encoder(Res_Encoder):
