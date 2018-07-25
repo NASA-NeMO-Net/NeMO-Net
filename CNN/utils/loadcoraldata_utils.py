@@ -34,6 +34,7 @@ class CoralData:
 	def __init__(self, Imagepath, Truthpath=None, Testpath = None, Bathypath=None, truth_key=None, load_type="cv2", tfwpath=None):
 		# Load images
 		self.truthimage_consolidated = None
+		self.truthimage = None
 		self.load_type = load_type
 		head, tail = os.path.split(Imagepath)
 		self.imagefilename = tail
@@ -178,10 +179,12 @@ class CoralData:
 				self.class_dict = truth_key
 				self.num_classes = len(self.class_labels) # total number of classes, including those not found
 			else:
-				for item in truth_key: # This was explicitly designed for 4 class Samoa data that comes in different shades of gray, ignore for now
-					self.truthimage[self.truthimage == item] = item_counter
-					item_counter+=1
-				self.num_classes = len(np.unique(self.truthimage))
+				if self.truthimage is not None:
+					for item in truth_key: # This was explicitly designed for 4 class Samoa data that comes in different shades of gray, ignore for now
+						self.truthimage[self.truthimage == item] = item_counter
+						item_counter+=1
+					self.num_classes = len(np.unique(self.truthimage))
+
 		else:
 			try:
 				self.num_classes = len(self.class_labels)
@@ -407,23 +410,26 @@ class CoralData:
 #	exporttrainpath: Directory for exported patch images 
 # 	exportlabelpath: Directory for exported segmented images
 # 	txtfilename: Name of text file to record image names (remember to include '.txt')
-# 	image_size: Size of image
+# 	image_size: Size of image (of the magnified image)
 # 	N: Number of images per class (NOTE: because these are segmented maps, the class is only affiliated with the center pixel)
+# 	magnification: Magnification ratio between truth/image (used for super-resolution)
+#	magimg_path: Magnified image path (truth image)
 # 	lastchannelremove: Remove last channel or not
 # 	labelkey: Naming convention of class labels (NOTE: must be same # as the # of classes)
 # 	subdir: Create subdirectories for each class
 # 	cont: Continuously add to folder (True), or overwrite (False)
 # 	consolidated: Export consolidated classes instead
 # 	mosaic_mean: Channel means
-#	mosaic_std: Channl std
+#	mosaic_std: Channel std
 #	bandstoexport: specific bands to export from raster
 #	exporttype: gdal.GDT_##### types
 #	label_cmap: cmap IN ORDER of export_class_dict
 
-	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, 
+	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, magnification=1, magimg_path=None,
 		lastchannelremove = True, labelkey = None, subdir=False, cont = False, consolidated = False, mosaic_mean = 0, mosaic_std = 1, 
 		bandstoexport=None, exporttype = gdal.GDT_Float32, label_cmap=None):
-		crop_len = int(np.floor(image_size/2))
+		crop_len = int(np.floor(image_size/2)) # crop_len of the MAGNIFIED image
+		m = magnification
 
 		if cont:
 			f = open(exporttrainpath+txtfilename,'a')
@@ -432,6 +438,9 @@ class CoralData:
 
 		counter = 0
 		classcounter = 0
+
+		if magimg_path is not None:
+			magimage = cv2.imread(magimg_path)
 
 		if consolidated:
 			export_class_dict = self.consolidated_class_dict
@@ -463,8 +472,11 @@ class CoralData:
 
 				for nn in range(len(idx)):
 					# Note: i,j are off of truthcrop, and hence when taken against image needs only +image_size to be centered
-					tempimage = self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :]
+					tempimage = self.image[int(i[idx[nn]]/m):int(i[idx[nn]]/2+image_size/2), int(j[idx[nn]]/2):int(j[idx[nn]]/2+image_size/2), :]
 					temptruthimage = truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]
+					if magimg_path is not None:
+						tempmagimage = magimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]
+
 					if label_cmap is not None:
 						templabel = np.zeros((temptruthimage.shape[0], temptruthimage.shape[1], 3))
 						counter2 = 0
@@ -524,14 +536,23 @@ class CoralData:
 								for chan in range(self.image.shape[2]):
 									dataset.GetRasterBand(chan+1).WriteArray((tempimage[:,:,chan] - mosaic_mean[chan])/mosaic_std[chan])
 									dataset.FlushCache()
-							cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+							if image_or_label == "label":
+								cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+							elif image_or_label == "image":
+								cv2.imwrite(exportlabelpath+subdirpath+truthstr, tempmagimage)
 						else:
 							cv2.imwrite(exporttrainpath+subdirpath+trainstr, tempimage)
-							cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+							if magimg_path is None:
+								cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+							else:
+								cv2.imwrite(exportlabelpath+subdirpath+truthstr, tempmagimage)
 						f.write('./' + subdirpath+trainstr + ' ' + self.imagefilename + ' ' + str(i[idx[nn]])+' '+str(j[idx[nn]]) + '\n')
 					else:
 						cv2.imwrite(exporttrainpath+trainstr, tempimage)
-						cv2.imwrite(exportlabelpath+truthstr, templabel)
+						if image_or_label == "label":
+							cv2.imwrite(exportlabelpath+truthstr, templabel)
+						elif image_or_label == "image":
+							cv2.imwrite(exportlabelpath+truthstr, tempmagimage)
 						f.write('./' + trainstr + ' ' + self.imagefilename + ' ' + str(i[idx[nn]])+' '+str(j[idx[nn]]) + '\n')
 					print(str(counter*N+nn+1) + '/ ' + str(len(export_class_dict)*N) +' patches exported', end='\r')
 				classcounter += 1
@@ -640,6 +661,7 @@ class CoralData:
 
 			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
 			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
+			prob_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size, num_classes))
 
 			truth_predict = self.truthimage[offstart:offstart+whole_predict.shape[0], offstart:offstart+whole_predict.shape[1]]
 
@@ -800,8 +822,11 @@ def fill_in_truthmap_lastcolor(truthmap_fn, cmap, lastcolor):
 # fill in empty pixels based upon surrounding pixel colors
 # truthmap_fn: path to truthmap (classified from people)
 # surroundingarea: square grid size arround classification pixel (pick an odd number!)
-def fill_in_truthmap(truthmap_fn, surroundingarea):
-	white = np.asarray([255,255,255])
+def fill_in_truthmap(truthmap_fn, surroundingarea, nofillcolor=None):
+	if nofillcolor is None:
+		white = np.asarray([255,255,255])
+	else:
+		white = nofillcolor
 	if surroundingarea % 2 == 0:
 		raise ValueError('Please choose an odd number for fill_in_truthmap surroundingarea')
 	truthmap = cv2.imread(truthmap_fn)

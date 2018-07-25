@@ -247,12 +247,18 @@ def load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
     pool_size = load_specific_param(conv_layers, default_conv_params, conv_params, "pool_size")
     pool_strides = load_specific_param(conv_layers, default_conv_params, conv_params, "pool_strides")
     pad_size = load_specific_param(conv_layers, default_conv_params, conv_params, "pad_size")
+
+    filters_up = load_specific_param(conv_layers, default_conv_params, conv_params, "filters_up")
+    upconv_size = load_specific_param(conv_layers, default_conv_params, conv_params, "upconv_size")
+    upconv_strides = load_specific_param(conv_layers, default_conv_params, conv_params, "upconv_strides")
+
     layercombo = load_specific_param(conv_layers, default_conv_params, conv_params, "layercombo")
+
     # batchnorm_pos = load_specific_param(conv_layers, default_conv_params, conv_params, "batchnorm_pos") #old version has batchnorm_bool
     full_filters = load_specific_param(full_layers, default_conv_params, conv_params, "full_filters", layer_str="fully connected")
     dropout = load_specific_param(full_layers, default_conv_params, conv_params, "dropout", layer_str="fully connected")
 
-    return filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, layercombo, full_filters, dropout
+    return filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, layercombo, full_filters, dropout
 
 
 class Alex_Hyperopt_Encoder(Res_Encoder):
@@ -266,10 +272,13 @@ class Alex_Hyperopt_Encoder(Res_Encoder):
             "pool_size": [(2,2),(2,2),(1,1),(1,1),(2,2)],
             "pool_strides": [(2,2),(2,2),(1,1),(1,1),(2,2)],
             "pad_size": [(0,0),(0,0),(0,0),(0,0),(0,0)],
+            "filters_up": [100],
+            "upconv_size": [(2,2)],
+            "upconv_strides": [(1,1)],
             "layercombo": ["capb","capb","capb","capb","capb"],
             "full_filters": [4096,4096],
             "dropout": [0.5,0.5]}
-        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, layercombo, full_filters, dropout = \
+        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, layercombo, full_filters, dropout = \
             load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
 
         # actual start of CNN
@@ -277,7 +286,8 @@ class Alex_Hyperopt_Encoder(Res_Encoder):
         for i in range(conv_layers):
             block_name = 'alexblock{}'.format(i + 1)
             block = alex_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=True, pad_size=pad_size[i], pool_size=pool_size[i],
-                pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
+                pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], filters_up=filters_up[i], kernel_size_up=upconv_size[i], strides_up=upconv_strides[i],
+                layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
         for i in range(full_layers):
@@ -290,6 +300,7 @@ class Alex_Hyperopt_Encoder(Res_Encoder):
 
         super(Alex_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
+# Currently deprecated, since Alex_Hyperopt_Encoder has in-built parallel detection
 class Alex_Parallel_Hyperopt_Encoder(Res_Encoder):
     def __init__(self, inputs, classes, parallel_layers=4, combine_method='concat', conv_params=None, weight_decay=0., weights=None, trainable=True):
 
@@ -390,10 +401,13 @@ class Test_Hyperopt_Encoder(Res_Encoder):
             "pool_size": [(2,2),(2,2),(2,2),(2,2),(2,2)],
             "pool_strides": [(2,2),(2,2),(1,1),(1,1),(1,1)],
             "pad_size": [(0,0),(0,0),(0,0),(0,0),(0,0)],
+            "filters_up": [100],
+            "upconv_size": [(2,2)],
+            "upconv_strides": [(1,1)],
             "layercombo": ["cacapb","cacapba","cacacapb","cacacapb","cacacapb"],
             "full_filters": [2048,2048],
             "dropout": [0.5,0.5]}
-        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, layercombo, full_filters, dropout = \
+        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, layercombo, full_filters, dropout = \
             load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
 
         # actual start of CNN
@@ -401,7 +415,8 @@ class Test_Hyperopt_Encoder(Res_Encoder):
         for i in range(conv_layers):
             block_name = 'vgg_convblock{}'.format(i + 1)
             block = recursive_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], pool_size=pool_size[i],
-                    pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
+                    pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], filters_up=filters_up[i], kernel_size_up=upconv_size[i], strides_up=upconv_strides[i],
+                    layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
         if full_layers > 0:

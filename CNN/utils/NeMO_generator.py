@@ -54,7 +54,8 @@ class NeMOImageGenerator(ImageDataGenerator):
                  vertical_flip=False,
                  NeMO_rescale=None,
                  preprocessing_function=None,
-                 data_format=None):
+                 data_format=None,
+                 image_or_label="label"):
         """Init."""
         self.image_shape = tuple(image_shape)
         self.image_resample = image_resample
@@ -64,6 +65,7 @@ class NeMOImageGenerator(ImageDataGenerator):
         self.pixel_std = np.array(pixel_std)
         self.NeMO_rescale = NeMO_rescale
         self.random_rotation = random_rotation
+        self.image_or_label = image_or_label
 
         # Note that the below initialization mostly works with RGB data, use with care
         # However, rescale and channel_shift_range might be useful to multiply and shift individual channels, respectively
@@ -149,17 +151,18 @@ class NeMOImageGenerator(ImageDataGenerator):
             seed=seed)
 
     def flow_from_NeMOdirectory(self, directory, FCN_directory=None,
-                            target_size=(256, 256), color_mode='rgb',
+                            target_size=None, source_size=(64,64), color_mode='rgb',
                             passedclasses=None, class_mode='categorical',
                             batch_size=32, class_weights = None, shuffle=True, seed=None,
                             save_to_dir=None,
                             save_prefix='',
                             save_format='png',
-                            follow_links=False):
+                            follow_links=False,
+                            image_or_label="label"):
         return NeMODirectoryIterator(
-            directory, self, FCN_directory=FCN_directory, target_size=target_size, color_mode=color_mode, passedclasses=passedclasses, class_mode=class_mode,
+            directory, self, FCN_directory=FCN_directory, target_size=target_size, source_size=source_size, color_mode=color_mode, passedclasses=passedclasses, class_mode=class_mode,
             data_format=self.data_format, batch_size=batch_size, class_weights=class_weights, shuffle=shuffle, seed=seed,
-            save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format, follow_links=follow_links)
+            save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format, follow_links=follow_links, image_or_label=image_or_label)
 
 
 # Currently unused (here from previous code)
@@ -223,6 +226,7 @@ class NeMODirectoryIterator(Iterator):
         image_data_generator: Instance of `ImageDataGenerator`
             to use for random transformations and normalization.
         FCN_directory: Directory to use for FCN data, or complete labelled patch data
+        source_size: tuple of integers, dimensions of input images
         target_size: tuple of integers, dimensions to resize input images to.
         color_mode: One of `"rgb"`, `"grayscale"`. Color mode to read images.
         classes: Optional list of strings, names of sudirectories
@@ -249,15 +253,20 @@ class NeMODirectoryIterator(Iterator):
             (if `save_to_dir` is set).
     """
 
-    def __init__(self, directory, image_data_generator, FCN_directory=None, target_size=(256, 256), color_mode='rgb',
+    def __init__(self, directory, image_data_generator, FCN_directory=None, target_size=None, source_size=(64,64), color_mode='rgb',
                  passedclasses=None, class_mode='categorical', batch_size=32, class_weights=None, shuffle=True, seed=None,
-                 data_format=None, save_to_dir=None, save_prefix='', save_format='png', follow_links=False):
+                 data_format=None, save_to_dir=None, save_prefix='', save_format='png', follow_links=False, image_or_label="label"):
         if data_format is None:
             data_format = K.image_data_format() #channels_last
         self.directory = directory
         self.FCN_directory = FCN_directory
         self.image_data_generator = image_data_generator
-        self.target_size = tuple(target_size)
+        self.source_size = tuple(source_size)
+        if target_size is None:
+            self.target_size = self.source_size
+        else:
+            self.target_size = tuple(target_size)
+
         if color_mode not in {'rgb', 'grayscale','8channel'}:
             raise ValueError('Invalid color mode:', color_mode,
                              '; expected "rgb", "grayscale", or "8channel.')
@@ -265,19 +274,19 @@ class NeMODirectoryIterator(Iterator):
         self.data_format = data_format
         if self.color_mode == 'rgb':
             if self.data_format == 'channels_last':
-                self.image_shape = self.target_size + (3,)
+                self.image_shape = self.source_size + (3,)
             else:
-                self.image_shape = (3,) + self.target_size
+                self.image_shape = (3,) + self.source_size
         elif self.color_mode == "8channel":
             if self.data_format == 'channels_last':
-                self.image_shape = self.target_size + (8,)
+                self.image_shape = self.source_size + (8,)
             else:
-                self.image_shape = (8,) + self.target_size
+                self.image_shape = (8,) + self.source_size
         else:
             if self.data_format == 'channels_last':
-                self.image_shape = self.target_size + (1,)
+                self.image_shape = self.source_size + (1,)
             else:
-                self.image_shape = (1,) + self.target_size
+                self.image_shape = (1,) + self.source_size
         if class_mode not in {'categorical', 'binary', 'sparse', 'input', 'fixed_RGB', None}:
             raise ValueError('Invalid class_mode:', class_mode, '; expected one of "categorical", "binary", "sparse", "input", "fixed_RGB" or None.')
         self.class_mode = class_mode
@@ -285,6 +294,7 @@ class NeMODirectoryIterator(Iterator):
         self.save_prefix = save_prefix
         self.save_format = save_format
         self.class_weights = class_weights
+        self.image_or_label = image_or_label
 
         white_list_formats = {'png', 'jpg', 'jpeg', 'bmp', 'ppm', 'tif'}
 
@@ -342,9 +352,13 @@ class NeMODirectoryIterator(Iterator):
             self.FCN_filenames = []
             self.min_labelkey = np.min([self.class_indices[k] for k in self.class_indices])
             self.labelkey = [np.uint8(255/self.num_consolclass*i) for i in range(self.min_labelkey, self.min_labelkey+self.num_consolclass)] # Assuming labels are saved according to # of consolclass
-            label_shape = list(self.image_shape)
-            label_shape[self.image_data_generator.channel_axis - 1] = self.num_consolclass
-            self.label_shape = tuple(label_shape)
+            label_shape = list(self.image_shape) # R x C x D
+            if self.image_or_label == "label":
+                label_shape[self.image_data_generator.channel_axis - 1] = self.num_consolclass
+                self.label_shape = tuple(label_shape)
+            else:
+                label_shape = self.target_size + (self.image_shape[-1],)
+                self.label_shape = tuple(label_shape)
 
             for dirpath in (os.path.join(FCN_directory, subdir) for subdir in classes):
                 FCN_results.append(pool.apply_async(_list_valid_filenames_in_directory,
@@ -473,7 +487,7 @@ class NeMODirectoryIterator(Iterator):
                 fname = self.filenames[j]
                 img = load_img(os.path.join(self.directory, fname),
                                grayscale=grayscale,
-                               target_size=self.target_size)
+                               target_size=self.source_size)
                 x = img_to_array(img, data_format=self.data_format)
                 x = self.image_data_generator.standardize(x) # standardize and rescaling is done here
                 if self.image_data_generator.channel_shift_range != 0:
@@ -497,6 +511,49 @@ class NeMODirectoryIterator(Iterator):
                 batch_y = self.classes[index_array]
             elif self.class_mode == 'binary':
                 batch_y = self.classes[index_array].astype(K.floatx())
+            elif self.FCN_directory is not None:
+                if self.image_or_label == "image":
+                    batch_y = np.zeros((len(batch_x),) + self.label_shape, dtype=K.floatx()) # N x R x C x D
+                elif self.image_or_label == "label":
+                    batch_y = np.zeros((len(batch_x),) + self.label_shape, dtype=np.int8) # N x R x C x D
+
+                batch_weights = np.zeros((len(batch_x), self.image_shape[0], self.image_shape[1]), dtype=np.float)
+                for i, j in enumerate(index_array):
+                    fname = self.FCN_filenames[j]
+                    if self.image_or_label == "label":
+                        y = self._load_seg(fname)
+                        if self.image_data_generator.random_rotation:           # flip and rotate according to previous batch_x images
+                            y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
+                        if self.class_weights is not None:
+                            weights = np.zeros((self.image_shape[0], self.image_shape[1]), dtype=np.float)
+                            for k in self.class_weights:
+                                weights[y == self.class_indices[k]] = self.class_weights[k]             #class_weights must be a dictionary
+                            batch_weights[i] = weights
+                        if self.save_to_dir:            # save to dir before y is transformed to categorical tensor
+                            img = y
+                            img = pil_image.fromarray(img.astype('uint8'), 'RGB')
+                            fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_labelimg',
+                                                                                  index=current_index + i,
+                                                                                  hash=index_array[i],
+                                                                                  format=self.save_format)
+                            cv2.imwrite(os.path.join(self.save_to_dir, fname), img)
+                        y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
+                        batch_y[i] = y
+                    elif self.image_or_label == "image":
+                        img = load_img(os.path.join(self.FCN_directory, fname), grayscale=grayscale, target_size=self.target_size)
+                        y = img_to_array(img, data_format=self.data_format)
+                        if self.save_to_dir:            # save to dir before y is transformed to categorical tensor
+                            img = y
+                            img = pil_image.fromarray(img.astype('uint8'), 'RGB')
+                            fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_labelimg',
+                                                                                  index=current_index + i,
+                                                                                  hash=index_array[i],
+                                                                                  format=self.save_format)
+                            img.save(os.path.join(self.save_to_dir, fname))
+                        y = self.image_data_generator.standardize(y) # standardize and rescaling is done here
+                        if self.image_data_generator.channel_shift_range != 0:
+                            y = self.image_data_generator.random_channel_shift(y)  
+                        batch_y[i] = y
             elif self.class_mode == 'categorical':
                 batch_y = np.zeros((len(batch_x), self.num_consolclass), dtype=K.floatx())
                 for i, label in enumerate(self.classes[index_array]):
@@ -505,7 +562,7 @@ class NeMODirectoryIterator(Iterator):
                 # assert self.FCN_directory is not None
                 # Temporarily pass in FCN_directory as fixed RGB values of size [N x N_channels]
                 # batch_y = self.FCN_directory  # probably want to rethink this
-                midpoint = int(self.target_size[0]-1/2)
+                midpoint = int(self.source_size[0]-1/2)
                 batch_y = np.zeros((len(batch_x), 3), dtype=K.floatx())
                 for i, label in enumerate(self.classes[index_array]):
                     # print("batch_x shape: ", batch_x.shape, midpoint)
@@ -517,10 +574,13 @@ class NeMODirectoryIterator(Iterator):
         quick_shape1 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2],z.shape[3])) # convert to B x (C*R) x N_channel
         quick_shape2 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2]))
 
-        if self.class_weights is None:
-            return batch_x, quick_shape1(batch_y)
+        if self.image_or_label == "image":
+            return batch_x, batch_y
         else:
-            return batch_x, quick_shape1(batch_y), quick_shape2(batch_weights)
+            if self.class_weights is None:
+                return batch_x, quick_shape1(batch_y)
+            else:
+                return batch_x, quick_shape1(batch_y), quick_shape2(batch_weights)
 
     def _load_seg(self, fn):
         """Segmentation load method.
@@ -528,13 +588,13 @@ class NeMODirectoryIterator(Iterator):
         # Arguments
             fn: filename of the image (with extension suffix)
         # Returns
-            arr: numpy array of shape self.target_size
+            arr: numpy array of shape self.source_size
         """
         label_path = os.path.join(self.FCN_directory, fn)
         if label_path.endswith('.tif'):
             img = pil_image.open(label_path)
-            if self.target_size:
-                wh_tuple = (self.target_size[1], self.target_size[0])
+            if self.source_size:
+                wh_tuple = (self.source_size[1], self.source_size[0])
             if img.size != wh_tuple:
                 img = img.resize(wh_tuple)
             y = img_to_array(img, data_format=self.data_format)

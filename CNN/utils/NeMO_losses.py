@@ -19,6 +19,9 @@ def flatten_categorical_crossentropy(classes):
         return keras.losses.categorical_crossentropy(y_true, y_pred)
     return f
 
+def charbonnierLoss(y_true, y_pred):
+    return K.mean(K.sqrt(K.square(y_pred - y_true) + K.constant(1e-6)),-1)
+
 def unsupervised_distance_loss(y_fixed, gamma=1):
     # Pass in y_fixed, which is a set of n_classes x n_channels fixed points. Note that n_classes can be increased beyond the original # of classes if need be
     def loss(y_true, y_pred):
