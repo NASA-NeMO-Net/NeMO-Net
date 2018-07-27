@@ -119,18 +119,6 @@ class Res_Encoder(Model):
     def __init__(self, inputs, blocks, weights=None, trainable=True, name='encoder'):
         inverse_pyramid = []
 
-        # split_inputs = None 
-        # if crop_shapes is not None:             # used for multi-input models
-        #     split_inputs = []
-        #     for shape in crop_shapes:
-        #         crop_len = (int(inputs.shape[1])-shape[0])/2
-        #         if (int(inputs.shape[1]) - shape[0])%2 == 0:
-        #             crop_len = int(crop_len)
-        #             split_inputs.append(Cropping2D(cropping=((crop_len,crop_len), (crop_len,crop_len)))(inputs))
-        #         else:
-        #             crop_len_lo = int(np.trunc(crop_len))
-        #             crop_len_hi = int(np.ceil(crop_len))
-        #             split_inputs.append(Cropping2D(cropping=((crop_len_lo,crop_len_hi), (crop_len_lo,crop_len_hi)))(inputs))
 
         # all parallel blocks
         if type(inputs) is list:
@@ -425,7 +413,6 @@ class Test_Hyperopt_Encoder(Res_Encoder):
             blocks.append(block)
 
         super(Test_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
-
 
 class Res34_Encoder(Res_Encoder):
     def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, fcflag = False):

@@ -129,13 +129,13 @@ def SharpMask_FCN(input_shape, classes, decoder_index, weight_decay=0., trainabl
     inputs = Input(shape=input_shape)
     pyramid_layers = decoder_index
 
-    encoder = VGG_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, conv_layers=conv_layers,
+    encoder = Test_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, conv_layers=conv_layers,
         full_layers=full_layers, conv_params=conv_params)
 
 
     feat_pyramid = [encoder.outputs[index] for index in pyramid_layers]
     # Append image to the end of feature pyramid
-    # feat_pyramid.append(inputs)   No need to append inputs here... only if we need to use inputs
+    feat_pyramid.append(inputs)
 
     # Decode feature pyramid
     outputs = VGG_DecoderBlock(feat_pyramid,  classes=classes, scales=scales, weight_decay=weight_decay, 

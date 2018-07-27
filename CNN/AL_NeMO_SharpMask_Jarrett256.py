@@ -21,6 +21,8 @@ import loadcoraldata_utils as coralutils
 from NeMO_models import AlexNetLike, SharpMask_FCN
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 from NeMO_backend import get_model_memory_usage
+import NeMO_layers
+from keras.models import load_model
 from keras.callbacks import (
     ReduceLROnPlateau,
     CSVLogger,
@@ -30,8 +32,8 @@ from keras.callbacks import (
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 256
-batch_size = 12
-model_name = 'SharpMask_Jarrett256'
+batch_size = 16
+model_name = 'SharpMask_Jarrett256_v2'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
@@ -90,6 +92,7 @@ datagen = NeMOImageGenerator(image_shape=[y, x, num_channels],
                                     pixel_std=pixel_std)
 train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     FCN_directory=train_loader.label_dir,
+    source_size=(x,y),
     target_size=(x,y),
     color_mode=train_loader.color_mode,
     passedclasses = labelkey,
@@ -99,6 +102,7 @@ train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
 
 validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
     FCN_directory=val_loader.label_dir,
+    source_size=(x,y),
     target_size=(x,y),
     color_mode=val_loader.color_mode,
     passedclasses = labelkey,
@@ -118,32 +122,43 @@ conv_params = {"filters": [[64] , [64,64,256]*3, [128,128,512]*3, [256,256,1024]
     "pool_size": [(3,3), (1,1), (1,1), (1,1), (1,1)],
     "pool_strides": [(2,2), (1,1), (1,1), (1,1), (1,1)],
     "pad_size": [(0,0), (0,0), (0,0), (0,0), (0,0)],
+    "filters_up": [None]*conv_layers,
+    "upconv_size": [None]*conv_layers,
+    "upconv_strides": [None]*conv_layers,
     "layercombo": ["cbap", "cbacbacs"+"bacbacbacs"*2, "bacbacbacs"*3, "bacbacbacs"*3, "c"],
     "full_filters": [1024,1024],
     "dropout": [0,0]}
 
 bridge_params = {"filters": [None, [128,128,64], [64,64,32], [32,32,16], [16,16,8]],
     "conv_size": [None, (3,3),(3,3),(3,3), (3,3)],
-    "layercombo": [None, "cbacbac", "cbacbac", "cbacbac", "cbacbac"]}
+    "filters_up": [None]*5,
+    "upconv_size": [None]*5,
+    "upconv_strides": [None]*5,
+    "layercombo": ["", "cbacbac", "cbacbac", "cbacbac", "cbacbac"]}
 
 prev_params = {"filters": [None, [128,64], [64,32], [32,16], [16,8]],
     "conv_size": [None, (3,3),(3,3),(3,3), (3,3)],
-    "layercombo": [None, "cbac", "cbac", "cbac", "cbac"]} 
+    "filters_up": [None]*5,
+    "upconv_size": [None]*5,
+    "upconv_strides": [None]*5,
+    "layercombo": ["", "cbac", "cbac", "cbac", "cbac"]} 
 
 next_params = {"filters": [None, 128,64,32,16],
     "conv_size": [None, (3,3),(3,3),(3,3), (3,3)],
-    "layercombo": [None, "ba", "ba", "ba", "ba"]} 
+    "filters_up": [None]*5,
+    "upconv_size": [None]*5,
+    "upconv_strides": [None]*5,
+    "layercombo": ["", "ba", "ba", "ba", "ba"]} 
 
 decoder_index = [0,1,2,3,4]
 upsample = [False,True,True,True,True]
 scales= [1,1,1,1,1]
 
-SharpMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, decoder_index = decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
-    conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params, scales=scales, 
-    bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, upsample=upsample)
+# SharpMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, decoder_index = decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
+#     conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params, scales=scales, 
+#     bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, upsample=upsample)
 
-# SharpMask = AlexNetLike(input_shape=(y, x, num_channels), classes=num_classes, weight_decay=3e-3, trainable_encoder=True, weights=None,
-#     conv_layers=conv_layers, full_layers=0, conv_params=conv_params)
+SharpMask = load_model('./tmp/SharpMask_Jarrett256_v2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D})
 
 optimizer = keras.optimizers.Adam(1e-4)
 

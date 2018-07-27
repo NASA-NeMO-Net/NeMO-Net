@@ -262,6 +262,7 @@ class NeMODirectoryIterator(Iterator):
         self.FCN_directory = FCN_directory
         self.image_data_generator = image_data_generator
         self.source_size = tuple(source_size)
+
         if target_size is None:
             self.target_size = self.source_size
         else:
