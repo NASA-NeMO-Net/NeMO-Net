@@ -472,7 +472,7 @@ class CoralData:
 
 				for nn in range(len(idx)):
 					# Note: i,j are off of truthcrop, and hence when taken against image needs only +image_size to be centered
-					tempimage = self.image[int(i[idx[nn]]/m):int(i[idx[nn]]/2+image_size/2), int(j[idx[nn]]/2):int(j[idx[nn]]/2+image_size/2), :]
+					tempimage = self.image[int(i[idx[nn]]/m):int(i[idx[nn]]/m+image_size/m), int(j[idx[nn]]/m):int(j[idx[nn]]/m+image_size/m), :]
 					temptruthimage = truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]
 					if magimg_path is not None:
 						tempmagimage = magimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]
