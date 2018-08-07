@@ -34,7 +34,10 @@ class CoralData:
 	def __init__(self, Imagepath, Truthpath=None, Testpath = None, Bathypath=None, truth_key=None, load_type="cv2", tfwpath=None):
 		# Load images
 		self.truthimage_consolidated = None
+		self.truthimage = None
 		self.load_type = load_type
+		head, tail = os.path.split(Imagepath)
+		self.imagefilename = tail
 		if load_type == "PIL":
 			self.image = img_to_array(pil_image.open(Imagepath))
 			if Truthpath is not None:
@@ -90,7 +93,7 @@ class CoralData:
 
 				field_vals = list(set([feature.GetFieldAsString('Class_name') for feature in source_layer]))
 				field_vals.sort(key=lambda x: x.lower())
-				if 'NoData' not in field_vals:
+				if 'NoData' not in field_vals: 		# NoData field automatically added to .shp files (this is an artifact from PerosBanhos.shp, which is required)
 					self.class_labels = ['NoData'] + field_vals 	# all unique labels
 
 				x_min, x_max, y_min, y_max = source_layer.GetExtent()
@@ -138,27 +141,30 @@ class CoralData:
 				self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
 				self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
 				self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in range(num_classes))
-			if (Truthpath.endswith('.tif') or Truthpath.endswith('.TIF')) and load_type is "raster":
-				self.truthimage = cv2.imread(Truthpath,cv2.IMREAD_UNCHANGED)
+			if ((Truthpath.endswith('.tif') or Truthpath.endswith('.TIF')) or Truthpath.endswith('.png')) and load_type is "raster":
+				self.truthimage = cv2.imread(Truthpath)
 				class_indices = np.unique(self.truthimage)
 				num_classes = len(class_indices)
-				self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in class_indices)
+				try:
+					self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in class_indices)
 
-				gdal_truthimg = gdal.Open(Truthpath)
-				gdal_truthimg_gt = gdal_truthimg.GetGeoTransform()
-				x_min, x_max, y_min, y_max = gdal_truthimg_gt[0], gdal_truthimg_gt[0]+self.truthimage.shape[1]*gdal_truthimg_gt[1], \
-					gdal_truthimg_gt[3]-self.truthimage.shape[0]*gdal_truthimg_gt[1], gdal_truthimg_gt[3]
-				
-				image_xstart = np.max([0, int((x_min - self.geotransform[0])/pixel_size)])
-				truth_xstart = np.max([0, int((self.geotransform[0] - x_min)/pixel_size)])
-				image_ystart = np.max([0, int((self.geotransform[3] - y_max)/pixel_size)])
-				truth_ystart = np.max([0, int((y_max - self.geotransform[3])/pixel_size)])
+					gdal_truthimg = gdal.Open(Truthpath)
+					gdal_truthimg_gt = gdal_truthimg.GetGeoTransform()
+					x_min, x_max, y_min, y_max = gdal_truthimg_gt[0], gdal_truthimg_gt[0]+self.truthimage.shape[1]*gdal_truthimg_gt[1], \
+						gdal_truthimg_gt[3]-self.truthimage.shape[0]*gdal_truthimg_gt[1], gdal_truthimg_gt[3]
+					
+					image_xstart = np.max([0, int((x_min - self.geotransform[0])/pixel_size)])
+					truth_xstart = np.max([0, int((self.geotransform[0] - x_min)/pixel_size)])
+					image_ystart = np.max([0, int((self.geotransform[3] - y_max)/pixel_size)])
+					truth_ystart = np.max([0, int((y_max - self.geotransform[3])/pixel_size)])
 
-				total_cols = int((np.min([xsize*pixel_size + self.geotransform[0], x_max]) - np.max([self.geotransform[0], x_min]))/pixel_size)
-				total_rows = int((np.min([self.geotransform[3], y_max]) - np.max([-ysize*pixel_size + self.geotransform[3], y_min]))/pixel_size)
+					total_cols = int((np.min([xsize*pixel_size + self.geotransform[0], x_max]) - np.max([self.geotransform[0], x_min]))/pixel_size)
+					total_rows = int((np.min([self.geotransform[3], y_max]) - np.max([-ysize*pixel_size + self.geotransform[3], y_min]))/pixel_size)
 
-				self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
-				self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
+					self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
+					self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
+				except:
+					print("Warning! Truth image not in expected format... loading directly whole image using cv2...")
 
 				gdal_truthimg = None
 		if Bathypath is not None:
@@ -173,10 +179,12 @@ class CoralData:
 				self.class_dict = truth_key
 				self.num_classes = len(self.class_labels) # total number of classes, including those not found
 			else:
-				for item in truth_key: # This was explicitly designed for 4 class Samoa data that comes in different shades of gray, ignore for now
-					self.truthimage[self.truthimage == item] = item_counter
-					item_counter+=1
-				self.num_classes = len(np.unique(self.truthimage))
+				if self.truthimage is not None:
+					for item in truth_key: # This was explicitly designed for 4 class Samoa data that comes in different shades of gray, ignore for now
+						self.truthimage[self.truthimage == item] = item_counter
+						item_counter+=1
+					self.num_classes = len(np.unique(self.truthimage))
+
 		else:
 			try:
 				self.num_classes = len(self.class_labels)
@@ -211,6 +219,19 @@ class CoralData:
 			if self.consolclass_weights[k] == float("inf"):
 				self.consolclass_weights[k] = 0
 		self.consolclass_count = dict((k, (self.truthimage_consolidated == newclassdict[k]).sum()) for k in newclassdict)
+
+	def export_consolidated_truthmap(self, filename):
+		driver = gdal.GetDriverByName('GTiff')
+		# print(self.image.shape)
+		dataset = driver.Create(filename, self.image.shape[1], self.image.shape[0], 1 , gdal.GDT_Byte)
+		dataset.SetGeoTransform(self.geotransform)
+		dataset.SetProjection(self.projection)
+		# print(self.truthimage_consolidated.shape)
+		outband = dataset.GetRasterBand(1)
+		outband.WriteArray(self.truthimage_consolidated[:,:])
+		outband.FlushCache()
+		# dataset.GetRasterBand(1).WriteArray(self.truthimage_consolidated)
+		# dataset.FlushCache()
 
 	def get_anchors(self, classdict, anchorlist):
 		channels = self.image.shape[2]
@@ -291,12 +312,19 @@ class CoralData:
 				item_counter+=1
 			self.num_classes = len(np.unique(self.truthimage))
 
+#### Set pixel mean and std
+# Input:
+# 	mean
+#	std
+	def set_mean_std(self, mean, std):
+		self.pixelmean = mean
+		self.pixelstd = std
+
 #### Set the pixel depth (usually 8-bit = 255)
 # Input:
 # 	depth: Pixel depth
 	def set_depth(self, depth):
-		self.depth = depth
-
+		self.set_mean_std(depth/2, depth/2)
 
 	def _calculate_corner(self, geotransform, column, row):
 		x = geotransform[1]*column + geotransform[2]*row + geotransform[0]
@@ -308,7 +336,7 @@ class CoralData:
 # Output:
 # 	Set of vectorized normalized images, N_images x nrow x ncol x n_channels
 	def _rescale(self, dataset):
-		return (dataset.astype(np.float32) - self.depth/2)/(self.depth/2)
+		return (dataset.astype(np.float32) - self.pixelmean)/(self.pixelstd)
 
 #### Classify from categorical array to label
 # Input:
@@ -331,71 +359,77 @@ class CoralData:
 	    shuffled_labels = labels[permutation,:]
 	    return shuffled_dataset, shuffled_labels 
 
-#### Generate a randomized, normalized set of images/labels from original image + reference labels
-# Note that the label data is only the central pixel label of the defined training image
+#### Generate a randomized, normalized set of points/labels from original image
 # Input:
-# 	image_size: Size of image
-# 	n: Number of images per class
-# 	idxremove: Which index to remove (NOTE: This is NOT the channel index, but is from the index of a list of datasets)
-# 	datasets: list of images, starts as empty []
-# 	labels: list of labels: starts as empty []
-# 	figureson: True/False, displays 1 image from each class
+# 	N: Number of points per class
+#	consolidated: consolidated classes
+#	bandstoexport: specific bands to export (starting at 1)
 # Output:
-# 	datasets: set of randomized, normalized images, N_images x nrow x ncol x n_channels
-# 	labels: set of randomized labels (concurrent with datasets), N_images x num_labels (num_labels = 1 for now)
-	def _generate_randomized_set(self, image_size, n, idxremove, datasets, labels, figureson):
-		crop_len = int(np.floor(image_size/2))
-		try:
-			# Crop the image so that border areas are not considered
-			truthcrop = self.truthimage[crop_len:self.truthimage.shape[0]-crop_len, crop_len:self.truthimage.shape[1]-crop_len]
-		except TypeError:
-			print("Truth/Reference image improperly defined")
-			return
+# 	points: set of randomized points, n x n_channels (defined by bandstoexport) 
+# 	labels: set of randomized labels (concurrent with points), n
+	def generate_randomized_points(self, N, consolidated = False, bandstoexport=None, cmap = None):
 
-		for k in range(self.num_classes):
-			[i,j] = np.where(truthcrop == k)
-			idx = np.asarray(random.sample(range(len(i)), n)).astype(int)
-			datasets[k*n:(k+1)*n,:,:,:] = [self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :] for nn in range(len(idx))]
-			labels[k*n:(k+1)*n,0] = [truthcrop[i[idx[nn]], j[idx[nn]]] for nn in range(len(idx))]
-			# datasets.append([self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :] for nn in range(len(idx))])
-			# labels.append([truthcrop[i[idx[nn]], j[idx[nn]]] for nn in range(len(idx))])
+		if consolidated:
+			export_class_dict = self.consolidated_class_dict
+			truthimage = self.truthimage_consolidated
+			num_classes = self.consolidated_num_classes
+		else:
+			export_class_dict = self.class_dict
+			truthimage = self.truthimage
+			num_classes = self.num_classes
 
-		# datasets = np.asarray(datasets) # train_datasets is in the format of num_labels x N_train x nrows x ncols x n_channels
-		# labels = np.asarray(labels) # train_labels is in the format of num_labels x N_train
-		# datasets = datasets.reshape(self.num_classes*n, image_size, image_size, self.image.shape[-1]) # flatten first 2 dimensions of train_datasets
-		# labels = labels.reshape(self.num_classes*n,1) # flatten into vector
+		points = []
+		labels = []
 
-		if idxremove is not None:
-			datasets = np.delete(datasets,idxremove,-1) # Remove specific last dimension of array
+		for k in export_class_dict:
+			if cmap is None:
+				[i,j] = np.where(truthimage == export_class_dict[k])
+			else:
+				# truthimage is in BGR here
+				[i,j] = np.where(np.all(truthimage == np.asarray(np.asarray(cmap(export_class_dict[k]-1)[-2::-1])*255, dtype=np.uint8), axis=-1))
+			if len(i) != 0:
+				if len(i) < N:
+					idx = [count%len(i) for count in range(N)]
+				else:
+					idx = np.asarray(random.sample(range(len(i)), N)).astype(int)
 
-		if figureson:
-			plt.figure()
-			for i in range(self.num_classes):
-				plt.subplot(1, self.num_classes, i+1)
-				plt.imshow(datasets[i*n,:,:,0:3].astype(np.uint8))
-				# plt.imshow(cv2.cvtColor(datasets[i*n,:,:,0:3], cv2.COLOR_BGR2RGB))
-				if i > 0:
-					plt.axis("off")
-			plt.show()
+				for nn in range(len(idx)):
+					if bandstoexport is not None:
+						bandstoexport = np.asarray(bandstoexport)
+						points.append(self.image[i[idx[nn]],j[idx[nn]],bandstoexport-1])
+					else:
+						points.append(self.image[i[idx[nn]],j[idx[nn]],:])
+					labels.append(truthimage[i[idx[nn]], j[idx[nn]]])
 
-		datasets, labels = self._randomize(datasets, labels)
-		datasets = self._rescale(datasets)
-		return datasets, labels
+		points = np.asarray(points)
+		labels = np.asarray(labels)
+
+		return points, labels
 
 # Input:
 #	exporttrainpath: Directory for exported patch images 
 # 	exportlabelpath: Directory for exported segmented images
 # 	txtfilename: Name of text file to record image names (remember to include '.txt')
-# 	image_size: Size of image
+# 	image_size: Size of image (of the magnified image)
 # 	N: Number of images per class (NOTE: because these are segmented maps, the class is only affiliated with the center pixel)
+# 	magnification: Magnification ratio between truth/image (used for super-resolution)
+#	magimg_path: Magnified image path (truth image)
 # 	lastchannelremove: Remove last channel or not
 # 	labelkey: Naming convention of class labels (NOTE: must be same # as the # of classes)
 # 	subdir: Create subdirectories for each class
-# 	cont: Continuously add to folder, or overwrite
+# 	cont: Continuously add to folder (True), or overwrite (False)
 # 	consolidated: Export consolidated classes instead
-	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, 
-		lastchannelremove = True, labelkey = None, subdir=False, cont = False, consolidated = False, mosaic_mean = 0, mosaic_std = 1):
-		crop_len = int(np.floor(image_size/2))
+# 	mosaic_mean: Channel means
+#	mosaic_std: Channel std
+#	bandstoexport: specific bands to export from raster
+#	exporttype: gdal.GDT_##### types
+#	label_cmap: cmap IN ORDER of export_class_dict
+
+	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, magnification=1, magimg_path=None,
+		lastchannelremove = True, labelkey = None, subdir=False, cont = False, consolidated = False, mosaic_mean = 0, mosaic_std = 1, 
+		bandstoexport=None, exporttype = gdal.GDT_Float32, label_cmap=None):
+		crop_len = int(np.floor(image_size/2)) # crop_len of the MAGNIFIED image
+		m = magnification
 
 		if cont:
 			f = open(exporttrainpath+txtfilename,'a')
@@ -404,6 +438,9 @@ class CoralData:
 
 		counter = 0
 		classcounter = 0
+
+		if magimg_path is not None:
+			magimage = cv2.imread(magimg_path)
 
 		if consolidated:
 			export_class_dict = self.consolidated_class_dict
@@ -435,8 +472,20 @@ class CoralData:
 
 				for nn in range(len(idx)):
 					# Note: i,j are off of truthcrop, and hence when taken against image needs only +image_size to be centered
-					tempimage = self.image[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :]
-					templabel = np.asarray(truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]*(255/num_classes)).astype(np.uint8)
+					tempimage = self.image[int(i[idx[nn]]/m):int(i[idx[nn]]/m+image_size/m), int(j[idx[nn]]/m):int(j[idx[nn]]/m+image_size/m), :]
+					temptruthimage = truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]
+					if magimg_path is not None:
+						tempmagimage = magimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]
+
+					if label_cmap is not None:
+						templabel = np.zeros((temptruthimage.shape[0], temptruthimage.shape[1], 3))
+						counter2 = 0
+						for key in export_class_dict:
+							templabel[temptruthimage == export_class_dict[key]] = np.asarray(label_cmap(counter2)[-2::-1])*255 # 8bit-based cmap
+							counter2 += 1
+						templabel = templabel.astype(np.uint8)
+					else:
+						templabel = np.asarray(temptruthimage*(255/num_classes)).astype(np.uint8) # Scale evenly classes from 0-255 in grayscale
 
 					if lastchannelremove:
 						tempimage = np.delete(tempimage, -1,-1) # Remove last dimension of array
@@ -466,24 +515,45 @@ class CoralData:
 
 						if self.load_type == "raster":
 							driver = gdal.GetDriverByName('GTiff')
-							dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, self.image.shape[2], gdal.GDT_Float32)
-							x, y = self._calculate_corner(self.geotransform, j[idx[nn]]-crop_len, i[idx[nn]]-crop_len)
-							# print(x, self.geotransform[1], y, self.geotransform[5])
-							dataset.SetGeoTransform((x, self.geotransform[1], 0, y, 0, self.geotransform[5]))
+							if bandstoexport is not None:
+								dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, len(bandstoexport), exporttype)
+							else:
+								dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, self.image.shape[2], exporttype)
+							x, y = self._calculate_corner(self.geotransform, j[idx[nn]]-crop_len, i[idx[nn]]-crop_len) # calculate the x,y coordinates
+							dataset.SetGeoTransform((x, self.geotransform[1], 0, y, 0, self.geotransform[5]))	# set geotransform at x,y coordinates
 							dataset.SetProjection(self.projection)
 
-							for chan in range(self.image.shape[2]):
-								dataset.GetRasterBand(chan+1).WriteArray((tempimage[:,:,chan] - mosaic_mean[chan])/mosaic_std[chan])
-								dataset.FlushCache()
-							cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+							if bandstoexport is not None:
+								counter2 = 0
+								for chan in bandstoexport:
+									tempchannel = (tempimage[:,:,chan-1] - mosaic_mean[counter2])/mosaic_std[counter2]
+									tempchannel[tempchannel > 255] = 255			# Artificial ceiling of 255 for RGB ONLY!
+									tempchannel[tempchannel < 0] = 0
+									dataset.GetRasterBand(counter2+1).WriteArray(tempchannel)
+									dataset.FlushCache()
+									counter2 += 1
+							else:
+								for chan in range(self.image.shape[2]):
+									dataset.GetRasterBand(chan+1).WriteArray((tempimage[:,:,chan] - mosaic_mean[chan])/mosaic_std[chan])
+									dataset.FlushCache()
+							if image_or_label == "label":
+								cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+							elif image_or_label == "image":
+								cv2.imwrite(exportlabelpath+subdirpath+truthstr, tempmagimage)
 						else:
 							cv2.imwrite(exporttrainpath+subdirpath+trainstr, tempimage)
-							cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
-						f.write('./' + subdirpath+trainstr+'\n')
+							if magimg_path is None:
+								cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
+							else:
+								cv2.imwrite(exportlabelpath+subdirpath+truthstr, tempmagimage)
+						f.write('./' + subdirpath+trainstr + ' ' + self.imagefilename + ' ' + str(i[idx[nn]])+' '+str(j[idx[nn]]) + '\n')
 					else:
 						cv2.imwrite(exporttrainpath+trainstr, tempimage)
-						cv2.imwrite(exportlabelpath+truthstr, templabel)
-						f.write('./' + trainstr+'\n')
+						if image_or_label == "label":
+							cv2.imwrite(exportlabelpath+truthstr, templabel)
+						elif image_or_label == "image":
+							cv2.imwrite(exportlabelpath+truthstr, tempmagimage)
+						f.write('./' + trainstr + ' ' + self.imagefilename + ' ' + str(i[idx[nn]])+' '+str(j[idx[nn]]) + '\n')
 					print(str(counter*N+nn+1) + '/ ' + str(len(export_class_dict)*N) +' patches exported', end='\r')
 				classcounter += 1
 			counter += 1
@@ -591,6 +661,7 @@ class CoralData:
 
 			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
 			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
+			prob_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size, num_classes))
 
 			truth_predict = self.truthimage[offstart:offstart+whole_predict.shape[0], offstart:offstart+whole_predict.shape[1]]
 
@@ -733,4 +804,106 @@ def confusion_matrix_stats(cm, classes, file2sav = "cm_stats"):
 	
 	# df.to_csv('./output/' +file2save + '.csv')
 
+# fill in last remaining color on a truthmap
+# truthmap_fn: path to truthmap
+# cmap: colormap of colors that already exist in the truthmap
+# lastcolor: last color to fill in, in BGR
+def fill_in_truthmap_lastcolor(truthmap_fn, cmap, lastcolor):
+	truthmap = cv2.imread(truthmap_fn) 	# Read in as BGR
+	cmap_8bit = np.asarray([np.asarray(cmap(i)[-2::-1])*255 for i in range(len(cmap.colors))], dtype = np.uint8)	 #in BGR
 
+	replacemap = np.ones((truthmap.shape[0], truthmap.shape[1]), dtype=np.bool)
+	for color in cmap_8bit:
+		idx = np.where(np.all(truthmap==color, axis=-1))
+		replacemap[idx] = False
+	truthmap[replacemap] = lastcolor
+	return truthmap
+
+# fill in empty pixels based upon surrounding pixel colors
+# truthmap_fn: path to truthmap (classified from people)
+# surroundingarea: square grid size arround classification pixel (pick an odd number!)
+def fill_in_truthmap(truthmap_fn, surroundingarea, nofillcolor=None):
+	if nofillcolor is None:
+		white = np.asarray([255,255,255])
+	else:
+		white = nofillcolor
+	if surroundingarea % 2 == 0:
+		raise ValueError('Please choose an odd number for fill_in_truthmap surroundingarea')
+	truthmap = cv2.imread(truthmap_fn)
+	y,x = np.where(np.all(truthmap == white, axis=-1))
+	for j,i in zip(y,x):
+		crop_len = int((surroundingarea-1)/2)
+		found_replace = False
+		while found_replace is False:
+			tempy_min = max(j-crop_len,0)
+			tempy_max = min(j+crop_len+1,truthmap.shape[0])
+			tempx_min = max(i-crop_len,0)
+			tempx_max = min(i+crop_len+1, truthmap.shape[1])
+			truthmap_patch = truthmap[tempy_min:tempy_max,tempx_min:tempx_max,:]
+			unq, unq_count = np.unique(truthmap_patch.reshape(-1, truthmap_patch.shape[2]), return_counts=True, axis=0)
+			idx = np.where(np.all(unq == white, axis=-1))
+
+			if len(idx[0]) > 0: 		# Get rid of white counts
+				unq = np.delete(unq, idx, axis=0)
+				unq_count = np.delete(unq_count, idx, axis=0)
+
+			if len(unq) > 0:			# Make sure there is still at least 1 unique left
+				found_replace = True
+			else:						# If no uniques left, increment area by 1
+				crop_len += 1
+		maxidx = np.argmax(unq_count)
+		truthmap[j,i] = unq[maxidx]
+	return truthmap
+
+# Loads patch from mosaiced .tif file
+# imagepath: file where raster file is located
+# specific_fn: specific patch filename of the NxN patch being loaded
+# trainfile: file where all info is stored for all NxN patches
+# image_size: Size of image (just 1 number since it is a square)
+# offset: (y,x) offset of patch to load in tuple
+def load_specific_patch(imagepath, specific_fn, trainfile, image_size, offset=0):
+	f = open(trainfile,"r")
+	col = []
+	row = []
+	rastername = []
+	patch_name = []
+	for line in f:
+		infosplit = line.split(" ")
+		col.append(int(infosplit[-1]))
+		row.append(int(infosplit[-2]))
+		rastername.append(infosplit[-3])
+		patch_path = ' '.join(infosplit[0:-3])
+		head, tail = os.path.split(patch_path)
+		patch_name.append(tail)
+
+	idx = patch_name.index(specific_fn)
+	raster = CoralData(imagepath+'/'+rastername[idx], load_type="raster")
+	patch = raster.image[row[idx]+offset:row[idx]+offset+image_size, col[idx]+offset:col[idx]+offset+image_size, :]
+	projection = raster.projection
+	# geotransform is organized as [top left x, w-e pixel resolution, 0, top left y, 0, n-s pixel resolution (negative)]
+	# print(raster.geotransform)
+	geotransform = [g for g in raster.geotransform]
+	# geotransform = [(g[0]+offset*g[1], g[1], g[2], g[3]+offset*g[5], g[4], g[5]) for g in raster.geotransform]
+	# geotransform = raster.geotransform
+	geotransform[0] = geotransform[0] + offset*geotransform[1]
+	geotransform[3] = geotransform[3] + offset*geotransform[5]
+
+	return patch, projection, geotransform
+
+# Turns RGB cmap into dictionary-defined truthmap
+# Note: Dictionary might go from 1 to num_classes, and hence the grayscale truthmap will go from num_classes:255/num_classes:255
+# RGBpath: path to all RGB truthmaps
+# Graypath: Final path to put all Grayscale truthmaps
+# cmap: RGB cmap
+# class_dict: Dictionary associated with each color to class (make sure it's in same order as cmap!)
+def transform_RGB2Gray(RGBpath, Graypath, cmap, class_dict):
+	files = [f for f in os.listdir(RGBpath) if os.path.isfile(os.path.join(RGBpath,f))]
+	classvalues = [class_dict[k] for k in class_dict]
+	cmap_len = len(cmap.colors)
+	for f in files:
+		BGRpatch = cv2.imread(os.path.join(RGBpath,f))
+		Graypatch = np.zeros((BGRpatch.shape[0],BGRpatch.shape[1]), dtype=np.uint8)
+		for i in range(cmap_len):
+			y,x = np.where(np.all(BGRpatch == np.asarray(np.asarray(cmap(i)[-2::-1])*255, dtype=np.uint8), axis=-1))
+			Graypatch[y,x] = np.uint8(classvalues[i]*255/cmap_len)
+		cv2.imwrite(os.path.join(Graypath,f), Graypatch)

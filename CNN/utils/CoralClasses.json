@@ -104,6 +104,17 @@
     "Deep water": 9,
     "Other": 10
   },
+  "VedConsolidated_ClassDict":{
+  	"Coral": 1,
+  	"Sediment": 2,
+  	"Beach": 3,
+  	"Seagrass": 4,
+  	"Terrestrial vegetation": 5,
+  	"Deep water": 6,
+  	"Clouds": 7,
+  	"Wave breaking": 8,
+  	"Other or Unknown": 9
+  },
   "PerosBanhos2L3_Dict": {
     "NoData": "Other", 
     "back reef - pavement": "Back-reef pavement", 
@@ -237,5 +248,31 @@
     "Seagrass Meadows": "Seagrass meadows",
     "Deep Ocean Water": "Deep water",
     "Other": "Other"
+  },
+  "L32VedConsolidated_Dict":{
+    "Reef Crest - coralline algae ridge": "Coral",
+    "Fore-reef deep slope": "Coral",
+    "Fore-reef shallow slope": "Coral",
+    "Fore-reef shallow terrace": "Coral",
+    "Fore-reef octocorals-dominated (Caribbean)": "Coral",
+    "Back-reef pavement": "Coral",
+    "Back-reef coral framework": "Coral",
+    "Back-reef coral bommies": "Coral",
+    "Back-reef octocorals-dominated (Caribbean)": "Coral",
+    "Lagoon Pinnacle reefs": "Coral",
+    "Lagoon Patch reefs": "Coral",
+    "Lagoon Fringing reefs": "Coral",
+    "Lagoon Deep water": "Deep water",
+    "Fore-reef sand flats": "Sediment",
+    "Back-reef sediment-dominated": "Sediment",
+    "Lagoon sediment apron - Barren": "Sediment",
+    "Terrestrial Vegetated": "Terrestrial vegetation",
+    "Terrestrial Mangroves": "Terrestrial vegetation",
+    "Intertidal Wetlands": "Terrestrial vegetation",
+    "Beach (sand)": "Beach",
+    "Beach (rock)": "Beach",
+    "Seagrass Meadows": "Seagrass",
+    "Deep Ocean Water": "Deep water",
+    "Other": "Other or Unknown"
   }
 }
