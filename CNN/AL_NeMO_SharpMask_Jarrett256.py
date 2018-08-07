@@ -154,11 +154,11 @@ decoder_index = [0,1,2,3,4]
 upsample = [False,True,True,True,True]
 scales= [1,1,1,1,1]
 
-# SharpMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, decoder_index = decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
-#     conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params, scales=scales, 
-#     bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, upsample=upsample)
+SharpMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, decoder_index = decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
+    conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params, scales=scales, 
+    bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, upsample=upsample)
 
-SharpMask = load_model('./tmp/SharpMask_Jarrett256_v2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D})
+# SharpMask = load_model('./tmp/SharpMask_Jarrett256_v2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D})
 
 optimizer = keras.optimizers.Adam(1e-4)
 

@@ -12,17 +12,18 @@ import importlib
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 from osgeo import gdal
 
+from matplotlib import colors
 
 # Fill in truth maps as taken from Jarrett's submissions
-imagepath = "/home/asli/Documents/NeMO-Net Data/"
-startpath = "../Images/UserSubmissions/"
+imagepath = "/home/asli/Documents/NeMO-Net Data/processed_Fiji_files"
+startpath = "../Images/UserSubmissions"
 finalpath_RGB = "../Images/Jarrett_submissions/Original/"
 os.makedirs(os.path.dirname(finalpath_RGB), exist_ok=True)
 finalpath_patch = "../Images/Jarrett_submissions/Patches/"
 os.makedirs(os.path.dirname(finalpath_patch), exist_ok=True)
 finalpath_truthmap = "../Images/Jarrett_submissions/Truthmaps_RGB/"
 os.makedirs(os.path.dirname(finalpath_truthmap), exist_ok=True)
-rasterfile = startpath + "rastertrain.txt"
+rasterfile = startpath + "/rastertrain.txt"
 
 image_size = 256
 offset = 128
@@ -30,8 +31,9 @@ offset = 128
 alldir = [os.path.join(startpath,o) for o in os.listdir(startpath) if os.path.isdir(os.path.join(startpath,o))]
 counter = 0
 for d in alldir:
-    files = [f for f in os.listdir(d) if os.path.isfile(os.path.join(d,f))]
+    files = [f for f in os.listdir(d) if f.endswith('.tiff')]
     for f in files:
+        print(os.path.join(d,f))
         fillmap = coralutils.fill_in_truthmap(os.path.join(d,f), 3, nofillcolor=np.asarray([0,0,0]))
         filestr = "Coral_" + str(counter).zfill(8) + ".png"
         cv2.imwrite(os.path.join(finalpath_truthmap,filestr), fillmap)
@@ -75,7 +77,7 @@ TrainingPatch_dir = '../Images/Jarrett_Training_Patches/Coral/'
 os.makedirs(os.path.dirname(TrainingPatch_dir), exist_ok=True)
 src_files = os.listdir(finalpath_patch)
 for f in src_files:
-	full_f = os.path.join(TrainingPatch_dir, f)
+	full_f = os.path.join(finalpath_patch, f)
 	if (os.path.isfile(full_f)):
 		shutil.copy(full_f, TrainingPatch_dir)
 shutil.copy(rasterfile, '../Images/Jarrett_Training_Patches/')
@@ -85,7 +87,7 @@ TrainingRef_dir = '../Images/Jarrett_TrainingRef_Patches/Coral/'
 os.makedirs(os.path.dirname(TrainingRef_dir), exist_ok=True)
 src_files = os.listdir(Graypath)
 for f in src_files:
-	full_f = os.path.join(TrainingRef_dir, f)
+	full_f = os.path.join(Graypath, f)
 	if (os.path.isfile(full_f)):
 		shutil.copy(full_f, TrainingRef_dir)
 
@@ -94,7 +96,7 @@ ValidPatch_dir = '../Images/Jarrett_Valid_Patches/Coral/'
 os.makedirs(os.path.dirname(ValidPatch_dir), exist_ok=True)
 src_files = os.listdir(finalpath_patch)
 for f in src_files:
-	full_f = os.path.join(ValidPatch_dir, f)
+	full_f = os.path.join(finalpath_patch, f)
 	if (os.path.isfile(full_f)):
 		shutil.copy(full_f, ValidPatch_dir)
 shutil.copy(rasterfile, '../Images/Jarrett_Valid_Patches/')
@@ -104,6 +106,6 @@ ValidRef_dir = '../Images/Jarrett_ValidRef_Patches/Coral/'
 os.makedirs(os.path.dirname(ValidRef_dir), exist_ok=True)
 src_files = os.listdir(Graypath)
 for f in src_files:
-	full_f = os.path.join(ValidRef_dir, f)
+	full_f = os.path.join(Graypath, f)
 	if (os.path.isfile(full_f)):
 		shutil.copy(full_f, ValidRef_dir)
