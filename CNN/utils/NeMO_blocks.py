@@ -114,7 +114,8 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_boo
           #   if test_size > x.shape[1]:
           #     temp_padsize = int(np.ceil((test_size-int(x.shape[1]))/2))
           #     x = ZeroPadding2D(padding=(temp_padsize,temp_padsize))(x)
-          print("stats: ", block_name, f(filters,c_count), f(kernel_size,c_count), f(conv_strides,c_count), f(padding,c_count), f(dilation_rate,c_count), weight_decay)
+          print("block:", block_name, "filters:", f(filters,c_count), "conv_size:", f(kernel_size,c_count), "conv_strides:", f(conv_strides,c_count), 
+            "padding:", f(padding,c_count), "dilation_rate:", f(dilation_rate,c_count), "weight_decay:", weight_decay)
 
           x = Conv2D(f(filters,c_count), f(kernel_size,c_count), strides=f(conv_strides,c_count), padding=f(padding,c_count), dilation_rate=f(dilation_rate,c_count),
             kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay), name='{}_conv{}'.format(block_name,c_count+1))(x)
@@ -142,7 +143,7 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_boo
           start_x = x
           s_count +=1
         if layer_char == "u":
-          print("stats: ", block_name, f(filters_up,u_count), f(kernel_size_up,u_count), f(strides_up,u_count))
+          print("block: ", block_name, "filters_up:", f(filters_up,u_count), "conv_size_up:", f(kernel_size_up,u_count), "strides_up:", f(strides_up,u_count))
           x = Conv2DTranspose(f(filters_up,u_count), f(kernel_size_up,u_count), strides=f(strides_up,u_count), padding='same', kernel_initializer='he_normal', 
             name='{}_convT{}'.format(block_name, u_count+1))(x)
           u_count +=1

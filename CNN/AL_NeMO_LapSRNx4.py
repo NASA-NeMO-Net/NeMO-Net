@@ -146,26 +146,16 @@ conv_params = {"filters":[([64,128],[64,128],[64,128]), 128, ([128],[]), ([128],
 #     "full_filters": [1024,1024],
 #     "dropout": [0,0]}
 
-bridge_params = {"filters": [None,3,3],
-    "conv_size": [None,(2,2),(2,2)],
-    "filters_up": [None,None,None],
-    "upconv_size": [None,None,None],
-    "upconv_strides": [None,None,None],
+bridge_params = {"filters": [3],
+    "conv_size": [(2,2)],
     "layercombo": ["", "ca", "ca"]}
 
-prev_params = {"filters": [None, None, None],
-    "conv_size": [None, None, None],
-    "filters_up": [None,3,3],
-    "upconv_size": [None, (2,2), (2,2)],
-    "upconv_strides": [None, (2,2), (2,2)],
-    "layercombo": [None, "u", "u"]} 
+prev_params = { "filters_up": [3],
+    "upconv_size": [(2,2)],
+    "upconv_strides": [(2,2)],
+    "layercombo": ["", "u", "u"]} 
 
-next_params = {"filters": [None,None, None],
-    "conv_size": [None, None, None],
-    "filters_up": [None, None, None],
-    "upconv_size": [None, None, None],
-    "upconv_strides": [None, None, None],
-    "layercombo": ["", "", ""]} 
+next_params = {"layercombo": ["", "", ""]} 
 
 decoder_index = [5,0,1]     # Input is added manually in the model, last one is not used
 upsample = [False,False,False]
@@ -185,10 +175,10 @@ TestArchitecture.summary()
 TestArchitecture.compile(loss=charbonnierLoss, optimizer=optimizer)
 print("Memory required (GB): ", get_model_memory_usage(batch_size, TestArchitecture))
 
-TestArchitecture.fit_generator(train_generator,
-    steps_per_epoch=125,
-    epochs=100,
-    validation_data=validation_generator,
-    validation_steps=20,
-    verbose=1,
-    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+# TestArchitecture.fit_generator(train_generator,
+#     steps_per_epoch=125,
+#     epochs=100,
+#     validation_data=validation_generator,
+#     validation_steps=20,
+#     verbose=1,
+#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])

@@ -208,18 +208,70 @@ class Alex_Encoder(Res_Encoder):
 
         super(Alex_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
-def load_specific_param(num_layers, default_conv_params, conv_params, specific_param, layer_str="convolutional"):
-    default_param = default_conv_params[specific_param]
-    try:
-        param = conv_params[specific_param]
+def recursive_concatcombo(layercombo):
+
+    if type(layercombo) is str:
+        return layercombo
+
+    if type(layercombo) is tuple or list:
+        a = [recursive_concatcombo(combo) for combo in layercombo]
+    return a
+
+def flatten_list(S):
+    if S == []:
+        return S
+    if isinstance(S[0], list):
+        return flatten_list(S[0]) + flatten_list(S[1:])
+    return S[:1] + flatten_list(S[1:])
+
+
+def load_specific_param(num_layers, conv_params, specific_param, combokey, supercombo, default_conv_params=None, layer_str="convolutional"):
+    # default_param = default_conv_params[specific_param]
+    # supercombo = [combo for combo in layercombo]
+    param = []
+
+    if specific_param is "layercombo":
+        try:
+            param = conv_params[specific_param]
+        except:
+            print("Please specify {} parameter of length {}".format(specific_param,num_layers))
+
+        if len(param) == 1:     # if only one param, use that for all the layers
+            param = [param]*num_layers
+
         if len(param) != num_layers:
-            print("Found {} {} layers but {} {}, will only replace initial {} {}...".format(num_layers, layer_str, len(param), specific_param, len(param), specific_param))
-            for i in range(len(param), num_layers):
-                param.append(default_param[i])
-        print("{}: {}".format(specific_param, param[:num_layers]))
-    except:
-        print("{} not found, reverting to default: {}".format(specific_param,default_param[:num_layers]))
-        param = default_param
+            print("{} parameter not the same length as the # of {} layers: {}".format(specific_param,layer_str,num_layers))
+            raise ValueError
+    else:
+        if combokey in supercombo:
+            try:
+                param = conv_params[specific_param]
+            except:
+                print("{} parameter not found, please specify it in the params dictionary as it is required".format(specific_param))
+                raise ValueError
+
+            if len(param) == 1:     # if only one param, use that for all the layers
+                param = [param]*num_layers
+
+            if len(param) != num_layers:
+                print("{} parameter not the same length as the # of {} layers: {}".format(specific_param,layer_str,num_layers))
+                raise ValueError
+    if len(param) is 0:
+        param = [None]*num_layers
+
+    print("{}: {}".format(specific_param, param))
+
+    # try:
+    #     param = conv_params[specific_param]
+
+    #     if len(param) != num_layers:
+    #         print("Found {} {} layers but {} {}, will only replace initial {} {}...".format(num_layers, layer_str, len(param), specific_param, len(param), specific_param))
+    #         for i in range(len(param), num_layers):
+    #             param.append(default_param[i])
+    #     print("{}: {}".format(specific_param, param[:num_layers]))
+    # except:
+    #     print("{} not found, reverting to default: {}".format(specific_param,default_param[:num_layers]))
+    #     param = default_param
 
     return param
 
@@ -227,24 +279,31 @@ def load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
     print("---------------------------------------------------------")
     print("ENCODER CONVOLUTIONAL PARAMETERS:")
 
-    filters = load_specific_param(conv_layers, default_conv_params, conv_params, "filters")
-    conv_size = load_specific_param(conv_layers, default_conv_params, conv_params, "conv_size")
-    conv_strides = load_specific_param(conv_layers, default_conv_params, conv_params, "conv_strides")
-    padding = load_specific_param(conv_layers, default_conv_params, conv_params, "padding")
-    dilation_rate = load_specific_param(conv_layers, default_conv_params, conv_params, "dilation_rate")
-    pool_size = load_specific_param(conv_layers, default_conv_params, conv_params, "pool_size")
-    pool_strides = load_specific_param(conv_layers, default_conv_params, conv_params, "pool_strides")
-    pad_size = load_specific_param(conv_layers, default_conv_params, conv_params, "pad_size")
+    layercombo = load_specific_param(conv_layers, conv_params, "layercombo", '', '', default_conv_params)
+    supercombo = recursive_concatcombo(layercombo) # turns list + tuples into all lists
+    supercombo = ''.join(flatten_list(supercombo)) # flattens list recursively
 
-    filters_up = load_specific_param(conv_layers, default_conv_params, conv_params, "filters_up")
-    upconv_size = load_specific_param(conv_layers, default_conv_params, conv_params, "upconv_size")
-    upconv_strides = load_specific_param(conv_layers, default_conv_params, conv_params, "upconv_strides")
+    filters = load_specific_param(conv_layers, conv_params, "filters", 'c', supercombo, default_conv_params)
+    conv_size = load_specific_param(conv_layers, conv_params, "conv_size", 'c', supercombo, default_conv_params)
+    conv_strides = load_specific_param(conv_layers, conv_params, "conv_strides", 'c', supercombo, default_conv_params)
+    padding = load_specific_param(conv_layers, conv_params, "padding", 'c', supercombo, default_conv_params)
+    dilation_rate = load_specific_param(conv_layers, conv_params, "dilation_rate", 'c', supercombo, default_conv_params)
+    pool_size = load_specific_param(conv_layers, conv_params, "pool_size", 'p', supercombo, default_conv_params)
+    pool_strides = load_specific_param(conv_layers, conv_params, "pool_strides", 'p', supercombo, default_conv_params)
+    pad_size = load_specific_param(conv_layers, conv_params, "pad_size", 'z', supercombo, default_conv_params)
 
-    layercombo = load_specific_param(conv_layers, default_conv_params, conv_params, "layercombo")
+    filters_up = load_specific_param(conv_layers, conv_params, "filters_up", 'u', supercombo, default_conv_params)
+    upconv_size = load_specific_param(conv_layers, conv_params, "upconv_size", 'u', supercombo, default_conv_params)
+    upconv_strides = load_specific_param(conv_layers, conv_params, "upconv_strides", 'u', supercombo, default_conv_params)
+
 
     # batchnorm_pos = load_specific_param(conv_layers, default_conv_params, conv_params, "batchnorm_pos") #old version has batchnorm_bool
-    full_filters = load_specific_param(full_layers, default_conv_params, conv_params, "full_filters", layer_str="fully connected")
-    dropout = load_specific_param(full_layers, default_conv_params, conv_params, "dropout", layer_str="fully connected")
+    if full_layers > 0:
+        full_filters = load_specific_param(full_layers, conv_params, "full_filters", 'f', ['f'], default_conv_params, layer_str="fully connected") 
+        dropout = load_specific_param(full_layers, conv_params, "dropout", 'f', ['f'], default_conv_params, layer_str="fully connected")
+    else:
+        full_filters = 0
+        dropout = 0
 
     return filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, layercombo, full_filters, dropout
 
@@ -377,7 +436,7 @@ class VGG_Hyperopt_Encoder(Res_Encoder):
 
         super(VGG_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
-class Test_Hyperopt_Encoder(Res_Encoder):
+class Recursive_Hyperopt_Encoder(Res_Encoder):
     def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, 
         conv_layers=5, full_layers=2, conv_params=None):
 
@@ -412,7 +471,7 @@ class Test_Hyperopt_Encoder(Res_Encoder):
             block = vgg_fcblock(full_filters, full_layers, dropout_bool=True, dropout=dropout, weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
-        super(Test_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
+        super(Recursive_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 
 class Res34_Encoder(Res_Encoder):
     def __init__(self, inputs, classes, weight_decay=0., weights=None, trainable=True, fcflag = False):

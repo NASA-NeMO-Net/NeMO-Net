@@ -13,7 +13,7 @@ from keras.layers import Input, Flatten, Activation, Reshape, Dense, Cropping2D
 from NeMO_layers import CroppingLike2D, BilinearUpSampling2D
 from keras.regularizers import l2
 from keras.layers.convolutional import Conv2D, AveragePooling2D
-from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Res34_Encoder, Alex_Hyperopt_Encoder, Alex_Parallel_Hyperopt_Encoder, VGG_Hyperopt_Encoder, Test_Hyperopt_Encoder
+from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Res34_Encoder, Alex_Hyperopt_Encoder, Alex_Parallel_Hyperopt_Encoder, VGG_Hyperopt_Encoder, Recursive_Hyperopt_Encoder
 from NeMO_decoders import VGGDecoder, VGGUpsampler, VGG_DecoderBlock
 from NeMO_functional_encoders import Func_Parallel_Hyperopt_Encoder
 from NeMO_backend import get_model_memory_usage
@@ -44,7 +44,7 @@ def TestModel(input_shape, classes, decoder_index, weight_decay=0., trainable_en
     inputs = Input(shape=input_shape)
     pyramid_layers = decoder_index
 
-    encoder = Test_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, conv_layers=conv_layers,
+    encoder = Recursive_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, conv_layers=conv_layers,
         full_layers=full_layers, conv_params=conv_params)
 
 
@@ -129,7 +129,7 @@ def SharpMask_FCN(input_shape, classes, decoder_index, weight_decay=0., trainabl
     inputs = Input(shape=input_shape)
     pyramid_layers = decoder_index
 
-    encoder = Test_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, conv_layers=conv_layers,
+    encoder = Recursive_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, conv_layers=conv_layers,
         full_layers=full_layers, conv_params=conv_params)
 
 
