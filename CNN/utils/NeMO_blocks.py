@@ -42,6 +42,7 @@ def recursive_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pa
   pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), filters_up=None, kernel_size_up=None, strides_up=None, dropout=0, 
   layercombo='capb', layercombine='sum', combinecount=0, weight_decay=0., block_name='convblock'):
     def f(input):
+      tempcombinecount = combinecount
       x = input
       g = lambda input,c_count: input[c_count] if type(input) is list else input
 
@@ -51,20 +52,33 @@ def recursive_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pa
         for i in range(len(layercombo)):
           x = recursive_conv(h(filters,i), h(kernel_size,i), h(conv_strides,i), h(padding,i), h(pad_bool,i), h(pad_size,i), h(pool_size,i),
             h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h(dropout,i), 
-            layercombo[i], layercombine, combinecount-1, weight_decay, block_name='{}_par{}'.format(block_name, i+1))(startx)
+            layercombo[i], layercombine, tempcombinecount, weight_decay, block_name='{}_par{}'.format(block_name, i+1))(startx)
+          tempcombinecount += 1
           end_x.append(x)
-        if layercombine[combinecount] is "cat":
+
+        if type(layercombine) is list:
+          if layercombine[combinecount] is "cat":
             x = concatenate(end_x, axis=-1)
-        elif layercombine[combinecount] is "sum":
+          elif layercombine[combinecount] is "sum":
             x = add(end_x)
-        else:
-            print("Undefined method of combining parallel layers!")
+          else:
+            print("Undefined layercombine!")
             raise ValueError
+        else:
+          if layercombine is "cat":
+            x = concatenate(end_x, axis=-1)
+          elif layercombine is "sum":
+            x = add(end_x)
+          else:
+            print("Undefined layercombine!")
+            raise ValueError
+
       elif type(layercombo) is list:
         for i in range(len(layercombo)):
           x = recursive_conv(h(filters,i), h(kernel_size,i), h(conv_strides,i), h(padding,i), h(pad_bool,i), h(pad_size,i), h(pool_size,i),
             h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h(dropout,i), 
-            layercombo[i], layercombine, combinecount, weight_decay, block_name='{}_str{}'.format(block_name, i+1))(x)
+            layercombo[i], layercombine, tempcombinecount, weight_decay, block_name='{}_str{}'.format(block_name, i+1))(x)
+          tempcombinecount += 1
       else:
         x = alex_conv(filters, kernel_size, conv_strides, padding, pad_bool, pad_size, pool_size, pool_strides, dilation_rate, filters_up, kernel_size_up, strides_up, dropout, 
           layercombo, weight_decay, block_name)(x)

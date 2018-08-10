@@ -474,10 +474,15 @@ class Recursive_Hyperopt_Encoder(Res_Encoder):
         # actual start of CNN
         blocks = []
         for i in range(conv_layers):
+            if type(layercombine[i]) is list:
+                combinecount = len(layercombine[i])-1
+            else:
+                combinecount = 0
+
             block_name = 'vgg_convblock{}'.format(i + 1)
             block = recursive_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], pool_size=pool_size[i],
                     pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], filters_up=filters_up[i], kernel_size_up=upconv_size[i], strides_up=upconv_strides[i],
-                    layercombo=layercombo[i], layercombine=layercombine[i], combinecount=len(layercombine[i])-1, weight_decay=weight_decay, block_name=block_name)
+                    layercombo=layercombo[i], layercombine=layercombine[i], combinecount=0, weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
         if full_layers > 0:

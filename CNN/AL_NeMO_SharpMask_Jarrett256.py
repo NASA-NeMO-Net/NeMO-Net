@@ -114,9 +114,9 @@ conv_layers = 5
 full_layers = 0
 
 # First 4 megablocks of the resnet-50 architecture
-conv_params = {"filters": [[64] , [64,64,256]*3, [128,128,512]*3, [256,256,1024]*3, [512]],
-    "conv_size": [[(7,7)] , [(1,1),(3,3),(1,1)]*3, [(1,1),(3,3),(1,1)]*3, [(1,1),(3,3),(1,1)]*3, [(1,1)]],
-    "conv_strides": [(1,1), [(2,2)]+[(1,1)]*8 , [(2,2)]+[(1,1)]*8 , [(2,2)]+[(1,1)]*8, [(1,1)]],
+conv_params = {"filters": [[64] , [([64,64,256],256)]*3, [128,128,512]*3, [256,256,1024]*3, [512]],
+    "conv_size": [[(7,7)] , [([(1,1),(3,3),(1,1)], (1,1))]*3, [(1,1),(3,3),(1,1)]*3, [(1,1),(3,3),(1,1)]*3, [(1,1)]],
+    "conv_strides": [(1,1), [([(2,2),(1,1),(1,1)], (2,2))] + [(1,1)]*2 , [(2,2)]+[(1,1)]*8 , [(2,2)]+[(1,1)]*8, [(1,1)]],
     "padding": ['same', 'same', 'same', 'same', 'same'],
     "dilation_rate": [(1,1), (1,1), (1,1), (1,1), (1,1)],
     "pool_size": [(3,3), (1,1), (1,1), (1,1), (1,1)],
@@ -125,8 +125,8 @@ conv_params = {"filters": [[64] , [64,64,256]*3, [128,128,512]*3, [256,256,1024]
     "filters_up": [None]*conv_layers,
     "upconv_size": [None]*conv_layers,
     "upconv_strides": [None]*conv_layers,
-    "layercombo": ["cbap", [("cbacbac","")]+[("bacbacbac","")]*2, "bacbacbacs"*3, "bacbacbacs"*3, "c"],
-    "layercombine": ["",["sum"]*3,"","",""],           
+    "layercombo": ["cbap", [("cbacbac","c")]+[("bacbacbac","")]*2, "bacbacbacs"*3, "bacbacbacs"*3, "c"],
+    "layercombine": ["","sum","","",""],           
     "full_filters": [1024,1024],
     "dropout": [0,0]}
 
