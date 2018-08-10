@@ -237,7 +237,7 @@ def load_specific_param(num_layers, conv_params, specific_param, combokey, super
             print("Please specify {} parameter of length {}".format(specific_param,num_layers))
 
         if len(param) == 1:     # if only one param, use that for all the layers
-            param = [param]*num_layers
+            param = param*num_layers
 
         if len(param) != num_layers:
             print("{} parameter not the same length as the # of {} layers: {}".format(specific_param,layer_str,num_layers))
@@ -250,7 +250,7 @@ def load_specific_param(num_layers, conv_params, specific_param, combokey, super
             param = ['sum']*num_layers
         
         if len(param) == 1:
-            param = [param]*num_layers
+            param = param*num_layers
             
         if len(param) != num_layers:
             print("{} parameter not the same length as the # of {} layers: {}".format(specific_param, layer_str, num_layers))
@@ -264,7 +264,7 @@ def load_specific_param(num_layers, conv_params, specific_param, combokey, super
                 raise ValueError
 
             if len(param) == 1:     # if only one param, use that for all the layers
-                param = [param]*num_layers
+                param = param*num_layers
 
             if len(param) != num_layers:
                 print("{} parameter not the same length as the # of {} layers: {}".format(specific_param,layer_str,num_layers))
@@ -482,7 +482,7 @@ class Recursive_Hyperopt_Encoder(Res_Encoder):
             block_name = 'vgg_convblock{}'.format(i + 1)
             block = recursive_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], pool_size=pool_size[i],
                     pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], filters_up=filters_up[i], kernel_size_up=upconv_size[i], strides_up=upconv_strides[i],
-                    layercombo=layercombo[i], layercombine=layercombine[i], combinecount=0, weight_decay=weight_decay, block_name=block_name)
+                    layercombo=layercombo[i], layercombine=layercombine[i], combinecount=[-1], weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
         if full_layers > 0:

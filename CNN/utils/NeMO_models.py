@@ -68,10 +68,10 @@ def TestModel(input_shape, classes, decoder_index, weight_decay=0., trainable_en
     return Model(inputs=inputs, outputs=outputs)
 
 
-def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, convpattern = None, full_layers=1, conv_params=None):
+def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=0, full_layers=0, conv_params=None):
     inputs = Input(shape=input_shape)
-    encoder = VGG_Hyperopt_Encoder(inputs, classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, 
-        conv_layers=conv_layers, convpattern=convpattern, full_layers=full_layers, conv_params=conv_params)
+    encoder = Recursive_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, 
+        conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
     encoder_output = encoder.outputs[0]
 
     return Model(inputs=inputs, output=encoder_output)
