@@ -242,6 +242,19 @@ def load_specific_param(num_layers, conv_params, specific_param, combokey, super
         if len(param) != num_layers:
             print("{} parameter not the same length as the # of {} layers: {}".format(specific_param,layer_str,num_layers))
             raise ValueError
+    elif specific_param is "layercombine":
+        try:
+            param = conv_params[specific_param]
+        except:
+            print("{} not specified... will use 'sum' function where appropriate".format(specific_param))
+            param = ['sum']*num_layers
+        
+        if len(param) == 1:
+            param = [param]*num_layers
+            
+        if len(param) != num_layers:
+            print("{} parameter not the same length as the # of {} layers: {}".format(specific_param, layer_str, num_layers))
+            raise ValueError
     else:
         if combokey in supercombo:
             try:
@@ -282,6 +295,7 @@ def load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
     layercombo = load_specific_param(conv_layers, conv_params, "layercombo", '', '', default_conv_params)
     supercombo = recursive_concatcombo(layercombo) # turns list + tuples into all lists
     supercombo = ''.join(flatten_list(supercombo)) # flattens list recursively
+    layercombine = load_specific_param(conv_layers, conv_params, "layercombine", '', '', default_conv_params)
 
     filters = load_specific_param(conv_layers, conv_params, "filters", 'c', supercombo, default_conv_params)
     conv_size = load_specific_param(conv_layers, conv_params, "conv_size", 'c', supercombo, default_conv_params)
@@ -305,7 +319,7 @@ def load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
         full_filters = 0
         dropout = 0
 
-    return filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, layercombo, full_filters, dropout
+    return filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, layercombo, layercombine, full_filters, dropout
 
 
 class Alex_Hyperopt_Encoder(Res_Encoder):
@@ -454,7 +468,7 @@ class Recursive_Hyperopt_Encoder(Res_Encoder):
             "layercombo": ["cacapb","cacapba","cacacapb","cacacapb","cacacapb"],
             "full_filters": [2048,2048],
             "dropout": [0.5,0.5]}
-        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, layercombo, full_filters, dropout = \
+        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, layercombo, layercombine, full_filters, dropout = \
             load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
 
         # actual start of CNN
@@ -463,7 +477,7 @@ class Recursive_Hyperopt_Encoder(Res_Encoder):
             block_name = 'vgg_convblock{}'.format(i + 1)
             block = recursive_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], pool_size=pool_size[i],
                     pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], filters_up=filters_up[i], kernel_size_up=upconv_size[i], strides_up=upconv_strides[i],
-                    layercombo=layercombo[i], weight_decay=weight_decay, block_name=block_name)
+                    layercombo=layercombo[i], layercombine=layercombine[i], combinecount=len(layercombine[i])-1, weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
         if full_layers > 0:

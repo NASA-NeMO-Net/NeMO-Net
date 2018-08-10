@@ -131,7 +131,7 @@ conv_params = {"filters":[([64,128],[64,128],[64,128]), 128, ([128],[]), ([128],
     "upconv_size": [[], [], [], [], [], [], (3,3), [], [], [], [], (3,3)],
     "upconv_strides": [[], [], [], [], [], [], (2,2), [], [], [], [], (2,2)],
     "layercombo": [("cbacba","cbacba","cbacba"), "c", ("cba",""), ("cba",""), ("cba",""), ("cba",""), "uba", ("cba",""), ("cba",""), ("cba",""), ("cba",""), "uba"],
-    "full_filters": [1024,1024],
+    "full_filters": [1024],
     "dropout": [0,0]}
 
 # conv_params = {"filters": [[64, 128], [128,[64,128],128]],

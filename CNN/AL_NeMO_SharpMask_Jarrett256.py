@@ -125,7 +125,8 @@ conv_params = {"filters": [[64] , [64,64,256]*3, [128,128,512]*3, [256,256,1024]
     "filters_up": [None]*conv_layers,
     "upconv_size": [None]*conv_layers,
     "upconv_strides": [None]*conv_layers,
-    "layercombo": ["cbap", "cbacbacs"+"bacbacbacs"*2, "bacbacbacs"*3, "bacbacbacs"*3, "c"],
+    "layercombo": ["cbap", [("cbacbac","")]+[("bacbacbac","")]*2, "bacbacbacs"*3, "bacbacbacs"*3, "c"],
+    "layercombine": ["",["sum"]*3,"","",""],           
     "full_filters": [1024,1024],
     "dropout": [0,0]}
 
@@ -167,10 +168,10 @@ SharpMask.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=
 
 print("Memory required (GB): ", get_model_memory_usage(batch_size, SharpMask))
 
-SharpMask.fit_generator(train_generator,
-    steps_per_epoch=50,
-    epochs=100,
-    validation_data=validation_generator,
-    validation_steps=5,
-    verbose=1,
-    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+# SharpMask.fit_generator(train_generator,
+#     steps_per_epoch=50,
+#     epochs=100,
+#     validation_data=validation_generator,
+#     validation_steps=5,
+#     verbose=1,
+#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])

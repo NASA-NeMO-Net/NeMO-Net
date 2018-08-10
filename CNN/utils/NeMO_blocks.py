@@ -6,7 +6,7 @@ from keras.layers import (
     Activation,
     Dense,
     Flatten,
-    concatenate
+    concatenate,
 )
 from keras.layers.convolutional import (
     Conv2D,
@@ -40,7 +40,7 @@ def h(inp,c_count):
 
 def recursive_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_bool=False, pad_size=(0,0),
   pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), filters_up=None, kernel_size_up=None, strides_up=None, dropout=0, 
-  layercombo='capb', weight_decay=0., block_name='convblock'):
+  layercombo='capb', layercombine='sum', combinecount=0, weight_decay=0., block_name='convblock'):
     def f(input):
       x = input
       g = lambda input,c_count: input[c_count] if type(input) is list else input
@@ -51,14 +51,20 @@ def recursive_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pa
         for i in range(len(layercombo)):
           x = recursive_conv(h(filters,i), h(kernel_size,i), h(conv_strides,i), h(padding,i), h(pad_bool,i), h(pad_size,i), h(pool_size,i),
             h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h(dropout,i), 
-            layercombo[i], weight_decay, block_name='{}_par{}'.format(block_name, i+1))(startx)
+            layercombo[i], layercombine, combinecount-1, weight_decay, block_name='{}_par{}'.format(block_name, i+1))(startx)
           end_x.append(x)
-        x = concatenate(end_x, axis=-1)
+        if layercombine[combinecount] is "cat":
+            x = concatenate(end_x, axis=-1)
+        elif layercombine[combinecount] is "sum":
+            x = add(end_x)
+        else:
+            print("Undefined method of combining parallel layers!")
+            raise ValueError
       elif type(layercombo) is list:
         for i in range(len(layercombo)):
           x = recursive_conv(h(filters,i), h(kernel_size,i), h(conv_strides,i), h(padding,i), h(pad_bool,i), h(pad_size,i), h(pool_size,i),
             h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h(dropout,i), 
-            layercombo[i], weight_decay, block_name='{}_str{}'.format(block_name, i+1))(x)
+            layercombo[i], layercombine, combinecount, weight_decay, block_name='{}_str{}'.format(block_name, i+1))(x)
       else:
         x = alex_conv(filters, kernel_size, conv_strides, padding, pad_bool, pad_size, pool_size, pool_strides, dilation_rate, filters_up, kernel_size_up, strides_up, dropout, 
           layercombo, weight_decay, block_name)(x)
