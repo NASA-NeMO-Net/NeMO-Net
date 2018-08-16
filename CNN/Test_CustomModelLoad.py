@@ -31,7 +31,7 @@ from keras.utils import np_utils
 from keras import optimizers
 from keras.preprocessing.image import img_to_array
 from keras.callbacks import Callback
-from NeMO_models import AlexNetLike
+from NeMO_models import AlexNetLike, TestModel, TestModel_EncoderDecoder
 import NeMO_layers
 import NeMO_encoders
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
@@ -56,18 +56,44 @@ full_layers = 0
 num_classes = 8
 
 conv_params = {"filters": [(64,64,64), [([64,(64,64)],128),128]],
-    "conv_size": [(2,2)],
-    "conv_strides": [(1,1)],
+    "conv_size": [((2,2),(3,3),(4,4)), (2,2)],
+    "conv_strides": [(2,2),(1,1)],
     "padding": ['same'],
     "dilation_rate": [(1,1)],
-    "pad_size": [(0,0)],
-    "layercombo": [("cba","cba","cba"), [(["cba",("cba","cba")],"cba"),"c"]],
+    "pool_size": [(2,2)],
+    "pool_strides": [(2,2)],
+#     "filters_up": [3],
+#     "upconv_size": [(3,3)],
+#     "upconv_strides": [(2,2)],
+#     "upconv_type": ["bilinear"],
+    "layercombo": [("cba","cba","cba"), [(["cba",("cba","cba")],"cba"),"cp"]],
     "layercombine": ["cat",["sum","cat"]],           
     "full_filters": [1024,1024],
     "dropout": [0,0]}
 
-TestModel = AlexNetLike(input_shape=(256, 256, 3), classes=num_classes, weight_decay=3e-3, trainable_encoder=True, 
-                weights=None, conv_layers=conv_layers, full_layers=0, conv_params=conv_params)
+bridge_params = {"filters": [None,3],
+    "conv_size": [(2,2)],
+    "conv_strides": [(1,1)],
+    "dilation_rate": [(1,1)],
+    "layercombo": ["ba", "cab"]}
+
+prev_params = { "layercombo": ["", ""]} 
+
+next_params = {"filters": [256,3],
+    "conv_size": [(3,3)],
+    "conv_strides": [(1,1)],
+    "dilation_rate": [(1,1)],
+    "filters_up": [3,3],
+    "upconv_size": [(3,3), (3,3)],
+    "upconv_strides": [(2,2),(2,2)],
+    "upconv_type": ["2dtranspose","bilinear"],
+    "layercombo": ["cabu", "cabu"]}
+
+decoder_index = [0,1]
+scales= [1,1]
+
+TestModel = TestModel_EncoderDecoder(input_shape=(256, 256, 3), classes=num_classes, decoder_index=decoder_index, weight_decay=3e-3, trainable_encoder=True, 
+                weights=None, conv_layers=conv_layers, full_layers=0, conv_params=conv_params, scales=scales, bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
 optimizer = keras.optimizers.Adam(1e-4)
 
 TestModel.summary()

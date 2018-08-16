@@ -39,7 +39,7 @@ def AlexNet(input_shape, classes, weight_decay=0., trainable_encoder=True, weigh
 #     return Model(inputs=inputs, outputs=scores)
 
 def TestModel(input_shape, classes, decoder_index, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=1, full_layers=0, conv_params=None,
-    scales=1, bridge_params=None, prev_params=None, next_params=None, upsample=False):
+    scales=1, bridge_params=None, prev_params=None, next_params=None):
 
     inputs = Input(shape=input_shape)
     pyramid_layers = decoder_index
@@ -53,7 +53,7 @@ def TestModel(input_shape, classes, decoder_index, weight_decay=0., trainable_en
 
     # Decode feature pyramid
     outputs = VGG_DecoderBlock(feat_pyramid,  classes=classes, scales=scales, weight_decay=weight_decay, 
-        bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, upsample=upsample)
+        bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
 
     # final_1b1conv = Conv2D(classes, (1,1), padding="same", kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay), name='final_1b1conv')(outputs)
 
@@ -125,7 +125,7 @@ def VGG_Hyperopt_FCN(input_shape, classes, decoder_index, weight_decay=0., train
     return Model(inputs=inputs, outputs=scores)
 
 def SharpMask_FCN(input_shape, classes, decoder_index, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, full_layers=0, conv_params=None, 
-    scales = 1, bridge_params=None, prev_params=None, next_params=None, upsample=True):
+    scales = 1, bridge_params=None, prev_params=None, next_params=None):
     inputs = Input(shape=input_shape)
     pyramid_layers = decoder_index
 
@@ -148,6 +148,26 @@ def SharpMask_FCN(input_shape, classes, decoder_index, weight_decay=0., trainabl
 
     # return model
     return Model(inputs=inputs, outputs=scores)
+
+def TestModel_EncoderDecoder(input_shape, classes, decoder_index, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, full_layers=0, conv_params=None, 
+    scales = 1, bridge_params=None, prev_params=None, next_params=None):
+    inputs = Input(shape=input_shape)
+    pyramid_layers = decoder_index
+
+    encoder = Recursive_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, conv_layers=conv_layers,
+        full_layers=full_layers, conv_params=conv_params)
+
+
+    feat_pyramid = [encoder.outputs[index] for index in pyramid_layers]
+    # Append image to the end of feature pyramid
+    feat_pyramid.append(inputs)
+
+    # Decode feature pyramid
+    outputs = VGG_DecoderBlock(feat_pyramid,  classes=classes, scales=scales, weight_decay=weight_decay, 
+        bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
+
+    # return model
+    return Model(inputs=inputs, outputs=outputs)
 
 def ResNet34(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None):
     """ Normal Resnet34 

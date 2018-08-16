@@ -48,7 +48,7 @@ def h_f(inp, c_count):
         return inp
 
 def recursive_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_bool=False, pad_size=(0,0),
-  pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), filters_up=None, kernel_size_up=None, strides_up=None, dropout=0, 
+  pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), filters_up=None, kernel_size_up=None, strides_up=None, upconv_type="bilinear", dropout=0, 
   layercombo='capb', layercombine='sum', combinecount=[-1], weight_decay=0., block_name='convblock'):
     def f(input):
       x = input
@@ -59,7 +59,7 @@ def recursive_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pa
         end_x = []
         for i in range(len(layercombo)):
           x = recursive_conv(h_f(filters,i), h(kernel_size,i), h(conv_strides,i), h(padding,i), h(pad_bool,i), h(pad_size,i), h(pool_size,i),
-            h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h(dropout,i), 
+            h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h_f(upconv_type,i), h(dropout,i), 
             layercombo[i], layercombine, combinecount, weight_decay, block_name='{}_par{}'.format(block_name, i+1))(startx)
           # tempcombinecount += 1
           end_x.append(x)
@@ -86,11 +86,11 @@ def recursive_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pa
       elif type(layercombo) is list:
         for i in range(len(layercombo)):
           x = recursive_conv(h_f(filters,i), h(kernel_size,i), h(conv_strides,i), h(padding,i), h(pad_bool,i), h(pad_size,i), h(pool_size,i),
-            h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h(dropout,i), 
+            h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h_f(upconv_type,i), h(dropout,i), 
             layercombo[i], layercombine, combinecount, weight_decay, block_name='{}_str{}'.format(block_name, i+1))(x)
           # tempcombinecount += 1
       else:
-        x = alex_conv(filters, kernel_size, conv_strides, padding, pad_bool, pad_size, pool_size, pool_strides, dilation_rate, filters_up, kernel_size_up, strides_up, dropout, 
+        x = alex_conv(filters, kernel_size, conv_strides, padding, pad_bool, pad_size, pool_size, pool_strides, dilation_rate, filters_up, kernel_size_up, strides_up, upconv_type, dropout, 
           layercombo, weight_decay, block_name)(x)
       return x
     return f
@@ -109,7 +109,7 @@ def recursive_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pa
 # weight_decay: kernel regularizer l2 weight decay [float]
 # block_name: Name of block [string]
 def alex_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_bool=False, pad_size=(0,0), 
-  pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), filters_up=None, kernel_size_up=None, strides_up=None, dropout=0, 
+  pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), filters_up=None, kernel_size_up=None, strides_up=None, upconv_type='bilinear', dropout=0, 
   layercombo='capb', weight_decay=0., block_name='alexblock'):
     def f(input):
       x = input
@@ -173,9 +173,21 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_boo
           start_x = x
           s_count +=1
         if layer_char == "u":
-          print("block: ", block_name, "filters_up:", f(filters_up,u_count), "conv_size_up:", f(kernel_size_up,u_count), "strides_up:", f(strides_up,u_count))
-          x = Conv2DTranspose(f(filters_up,u_count), f(kernel_size_up,u_count), strides=f(strides_up,u_count), padding='same', kernel_initializer='he_normal', 
-            name='{}_convT{}'.format(block_name, u_count+1))(x)
+          print("block: ", block_name, "filters_up:", f(filters_up,u_count), "conv_size_up:", f(kernel_size_up,u_count), "strides_up:", f(strides_up,u_count), "type:", f(upconv_type,u_count))
+          if f(upconv_type,u_count) == "bilinear":
+              xsize = K.int_shape(x)
+              xsize = [i for i in xsize]
+              xsize[1] = int(xsize[1]*f(strides_up,u_count)[0])
+              xsize[2] = int(xsize[2]*f(strides_up,u_count)[1])
+              xsize = tuple(xsize)
+              x = BilinearUpSampling2D(target_shape=xsize, name='{}_BiUp{}'.format(block_name, u_count+1))(x)
+          elif f(upconv_type,u_count) == "2dtranspose":
+              print("size: ", K.int_shape(x))
+              x = Conv2DTranspose(f(filters_up,u_count), f(kernel_size_up,u_count), strides=f(strides_up,u_count), padding='same', kernel_initializer='he_normal', 
+                name='{}_convT{}'.format(block_name, u_count+1))(x)
+          else:
+              print("Undefined upsampling method!")
+              raise ValueError
           u_count +=1
       return x
     return f
@@ -290,20 +302,17 @@ def vgg_convblock(filters, kernel_size, convs=1, conv_strides=(1,1), padding='sa
       return x
     return f
 
-def vgg_deconvblock(classes, scale, bridge_params=None, prev_params=None, next_params=None, upsample=True, target_shape=None, weight_decay=0., block_name='vgg_deconvblock'):
+def vgg_deconvblock(classes, scale, bridge_params=None, prev_params=None, next_params=None, weight_decay=0., block_name='vgg_deconvblock', count=0):
   # bridge_params are organized as [filter, conv_size, layercombo]
     def f(x, y):
         if bridge_params is not None:
           x = alex_conv(bridge_params[0], bridge_params[1], padding='same', pad_size=(0,0), dilation_rate=(1,1), filters_up=bridge_params[2], kernel_size_up=bridge_params[3], strides_up=bridge_params[4],
-            layercombo=bridge_params[5], weight_decay=weight_decay, block_name='{}_bridgeconv'.format(block_name))(x)
-
-        # x = Conv2D(classes, kernel_size=(1,1), activation='linear', padding='valid', kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay),
-        #   name='{}_1b1conv'.format(block_name))(x)
+            upconv_type=bridge_params[5], layercombo=bridge_params[6], weight_decay=weight_decay, block_name='{}_bridgeconv{}'.format(block_name,count))(x)
 
         if y is not None:
           if prev_params is not None:
             y = alex_conv(prev_params[0], prev_params[1], padding='same', pad_size=(0,0), dilation_rate=(1,1), filters_up=prev_params[2], kernel_size_up=prev_params[3], strides_up=prev_params[4],
-              layercombo=prev_params[5], weight_decay=weight_decay, block_name='{}_prevconv'.format(block_name))(y)
+              upconv_type=prev_params[5], layercombo=prev_params[6], weight_decay=weight_decay, block_name='{}_prevconv{}'.format(block_name,count))(y)
           def scaling(xx, ss=1):
             return xx * ss
           scaled = Lambda(scaling, arguments={'ss': scale}, name='{}_scale'.format(block_name))(x)
@@ -311,13 +320,13 @@ def vgg_deconvblock(classes, scale, bridge_params=None, prev_params=None, next_p
 
         if next_params is not None:
           x = alex_conv(next_params[0], next_params[1], padding='same', pad_size=(0,0), dilation_rate=(1,1), filters_up=next_params[2], kernel_size_up=next_params[3], strides_up=next_params[4],
-            layercombo=next_params[5], weight_decay=weight_decay, block_name='{}_nextconv'.format(block_name))(x)
+            upconv_type=next_params[5], layercombo=next_params[6], weight_decay=weight_decay, block_name='{}_nextconv{}'.format(block_name,count))(x)
 
-        if upsample:
-          upscore = BilinearUpSampling2D(target_shape=target_shape, name='{}_BilinearUpsample'.format(block_name))(x)
-        else:
-          upscore = x
-        return upscore
+#         if upsample:
+#           upscore = BilinearUpSampling2D(target_shape=target_shape, name='{}_BilinearUpsample'.format(block_name))(x)
+#         else:
+#           upscore = x
+        return x
     return f
 
 

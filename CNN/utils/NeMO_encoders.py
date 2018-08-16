@@ -309,7 +309,7 @@ def load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
     filters_up = load_specific_param(conv_layers, conv_params, "filters_up", 'u', supercombo, default_conv_params)
     upconv_size = load_specific_param(conv_layers, conv_params, "upconv_size", 'u', supercombo, default_conv_params)
     upconv_strides = load_specific_param(conv_layers, conv_params, "upconv_strides", 'u', supercombo, default_conv_params)
-
+    upconv_type = load_specific_param(conv_layers, conv_params, "upconv_type", 'u', supercombo,default_conv_params)
 
     # batchnorm_pos = load_specific_param(conv_layers, default_conv_params, conv_params, "batchnorm_pos") #old version has batchnorm_bool
     if full_layers > 0:
@@ -319,7 +319,7 @@ def load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
         full_filters = 0
         dropout = 0
 
-    return filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, layercombo, layercombine, full_filters, dropout
+    return filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, upconv_type, layercombo, layercombine, full_filters, dropout
 
 
 class Alex_Hyperopt_Encoder(Res_Encoder):
@@ -468,7 +468,7 @@ class Recursive_Hyperopt_Encoder(Res_Encoder):
             "layercombo": ["cacapb","cacapba","cacacapb","cacacapb","cacacapb"],
             "full_filters": [2048,2048],
             "dropout": [0.5,0.5]}
-        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, layercombo, layercombine, full_filters, dropout = \
+        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, upconv_type, layercombo, layercombine, full_filters, dropout = \
             load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
 
         # actual start of CNN
@@ -481,7 +481,7 @@ class Recursive_Hyperopt_Encoder(Res_Encoder):
 
             block_name = 'vgg_convblock{}'.format(i + 1)
             block = recursive_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], pool_size=pool_size[i],
-                    pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], filters_up=filters_up[i], kernel_size_up=upconv_size[i], strides_up=upconv_strides[i],
+                    pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], filters_up=filters_up[i], kernel_size_up=upconv_size[i], strides_up=upconv_strides[i], upconv_type=upconv_type[i],
                     layercombo=layercombo[i], layercombine=layercombine[i], combinecount=[-1], weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 
