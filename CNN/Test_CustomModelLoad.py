@@ -73,19 +73,15 @@ conv_params = {"filters": [(64,64,64), [([64,(64,64)],128),128]],
 
 bridge_params = {"filters": [None,3],
     "conv_size": [(2,2)],
-    "conv_strides": [(1,1)],
-    "dilation_rate": [(1,1)],
     "layercombo": ["ba", "cab"]}
 
 prev_params = { "layercombo": ["", ""]} 
 
 next_params = {"filters": [256,3],
     "conv_size": [(3,3)],
-    "conv_strides": [(1,1)],
-    "dilation_rate": [(1,1)],
-    "filters_up": [3,3],
-    "upconv_size": [(3,3), (3,3)],
-    "upconv_strides": [(2,2),(2,2)],
+    "filters_up": [3],
+    "upconv_size": [(3,3)],
+    "upconv_strides": [(2,2)],
     "upconv_type": ["2dtranspose","bilinear"],
     "layercombo": ["cabu", "cabu"]}
 
