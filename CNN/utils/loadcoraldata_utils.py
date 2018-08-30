@@ -412,7 +412,7 @@ class CoralData:
 # 	txtfilename: Name of text file to record image names (remember to include '.txt')
 # 	image_size: Size of image (of the magnified image)
 # 	N: Number of images per class (NOTE: because these are segmented maps, the class is only affiliated with the center pixel)
-# 	magnification: Magnification ratio between truth/image (used for super-resolution)
+#   magnification: Magnification ratio between truth/image (used for super-resolution)
 #	magimg_path: Magnified image path (truth image)
 # 	lastchannelremove: Remove last channel or not
 # 	labelkey: Naming convention of class labels (NOTE: must be same # as the # of classes)
