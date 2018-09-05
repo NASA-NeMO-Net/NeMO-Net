@@ -27,6 +27,9 @@ def h(inp,c_count):
     if len(inp) == 0:
       # print('a return: ', inp)
       return inp
+    
+    if type(inp) is tuple and len(inp) == 1:
+      return inp[0]
 
     if type(inp[0]) is list or type(inp[0]) is tuple:
       # print('b return: ', inp[c_count])
@@ -42,6 +45,8 @@ def h_f(inp, c_count):
     if type(inp) is list or type(inp) is tuple:
         if len(inp) == 0:
             return inp
+        elif len(inp) == 1:
+            return inp[0] 
         else:
             return inp[c_count]
     else:
