@@ -8,6 +8,8 @@ from matplotlib import pyplot as plt
 from PIL import Image as pil_image
 from keras.preprocessing.image import img_to_array
 from sklearn.metrics import confusion_matrix
+from scipy.ndimage.interpolation import zoom
+from scipy.misc import imresize
 from pandas_ml import ConfusionMatrix
 import keras.backend as K
 import itertools
@@ -406,6 +408,22 @@ class CoralData:
 
 		return points, labels
 
+    def export_raster_lores(self, lorespathfile, downscale=0.5):
+        driver = gdal.GetDriverByName('GTiff')
+        
+        downscalesize_x = int(self.image.shape[1]*downscale)
+        downscalesize_y = int(self.image.shape[0]*downscale)
+        dataset = driver.Create(lorespathfile, downscalesize_x, downscalesize_y, self.image.shape[2], gdal.GDT_Float32)
+        
+        dataset.SetGeoTransform((self.geotransform[0], self.geotransform[1]/downscale, 0, self.geotransform[3], 0, self.geotransform[5]/downscale))	# set geotransform at x,y coordinates
+        dataset.SetProjection(self.projection)
+        
+        for chan in range(self.image.shape[2]):
+            lores_image_channel = imresize(self.image[:,:,chan], downscale, mode='F')
+            dataset.GetRasterBand(chan+1).WriteArray(lores_image_channel)
+            dataset.FlushCache()
+        dataset = None
+        
 # Input:
 #	exporttrainpath: Directory for exported patch images 
 # 	exportlabelpath: Directory for exported segmented images
@@ -439,9 +457,24 @@ class CoralData:
 		counter = 0
 		classcounter = 0
 
+        # magnified (hi-res) image if path specified
 		if magimg_path is not None:
-			magimage = cv2.imread(magimg_path)
+            if self.load_type == "raster":
+                magimg_gdal = gdal.Open(magimg_path)
 
+                xsize = magimg_gdal.RasterXSize
+                ysize = magimg_gdal.RasterYSize
+                magimage = np.zeros((ysize,xsize,img.RasterCount))
+
+                for band in range(magimg_gdal.RasterCount):
+                    band += 1
+                    imgband = magimg_gdal.GetRasterBand(band)
+                    magimage[:,:,band-1] = imgband.ReadAsArray()
+                magimg_gdal = None
+            else:
+                magimage = cv2.imread(magimg_path)
+
+        # If consolidation of classes is required
 		if consolidated:
 			export_class_dict = self.consolidated_class_dict
 			truthimage = self.truthimage_consolidated
@@ -453,6 +486,7 @@ class CoralData:
 			truthcrop = self.truthimage[crop_len:self.truthimage.shape[0]-crop_len, crop_len:self.truthimage.shape[1]-crop_len]
 			num_classes = self.num_classes
 
+        # Start export, cycle through all export classes (with or without consolidation)
 		for k in export_class_dict:
 			[i,j] = np.where(truthcrop == export_class_dict[k])
 			if len(i) != 0:
@@ -472,10 +506,10 @@ class CoralData:
 
 				for nn in range(len(idx)):
 					# Note: i,j are off of truthcrop, and hence when taken against image needs only +image_size to be centered
-					tempimage = self.image[int(i[idx[nn]]/m):int(i[idx[nn]]/m+image_size/m), int(j[idx[nn]]/m):int(j[idx[nn]]/m+image_size/m), :]
-					temptruthimage = truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]
+					tempimage = self.image[int(i[idx[nn]]/m):int(i[idx[nn]]/m+image_size/m), int(j[idx[nn]]/m):int(j[idx[nn]]/m+image_size/m), :] # assumes smaller image
+					temptruthimage = truthimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size] # assumes large truth image
 					if magimg_path is not None:
-						tempmagimage = magimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size]
+						tempmagimage = magimage[i[idx[nn]]:i[idx[nn]]+image_size, j[idx[nn]]:j[idx[nn]]+image_size, :] # assumes large image
 
 					if label_cmap is not None:
 						templabel = np.zeros((temptruthimage.shape[0], temptruthimage.shape[1], 3))
@@ -536,12 +570,23 @@ class CoralData:
 								for chan in range(self.image.shape[2]):
 									dataset.GetRasterBand(chan+1).WriteArray((tempimage[:,:,chan] - mosaic_mean[chan])/mosaic_std[chan])
 									dataset.FlushCache()
-							if image_or_label == "label":
+                                    
+                            if magimg_path is None:
 								cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
-							elif image_or_label == "image":
-								cv2.imwrite(exportlabelpath+subdirpath+truthstr, tempmagimage)
+							else:
+                                magdataset = driver.Create(exportlabelpath+subdirpath+truthstr, tempmagimage.shape[0], tempmagimage.shape[1], tempmagimage.shape[2], exporttype)
+                                magdataset.SetGeoTransform((x, self.geotransform[1]*m, 0, y, 0, self.geotransform[5]*m))
+                                magdataset.SetProjection(self.projection)
+                                # Automatically export all channels for magnified (hi-res) image
+                                for chan in range(magdataset.shape[2]):
+                                    magdataset.GetRasterBand(chan+1).WriteArray((tempmagimage[:,:,chan] - mosaic_mean[chan])/mosaic_std[chan])
+                                    magdataset.FlushCache()
+                                
+								# cv2.imwrite(exportlabelpath+subdirpath+truthstr, tempmagimage)
 						else:
 							cv2.imwrite(exporttrainpath+subdirpath+trainstr, tempimage)
+                            
+                            # If need to export magnified image
 							if magimg_path is None:
 								cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)
 							else:
