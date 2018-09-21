@@ -160,14 +160,16 @@ class CoralData:
 					image_ystart = np.max([0, int((self.geotransform[3] - y_max)/pixel_size)])
 					truth_ystart = np.max([0, int((y_max - self.geotransform[3])/pixel_size)])
 
-					total_cols = int((np.min([xsize*pixel_size + self.geotransform[0], x_max]) - np.max([self.geotransform[0], x_min]))/pixel_size)
-					total_rows = int((np.min([self.geotransform[3], y_max]) - np.max([-ysize*pixel_size + self.geotransform[3], y_min]))/pixel_size)
+					total_cols = int((np.min([xsize*pixel_size + self.geotransform[0], x_max]) - np.max([self.geotransform[0], x_min]))//pixel_size)
+					total_rows = int((np.min([self.geotransform[3], y_max]) - np.max([-ysize*pixel_size + self.geotransform[3], y_min]))//pixel_size)
 
 					self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
-					self.truthimage = self.truthimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
+					self.truthimage = self.truthimage[truth_ystart:truth_ystart+int(total_rows*pixel_size//gdal_truthimg_gt[1]), truth_xstart:truth_xstart+int(total_cols*pixel_size//gdal_truthimg_gt[1])]
 				except:
 					print("Warning! Truth image not in expected format... loading directly whole image using cv2...")
 
+				if len(self.truthimage.shape) >= 3:
+					self.truthimage = self.truthimage[:,:,0]
 				gdal_truthimg = None
 		if Bathypath is not None:
 			self.bathyimage = cv2.imread(Bathypath, cv2.IMREAD_UNCHANGED)
@@ -448,6 +450,10 @@ class CoralData:
 		bandstoexport=None, exporttype = gdal.GDT_Float32, label_cmap=None):
 		crop_len = int(np.floor(image_size/2)) # crop_len of the MAGNIFIED image
 		m = magnification
+		if type(mosaic_mean) is int:
+			mosaic_mean = [mosaic_mean]*self.image.shape[2]
+		if type(mosaic_std) is int:
+			mosaic_std = [mosaic_std]*self.image.shape[2]
 
 		if cont:
 			f = open(exporttrainpath+txtfilename,'a')
@@ -463,7 +469,7 @@ class CoralData:
 				magimg_gdal = gdal.Open(magimg_path)
 				xsize = magimg_gdal.RasterXSize
 				ysize = magimg_gdal.RasterYSize
-				magimage = np.zeros((ysize,xsize,img.RasterCount))
+				magimage = np.zeros((ysize,xsize,magimg_gdal.RasterCount))
 
 				for band in range(magimg_gdal.RasterCount):
 					band += 1
@@ -487,6 +493,8 @@ class CoralData:
 
         # Start export, cycle through all export classes (with or without consolidation)
 		for k in export_class_dict:
+			test = np.where(truthcrop == export_class_dict[k])
+			# print("test: ", test)
 			[i,j] = np.where(truthcrop == export_class_dict[k])
 			if len(i) != 0:
 				if len(i) < N:
@@ -549,9 +557,9 @@ class CoralData:
 						if self.load_type == "raster":
 							driver = gdal.GetDriverByName('GTiff')
 							if bandstoexport is not None:
-								dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, len(bandstoexport), exporttype)
+								dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size//m, image_size//m, len(bandstoexport), exporttype)
 							else:
-								dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size, image_size, self.image.shape[2], exporttype)
+								dataset = driver.Create(exporttrainpath+subdirpath+trainstr, image_size//m, image_size//m, self.image.shape[2], exporttype)
 							x, y = self._calculate_corner(self.geotransform, j[idx[nn]]-crop_len, i[idx[nn]]-crop_len) # calculate the x,y coordinates
 							dataset.SetGeoTransform((x, self.geotransform[1], 0, y, 0, self.geotransform[5]))	# set geotransform at x,y coordinates
 							dataset.SetProjection(self.projection)
@@ -577,7 +585,7 @@ class CoralData:
 								magdataset.SetGeoTransform((x, self.geotransform[1]*m, 0, y, 0, self.geotransform[5]*m))
 								magdataset.SetProjection(self.projection)
 								# Automatically export all channels for magnified (hi-res) image
-								for chan in range(magdataset.shape[2]):
+								for chan in range(tempmagimage.shape[2]):
 									magdataset.GetRasterBand(chan+1).WriteArray((tempmagimage[:,:,chan] - mosaic_mean[chan])/mosaic_std[chan])
 									magdataset.FlushCache()
 

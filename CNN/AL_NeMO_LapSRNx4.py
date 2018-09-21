@@ -7,7 +7,7 @@ import keras
 import keras.backend as K
 import tensorflow as tf
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
 global _SESSION
 config = tf.ConfigProto(allow_soft_placement=True)
@@ -30,20 +30,20 @@ from keras.callbacks import (
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 from NeMO_losses import charbonnierLoss
 
-image_size = 16
-batch_size = 64
+image_size = 64
+batch_size = 12
 mag = 4
-model_name = 'SRx4'
+model_name = 'SRx4_Fiji'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
     json_data = json.load(json_file)
 
-#labelkey = json_data["VedConsolidated_ClassDict"]
-labelkey = {'Sand': 0, 'Branching': 1, 'Mounding': 2, 'Rock':3}
+labelkey = json_data["Fiji_ClassDict"]
+# labelkey = {'Sand': 0, 'Branching': 1, 'Mounding': 2, 'Rock':3}
 num_classes = len(labelkey)
 
-with open("init_args - SRx4.yml", 'r') as stream:
+with open("init_args - SRx4_Fiji_newtest.yml", 'r') as stream:
     try:
         init_args = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -59,8 +59,8 @@ elif train_loader.color_mode == '8channel':
 
 y = train_loader.target_size[1]
 x = train_loader.target_size[0]
-pixel_mean =127.5*np.ones(num_channels)
-pixel_std = 127.5*np.ones(num_channels)
+pixel_mean =100*np.ones(num_channels)
+pixel_std = 100*np.ones(num_channels)
 # channel_shift_range = [0.01]*num_channels
 # rescale = np.asarray([[0.95,1.05]]*num_channels)
 
@@ -116,49 +116,66 @@ validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
     # save_format='png',
     # image_or_label="image")
 
-conv_layers = 12
+
+conv_layers = 3
 full_layers = 0
 
-conv_params = {"filters":[([64,128],[64,128],[64,128]), 128, ([128],[]), ([128],[]), ([128],[]), ([128],[]),[], ([128],[]), ([128],[]), ([128],[]), ([128],[]),[]],
-    "conv_size": [([(1,1),(3,3)],[(1,1),(6,6)],[(3,3),(1,1)]), (3,3), ((3,3),[]), ((3,3),[]), ((3,3),[]), ((3,3),[]), [], ((3,3),[]), ((3,3),[]), ((3,3),[]), ((3,3),[]), []],
-    "conv_strides": [(1,1), (1,1), (1,1), (1,1), (1,1), (1,1), [], (1,1), (1,1), (1,1), (1,1), []],
-    "padding": ['same','same','same','same','same','same','same', 'same','same','same','same','same'],
-    "dilation_rate": [(1,1), (1,1), (1,1), (1,1), (1,1), (1,1), [], (1,1), (1,1), (1,1), (1,1), []],
-    "pool_size": [(2,2), (2,2), (2,2), (2,2), (2,2), (2,2),[], (2,2), (2,2), (2,2), (2,2),[]],
-    "pool_strides": [(2,2), (2,2), (2,2), (2,2), (2,2), (2,2),[], (2,2), (2,2), (2,2), (2,2),[]],
-    "pad_size": [(0,0), (0,0), (0,0), (0,0), (0,0), (0,0), [], (0,0), (0,0), (0,0), (0,0), []],
-    "filters_up": [[], [], [], [], [], [], 3, [], [], [], [], 3],
-    "upconv_size": [[], [], [], [], [], [], (3,3), [], [], [], [], (3,3)],
-    "upconv_strides": [[], [], [], [], [], [], (2,2), [], [], [], [], (2,2)],
-    "layercombo": [("cbacba","cbacba","cbacba"), "c", ("cba",""), ("cba",""), ("cba",""), ("cba",""), "uba", ("cba",""), ("cba",""), ("cba",""), ("cba",""), "uba"],
-    "full_filters": [1024],
+conv_params = {"filters":[64,64,64],
+    "conv_size": [[([(1,1),(3,3)], [(1,1),(6,6)], [(3,3),(1,1)]), (3,3)], (3,3), (3,3)],
+    "conv_strides": [(1,1), (1,1), (1,1)],
+    "padding": ['same','same', 'same'],
+    "dilation_rate": [(1,1), (1,1), (1,1)],
+    "filters_up": [None, 64, 64],
+    "upconv_size": [None, (3,3), (3,3)],
+    "upconv_strides": [None, (2,2), (2,2)],
+    "upconv_type": ["","2dtranspose","2dtranspose"],
+    "layercombo": [[("cbacba","cbacba","cbacba"),"c"], [([("cbacbacbacba",""), "cbacbacbacba"], ""), "uba"], [([("cbacbacbacba",""), "cbacbacbacba"], ""), "uba"]],
+    "layercombine": ["cat",["sum","sum"], ["sum","sum"]],
+    "full_filters": [1024,1024],
     "dropout": [0,0]}
 
-# conv_params = {"filters": [[64, 128], [128,[64,128],128]],
-#     "conv_size": [[(7,7), (5,5)], [(1,1),[(2,2),(3,3)],(5,5)]],
-#     "conv_strides": [(1,1),(1,1)],
-#     "padding": ['same', 'same'],
-#     "dilation_rate": [(1,1), (1,1)],
-#     "pool_size": [(2,2), (2,2)],
-#     "pool_strides": [(2,2), (2,2)],
-#     "pad_size": [(0,0), (0,0)],
-#     "layercombo": ["cbacp", ["cba","cacba","cba"]],
-#     "full_filters": [1024,1024],
-#     "dropout": [0,0]}
-
-bridge_params = {"filters": [3],
-    "conv_size": [(2,2)],
+bridge_params = {"filters": [None,8,8],
+    "conv_size": [None,(3,3),(3,3)],
+    "conv_strides": [None,(1,1),(1,1)],
+    "padding": ['same','same','same'],
+    "dilation_rate": [None, (1,1), (1,1)],
     "layercombo": ["", "ca", "ca"]}
 
-prev_params = { "filters_up": [3],
-    "upconv_size": [(2,2)],
-    "upconv_strides": [(2,2)],
+prev_params = {"filters_up": [None,8,8],
+    "upconv_size": [None, (3,3), (3,3)],
+    "upconv_strides": [None, (2,2), (2,2)],
+    "upconv_type": ["","2dtranspose", "2dtranspose"],
     "layercombo": ["", "u", "u"]} 
 
 next_params = {"layercombo": ["", "", ""]} 
 
-decoder_index = [5,0,1]     # Input is added manually in the model, last one is not used
-upsample = [False,False,False]
+# conv_params = {"filters":[([64,128],[64,128],[64,128]), 128, ([128],[]), ([128],[]), ([128],[]), ([128],[]),[], ([128],[]), ([128],[]), ([128],[]), ([128],[]),[]],
+#     "conv_size": [([(1,1),(3,3)],[(1,1),(6,6)],[(3,3),(1,1)]), (3,3), ((3,3),[]), ((3,3),[]), ((3,3),[]), ((3,3),[]), [], ((3,3),[]), ((3,3),[]), ((3,3),[]), ((3,3),[]), []],
+#     "conv_strides": [(1,1), (1,1), (1,1), (1,1), (1,1), (1,1), [], (1,1), (1,1), (1,1), (1,1), []],
+#     "padding": ['same','same','same','same','same','same','same', 'same','same','same','same','same'],
+#     "dilation_rate": [(1,1), (1,1), (1,1), (1,1), (1,1), (1,1), [], (1,1), (1,1), (1,1), (1,1), []],
+#     "pool_size": [(2,2), (2,2), (2,2), (2,2), (2,2), (2,2),[], (2,2), (2,2), (2,2), (2,2),[]],
+#     "pool_strides": [(2,2), (2,2), (2,2), (2,2), (2,2), (2,2),[], (2,2), (2,2), (2,2), (2,2),[]],
+#     "pad_size": [(0,0), (0,0), (0,0), (0,0), (0,0), (0,0), [], (0,0), (0,0), (0,0), (0,0), []],
+#     "filters_up": [[], [], [], [], [], [], 3, [], [], [], [], 3],
+#     "upconv_size": [[], [], [], [], [], [], (3,3), [], [], [], [], (3,3)],
+#     "upconv_strides": [[], [], [], [], [], [], (2,2), [], [], [], [], (2,2)],
+#     "layercombo": [("cbacba","cbacba","cbacba"), "c", ("cba",""), ("cba",""), ("cba",""), ("cba",""), "uba", ("cba",""), ("cba",""), ("cba",""), ("cba",""), "uba"],
+#     "full_filters": [1024],
+#     "dropout": [0,0]}
+
+# bridge_params = {"filters": [3],
+#     "conv_size": [(2,2)],
+#     "layercombo": ["", "ca", "ca"]}
+
+# prev_params = { "filters_up": [3],
+#     "upconv_size": [(2,2)],
+#     "upconv_strides": [(2,2)],
+#     "layercombo": ["", "u", "u"]} 
+
+# next_params = {"layercombo": ["", "", "",""]} 
+
+decoder_index = [1,0,2]     # Input is added manually in the model, last one is not used
 scales= [1,1,1]
 
 # SharpMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, decoder_index = decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
@@ -166,7 +183,7 @@ scales= [1,1,1]
 #     bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, upsample=upsample)
 
 TestArchitecture = TestModel(input_shape=(y, x, num_channels), classes=num_classes, decoder_index=decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
-    conv_layers=conv_layers, full_layers=0, conv_params=conv_params, scales=scales, bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, upsample=upsample)
+    conv_layers=conv_layers, full_layers=0, conv_params=conv_params, scales=scales, bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
 
 optimizer = keras.optimizers.Adam(1e-4)
 
@@ -175,10 +192,10 @@ TestArchitecture.summary()
 TestArchitecture.compile(loss=charbonnierLoss, optimizer=optimizer)
 print("Memory required (GB): ", get_model_memory_usage(batch_size, TestArchitecture))
 
-# TestArchitecture.fit_generator(train_generator,
-#     steps_per_epoch=125,
-#     epochs=100,
-#     validation_data=validation_generator,
-#     validation_steps=20,
-#     verbose=1,
-#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+TestArchitecture.fit_generator(train_generator,
+    steps_per_epoch=400,
+    epochs=100,
+    validation_data=validation_generator,
+    validation_steps=20,
+    verbose=1,
+    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])

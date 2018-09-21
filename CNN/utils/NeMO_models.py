@@ -46,7 +46,8 @@ def TestModel(input_shape, classes, decoder_index, weight_decay=0., trainable_en
 
     encoder = Recursive_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, conv_layers=conv_layers,
         full_layers=full_layers, conv_params=conv_params)
-
+    # outputs1 = Recursive_Hyperopt_Encoder(inputs)?
+    # outputs2 = Recursive_Hyperopt_Encoder(outputs1[0])?
 
     feat_pyramid = [encoder.outputs[index] for index in pyramid_layers]
     feat_pyramid.insert(0,inputs)
@@ -151,7 +152,6 @@ def TestModel_EncoderDecoder(input_shape, classes, decoder_index, weight_decay=0
 
     encoder = Recursive_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, conv_layers=conv_layers,
         full_layers=full_layers, conv_params=conv_params)
-
 
     feat_pyramid = [encoder.outputs[index] for index in pyramid_layers]
     # Append image to the end of feature pyramid

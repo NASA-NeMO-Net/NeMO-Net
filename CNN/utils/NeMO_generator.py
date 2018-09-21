@@ -452,27 +452,53 @@ class NeMODirectoryIterator(Iterator):
             elif self.class_mode == 'binary':
                 batch_y = self.classes[index_array].astype(K.floatx())
             elif self.FCN_directory is not None:
-                batch_y = np.zeros((len(batch_x),) + self.label_shape, dtype=np.int8) # N x R x C x D
+                if self.image_or_label == "image":
+                    batch_y = np.zeros((len(batch_x),) + self.label_shape, dtype=K.floatx()) # N x R x C x D
+                elif self.image_or_label == "label":
+                    batch_y = np.zeros((len(batch_x),) + self.label_shape, dtype=np.int8) # N x R x C x D
                 batch_weights = np.zeros((len(batch_x), self.image_shape[0], self.image_shape[1]), dtype=np.float)
+                
                 for i, j in enumerate(index_array):
                     fname = self.FCN_filenames[j]
-                    y = self._load_seg(fname)
-                    if self.image_data_generator.random_rotation:           # flip and rotate according to previous batch_x images
-                        y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
-                    if self.class_weights is not None:
-                        weights = np.zeros((self.image_shape[0], self.image_shape[1]), dtype=np.float)
-                        for k in self.class_weights:
-                            weights[y == self.class_indices[k]] = self.class_weights[k]             #class_weights must be a dictionary
-                        batch_weights[i] = weights
-                    if self.save_to_dir:            # save to dir before y is transformed to categorical tensor
-                        img = y
-                        fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_labelimg',
-                                                                              index=current_index + i,
-                                                                              hash=index_array[i],
-                                                                              format=self.save_format)
-                        cv2.imwrite(os.path.join(self.save_to_dir, fname), img)
-                    y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
-                    batch_y[i] = y
+                    
+                    if self.image_or_label == "label":
+                        y = self._load_seg(fname)
+                        if self.image_data_generator.random_rotation:           # flip and rotate according to previous batch_x images
+                            y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
+                        if self.class_weights is not None:
+                            weights = np.zeros((self.image_shape[0], self.image_shape[1]), dtype=np.float)
+                            for k in self.class_weights:
+                                weights[y == self.class_indices[k]] = self.class_weights[k]             #class_weights must be a dictionary
+                            batch_weights[i] = weights
+                        if self.save_to_dir:            # save to dir before y is transformed to categorical tensor
+                            img = y
+                            fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_labelimg',
+                                                                                  index=current_index + i,
+                                                                                  hash=index_array[i],
+                                                                                  format=self.save_format)
+                            cv2.imwrite(os.path.join(self.save_to_dir, fname), img)
+                        y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
+                        batch_y[i] = y
+                    elif self.image_or_label == "image":
+                        img = coralutils.CoralData(os.path.join(self.FCN_directory, fname), load_type="raster").image # if image and 8channel, then this must also be 8channel
+                        y = img_to_array(img, data_format=self.data_format)
+                        if self.image_data_generator.random_rotation:           # flip and rotate according to previous batch_x images
+                            y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
+                        if self.save_to_dir:            # save to dir before y is transformed to categorical tensor
+                            img = y
+                            fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_labelimg',
+                                                                                  index=current_index + i,
+                                                                                  hash=index_array[i],
+                                                                                  format='tif')
+                            FCNdriver = gdal.GetDriverByName('GTiff')
+                            FCNdataset = FCNdriver.Create(os.path.join(self.save_to_dir, fname), img.shape[0], img.shape[1], img.shape[2], gdal.GDT_Float32)
+                            for chan in range(img.shape[2]):
+                                FCNdataset.GetRasterBand(chan+1).WriteArray((img[:,:,chan]))
+                                FCNdataset.FlushCache()
+                        y = self.image_data_generator.standardize(y) # standardize and rescaling is done here
+                        if self.image_data_generator.channel_shift_range != 0:
+                            y = self.image_data_generator.random_channel_shift(y)  
+                        batch_y[i] = y
 
             elif self.class_mode == 'categorical':
                 batch_y = np.zeros((len(batch_x), self.num_consolclass), dtype=K.floatx())
@@ -543,6 +569,8 @@ class NeMODirectoryIterator(Iterator):
                     elif self.image_or_label == "image":
                         img = load_img(os.path.join(self.FCN_directory, fname), grayscale=grayscale, target_size=self.target_size)
                         y = img_to_array(img, data_format=self.data_format)
+                        if self.image_data_generator.random_rotation:           # flip and rotate according to previous batch_x images
+                            y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
                         if self.save_to_dir:            # save to dir before y is transformed to categorical tensor
                             img = y
                             img = pil_image.fromarray(img.astype('uint8'), 'RGB')
