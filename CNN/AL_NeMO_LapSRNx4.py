@@ -33,7 +33,7 @@ from NeMO_losses import charbonnierLoss
 image_size = 64
 batch_size = 12
 mag = 4
-model_name = 'SRx4_Fiji'
+model_name = 'SRx4_Fiji_4channel'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
@@ -43,7 +43,7 @@ labelkey = json_data["Fiji_ClassDict"]
 # labelkey = {'Sand': 0, 'Branching': 1, 'Mounding': 2, 'Rock':3}
 num_classes = len(labelkey)
 
-with open("init_args - SRx4_Fiji_newtest.yml", 'r') as stream:
+with open("init_args - SRx4_Fiji.yml", 'r') as stream:
     try:
         init_args = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -52,10 +52,12 @@ with open("init_args - SRx4_Fiji_newtest.yml", 'r') as stream:
 train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
 val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
 
-if train_loader.color_mode == 'rgb':
-    num_channels = 3
-elif train_loader.color_mode == '8channel':
-    num_channels = 8
+# if train_loader.color_mode == 'rgb':
+#     num_channels = 3
+# elif train_loader.color_mode == '8channel':
+#     num_channels = 8
+
+num_channels = 4 # WV2 to Sentinel hard-code
 
 y = train_loader.target_size[1]
 x = train_loader.target_size[0]
@@ -92,7 +94,7 @@ train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     FCN_directory=train_loader.label_dir,
     source_size=(x,y),
     target_size=(x*mag,y*mag),
-    color_mode=train_loader.color_mode,
+    color_mode="4channel",
     passedclasses = labelkey,
     class_mode = 'categorical',
     batch_size = batch_size,
@@ -106,7 +108,7 @@ validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
     FCN_directory=val_loader.label_dir,
     source_size=(x,y),
     target_size=(x*mag,y*mag),
-    color_mode=val_loader.color_mode,
+    color_mode="4channel",
     passedclasses = labelkey,
     class_mode = 'categorical',
     batch_size = batch_size,
@@ -134,14 +136,14 @@ conv_params = {"filters":[64,64,64],
     "full_filters": [1024,1024],
     "dropout": [0,0]}
 
-bridge_params = {"filters": [None,8,8],
+bridge_params = {"filters": [None,num_channels,num_channels],
     "conv_size": [None,(3,3),(3,3)],
     "conv_strides": [None,(1,1),(1,1)],
     "padding": ['same','same','same'],
     "dilation_rate": [None, (1,1), (1,1)],
     "layercombo": ["", "ca", "ca"]}
 
-prev_params = {"filters_up": [None,8,8],
+prev_params = {"filters_up": [None,num_channels,num_channels],
     "upconv_size": [None, (3,3), (3,3)],
     "upconv_strides": [None, (2,2), (2,2)],
     "upconv_type": ["","2dtranspose", "2dtranspose"],
