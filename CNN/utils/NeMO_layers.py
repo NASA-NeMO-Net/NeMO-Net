@@ -10,7 +10,7 @@ from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 class BilinearUpSampling2D(Layer):
     """Upsampling2D with bilinear interpolation."""
 
-    def __init__(self, target_shape=None, data_format=None, **kwargs):
+    def __init__(self, target_shape=None, data_format=None, method='bilinear', **kwargs):
         if data_format is None:
             data_format = K.image_data_format()
         assert data_format in {
@@ -18,6 +18,7 @@ class BilinearUpSampling2D(Layer):
         self.data_format = data_format
         self.input_spec = [InputSpec(ndim=4)]
         self.target_shape = target_shape
+        self.method = method
         if self.data_format == 'channels_first':
             self.target_size = (target_shape[2], target_shape[3])
         elif self.data_format == 'channels_last':
@@ -34,7 +35,7 @@ class BilinearUpSampling2D(Layer):
 
     def call(self, inputs):
         return K1.resize_images(inputs, size=self.target_size,
-                                method='bilinear')
+                                method=self.method)
 
     def get_config(self):
         config = {'target_shape': self.target_shape,

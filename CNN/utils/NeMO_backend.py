@@ -5,7 +5,10 @@ import h5py
 
 def resize_images(x, size, method='bilinear'):
     new_size = tf.convert_to_tensor(size, dtype=tf.int32)
-    resized = tf.image.resize_images(x, new_size)
+    if method is 'bilinear':
+        resized = tf.image.resize_images(x, new_size, method=tf.image.ResizeMethod.BILINEAR)
+    elif method is 'nn':
+        resized = tf.image.resize_images(x, new_size, method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
     return resized
 
 def load_weights(model, weights_path):

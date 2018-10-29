@@ -1,0 +1,32 @@
+# Images and output files #
+###############
+*.tif
+*.tiff
+*.png
+*.out
+*.jpg
+<<<<<<< HEAD
+*.kmz
+||||||| merged common ancestors
+=======
+*.shp
+*.shx
+*.tfw
+*.prj
+*.dbf
+>>>>>>> origin/NewKerasTest
+# TensorFlow  save files #
+###############
+*.meta
+*.index
+*.data*
+# Keras saved files #
+###################
+*.h5
+*.json
+*.hdf5
+*.npy
+*.json
+# Other files #
+################
+*.zip

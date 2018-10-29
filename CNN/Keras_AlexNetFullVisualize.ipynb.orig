@@ -3,27 +3,16 @@
   {
    "cell_type": "code",
 <<<<<<< HEAD
-||||||| merged common ancestors
-<<<<<<<<< Temporary merge branch 1
    "execution_count": 8,
    "metadata": {
     "collapsed": true
    },
    "outputs": [],
-||||||||| merged common ancestors
+||||||| merged common ancestors
    "execution_count": 8,
    "metadata": {},
    "outputs": [],
-=========
 =======
-<<<<<<< HEAD
-   "execution_count": 8,
-   "metadata": {
-    "collapsed": true
-   },
-   "outputs": [],
-=======
->>>>>>> 441d744c2ff9a103d4e2da67de65af0c7de11b27
    "execution_count": 2,
    "metadata": {},
    "outputs": [
@@ -35,12 +24,7 @@
      ]
     }
    ],
-<<<<<<< HEAD
-||||||| merged common ancestors
->>>>>>>>> Temporary merge branch 2
-=======
->>>>>>> NewKerasTest
->>>>>>> 441d744c2ff9a103d4e2da67de65af0c7de11b27
+>>>>>>> origin/NewKerasTest
    "source": [
     "# WRITTEN BY ALAN LI\n",
     "# NASA AMES LABORATORY FOR ADVANCED SENSING (LAS)\n",
@@ -75,32 +59,17 @@
   {
    "cell_type": "code",
 <<<<<<< HEAD
-||||||| merged common ancestors
-<<<<<<<<< Temporary merge branch 1
    "execution_count": 2,
    "metadata": {
     "collapsed": true
    },
-||||||||| merged common ancestors
+||||||| merged common ancestors
    "execution_count": 2,
    "metadata": {},
-=========
 =======
-<<<<<<< HEAD
-   "execution_count": 2,
-   "metadata": {
-    "collapsed": true
-   },
-=======
->>>>>>> 441d744c2ff9a103d4e2da67de65af0c7de11b27
    "execution_count": 3,
    "metadata": {},
-<<<<<<< HEAD
-||||||| merged common ancestors
->>>>>>>>> Temporary merge branch 2
-=======
->>>>>>> NewKerasTest
->>>>>>> 441d744c2ff9a103d4e2da67de65af0c7de11b27
+>>>>>>> origin/NewKerasTest
    "outputs": [],
    "source": [
     "def classifyback(predictions):\n",
@@ -149,28 +118,15 @@
   },
   {
 <<<<<<< HEAD
-||||||| merged common ancestors
-<<<<<<<<< Temporary merge branch 1
    "cell_type": "markdown",
-||||||||| merged common ancestors
+||||||| merged common ancestors
    "cell_type": "code",
    "execution_count": 3,
-=========
 =======
-<<<<<<< HEAD
-   "cell_type": "markdown",
-=======
->>>>>>> 441d744c2ff9a103d4e2da67de65af0c7de11b27
    "cell_type": "code",
    "execution_count": 4,
-<<<<<<< HEAD
-||||||| merged common ancestors
->>>>>>>>> Temporary merge branch 2
-=======
->>>>>>> NewKerasTest
->>>>>>> 441d744c2ff9a103d4e2da67de65af0c7de11b27
+>>>>>>> origin/NewKerasTest
    "metadata": {},
-   "outputs": [],
    "source": [
     "offstart = 0\n",
     "num_classes = 4\n",
