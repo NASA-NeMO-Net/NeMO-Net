@@ -3,6 +3,7 @@ import tensorflow as tf
 import keras.backend as K
 from keras.callbacks import Callback
 
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
 class CheckNumericsOps(Callback):
     """Callback that terminates training when a NaN loss is encountered."""
@@ -30,4 +31,26 @@ class CheckNumericsOps(Callback):
                     if np.any(np.isnan(layer_out)) or np.any(np.isinf(layer_out)):
                         print('The output of {} becomes nan'.format(layer.name))
                         self.model.stop_training = True
+						
+						
 
+class WeightsSaver(Callback):
+    """Callback that saves weights on either epoch end or batch end."""
+
+    def __init__(self, filepath, model_name, N):
+        super(WeightsSaver, self).__init__()
+        self.N = N
+        self.batch = 0
+        self.epoch = 0
+        self.model_name = model_name
+        self.filepath = filepath
+
+    def on_batch_end(self, batch, logs={}):
+        if self.batch % self.N == 0:
+            name = 'weights_' + self.model_name + '_epoch%03d_batch%05d.hdf5'%(self.epoch, self.batch)
+            savestr = self.filepath+name
+            self.model.save_weights(savestr, overwrite=True)
+        self.batch += 1
+
+    def on_epoch_end(self, epoch, logs=None):
+        self.epoch += 1

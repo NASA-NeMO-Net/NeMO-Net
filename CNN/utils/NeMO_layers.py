@@ -4,6 +4,8 @@ from keras.utils import conv_utils
 from keras.engine.topology import Layer
 from keras.engine import InputSpec
 
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
+
 
 class BilinearUpSampling2D(Layer):
     """Upsampling2D with bilinear interpolation."""

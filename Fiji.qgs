@@ -1,0 +1,851 @@
+<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<qgis projectname="" version="2.18.19">
+  <title></title>
+  <autotransaction active="0"/>
+  <evaluateDefaultValues active="0"/>
+  <layer-tree-group expanded="1" checked="Qt::PartiallyChecked" name="">
+    <customproperties/>
+    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Unchecked" id="10truthclass_wcldMask_01120180502181757737" source="F:/Images/processed_Fiji_files/10truthclass_wcldMask_011.TIF" name="10truthclass_wcldMask_011">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Unchecked" id="truth_classes_wcldMask_01120180502182006237" source="F:/Images/processed_Fiji_files/truth_classes_wcldMask_011.TIF" name="truth_classes_wcldMask_011">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Checked" id="mosaiced_01120180502181651207" source="F:/Images/processed_Fiji_files/mosaiced_011.TIF" name="mosaiced_011">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Unchecked" id="mosaiced_01220180502181840411" source="F:/Images/processed_Fiji_files/mosaiced_012.TIF" name="mosaiced_012">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Unchecked" id="10truthclass_wcldMask_00520180502180912504" source="F:/Images/processed_Fiji_files/10truthclass_wcldMask_005.TIF" name="10truthclass_wcldMask_005">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Unchecked" id="truth_classes_wcldMask_00320180507140741132" source="F:/Images/Fiji/truth_classes_wcldMask_003.TIF" name="truth_classes_wcldMask_003">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Unchecked" id="mosaiced_00520180502180346096" source="F:/Images/processed_Fiji_files/mosaiced_005.TIF" name="mosaiced_005">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Unchecked" id="mosaiced_00320180501155916909" source="F:/Images/processed_Fiji_files/mosaiced_003.TIF" name="mosaiced_003">
+      <customproperties>
+        <property key="expandedLegendNodes"/>
+      </customproperties>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Checked" id="mosaiced_00220180503173450970" source="F:/Images/processed_Fiji_files/mosaiced_002.TIF" name="mosaiced_002">
+      <customproperties/>
+    </layer-tree-layer>
+    <layer-tree-layer expanded="0" providerKey="gdal" checked="Qt::Checked" id="mosaiced_00120180501155650324" source="F:/Images/processed_Fiji_files/mosaiced_001.TIF" name="mosaiced_001">
+      <customproperties>
+        <property key="expandedLegendNodes"/>
+      </customproperties>
+    </layer-tree-layer>
+  </layer-tree-group>
+  <relations/>
+  <mapcanvas>
+    <units>meters</units>
+    <extent>
+      <xmin>250630.35182745981728658</xmin>
+      <ymin>8034521.02305047493427992</ymin>
+      <xmax>251369.68307746056234464</xmax>
+      <ymax>8035178.84805046301335096</ymax>
+    </extent>
+    <rotation>0</rotation>
+    <projections>0</projections>
+    <destinationsrs>
+      <spatialrefsys>
+        <proj4>+proj=utm +zone=1 +south +datum=WGS84 +units=m +no_defs</proj4>
+        <srsid>3151</srsid>
+        <srid>32701</srid>
+        <authid>EPSG:32701</authid>
+        <description>WGS 84 / UTM zone 1S</description>
+        <projectionacronym>utm</projectionacronym>
+        <ellipsoidacronym>WGS84</ellipsoidacronym>
+        <geographicflag>false</geographicflag>
+      </spatialrefsys>
+    </destinationsrs>
+    <rendermaptile>0</rendermaptile>
+    <layer_coordinate_transform_info/>
+  </mapcanvas>
+  <layer-tree-canvas>
+    <custom-order enabled="0">
+      <item>mosaiced_00120180501155650324</item>
+      <item>mosaiced_00320180501155916909</item>
+      <item>mosaiced_00520180502180346096</item>
+      <item>10truthclass_wcldMask_00520180502180912504</item>
+      <item>mosaiced_01120180502181651207</item>
+      <item>10truthclass_wcldMask_01120180502181757737</item>
+      <item>mosaiced_01220180502181840411</item>
+      <item>truth_classes_wcldMask_01120180502182006237</item>
+      <item>mosaiced_00220180503173450970</item>
+      <item>truth_classes_wcldMask_00320180507140741132</item>
+    </custom-order>
+  </layer-tree-canvas>
+  <legend updateDrawingOrder="true">
+    <legendlayer drawingOrder="-1" open="false" checked="Qt::Unchecked" name="10truthclass_wcldMask_011" showFeatureCount="0">
+      <filegroup open="false" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="10truthclass_wcldMask_01120180502181757737" visible="0"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="false" checked="Qt::Unchecked" name="truth_classes_wcldMask_011" showFeatureCount="0">
+      <filegroup open="false" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="truth_classes_wcldMask_01120180502182006237" visible="0"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="mosaiced_011" showFeatureCount="0">
+      <filegroup open="true" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="mosaiced_01120180502181651207" visible="1"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="true" checked="Qt::Unchecked" name="mosaiced_012" showFeatureCount="0">
+      <filegroup open="true" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="mosaiced_01220180502181840411" visible="0"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="false" checked="Qt::Unchecked" name="10truthclass_wcldMask_005" showFeatureCount="0">
+      <filegroup open="false" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="10truthclass_wcldMask_00520180502180912504" visible="0"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="false" checked="Qt::Unchecked" name="truth_classes_wcldMask_003" showFeatureCount="0">
+      <filegroup open="false" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="truth_classes_wcldMask_00320180507140741132" visible="0"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="true" checked="Qt::Unchecked" name="mosaiced_005" showFeatureCount="0">
+      <filegroup open="true" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="mosaiced_00520180502180346096" visible="0"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="false" checked="Qt::Unchecked" name="mosaiced_003" showFeatureCount="0">
+      <filegroup open="false" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="mosaiced_00320180501155916909" visible="0"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="mosaiced_002" showFeatureCount="0">
+      <filegroup open="true" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="mosaiced_00220180503173450970" visible="1"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" open="false" checked="Qt::Checked" name="mosaiced_001" showFeatureCount="0">
+      <filegroup open="false" hidden="false">
+        <legendlayerfile isInOverview="0" layerid="mosaiced_00120180501155650324" visible="1"/>
+      </filegroup>
+    </legendlayer>
+  </legend>
+  <projectlayers>
+    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>328844</xmin>
+        <ymin>7877552</ymin>
+        <xmax>341288</xmax>
+        <ymax>7889290</ymax>
+      </extent>
+      <id>10truthclass_wcldMask_00520180502180912504</id>
+      <datasource>F:/Images/processed_Fiji_files/10truthclass_wcldMask_005.TIF</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>10truthclass_wcldMask_005</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=1 +south +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3151</srsid>
+          <srid>32701</srid>
+          <authid>EPSG:32701</authid>
+          <description>WGS 84 / UTM zone 1S</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="embeddedWidgets/count" value="0"/>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="0"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="0.470588" alphaBand="0" classificationMax="10" classificationMinMaxOrigin="CumulativeCutFullExtentEstimated" band="1" classificationMin="1" type="singlebandpseudocolor">
+          <rasterTransparency/>
+          <rastershader>
+            <colorrampshader colorRampType="INTERPOLATED" clip="0">
+              <item alpha="255" value="1" label="1" color="#000004"/>
+              <item alpha="255" value="2" label="2" color="#180f3e"/>
+              <item alpha="255" value="3" label="3" color="#8e9058"/>
+              <item alpha="255" value="4" label="4" color="#cc2cba"/>
+              <item alpha="255" value="5" label="5" color="#5169e1"/>
+              <item alpha="255" value="6" label="6" color="#0ba50d"/>
+              <item alpha="255" value="7" label="7" color="#f1605d"/>
+              <item alpha="255" value="8" label="8" color="#6ffd5c"/>
+              <item alpha="255" value="9" label="9" color="#2a0aa8"/>
+              <item alpha="255" value="10" label="10" color="#fcfdbf"/>
+            </colorrampshader>
+          </rastershader>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>291400</xmin>
+        <ymin>7896936</ymin>
+        <xmax>298342</xmax>
+        <ymax>7908544</ymax>
+      </extent>
+      <id>10truthclass_wcldMask_01120180502181757737</id>
+      <datasource>F:/Images/processed_Fiji_files/10truthclass_wcldMask_011.TIF</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>10truthclass_wcldMask_011</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=1 +south +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3151</srsid>
+          <srid>32701</srid>
+          <authid>EPSG:32701</authid>
+          <description>WGS 84 / UTM zone 1S</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="embeddedWidgets/count" value="0"/>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="0"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="0.470588" alphaBand="0" classificationMax="10" classificationMinMaxOrigin="CumulativeCutFullExtentEstimated" band="1" classificationMin="1" type="singlebandpseudocolor">
+          <rasterTransparency/>
+          <rastershader>
+            <colorrampshader colorRampType="INTERPOLATED" clip="0">
+              <item alpha="255" value="1" label="1" color="#000004"/>
+              <item alpha="255" value="2" label="2" color="#180f3e"/>
+              <item alpha="255" value="3" label="3" color="#8e9058"/>
+              <item alpha="255" value="4" label="4" color="#cc2cba"/>
+              <item alpha="255" value="5" label="5" color="#5169e1"/>
+              <item alpha="255" value="6" label="6" color="#0ba50d"/>
+              <item alpha="255" value="7" label="7" color="#f1605d"/>
+              <item alpha="255" value="8" label="8" color="#6ffd5c"/>
+              <item alpha="255" value="9" label="9" color="#2a0aa8"/>
+              <item alpha="255" value="10" label="10" color="#fcfdbf"/>
+            </colorrampshader>
+          </rastershader>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>249118</xmin>
+        <ymin>8031222</ymin>
+        <xmax>260384</xmax>
+        <ymax>8041246</ymax>
+      </extent>
+      <id>mosaiced_00120180501155650324</id>
+      <datasource>F:/Images/processed_Fiji_files/mosaiced_001.TIF</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>mosaiced_001</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=1 +south +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3151</srsid>
+          <srid>32701</srid>
+          <authid>EPSG:32701</authid>
+          <description>WGS 84 / UTM zone 1S</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="embeddedWidgets/count" value="0"/>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="0"/>
+        <noDataList bandNo="2" useSrcNoData="0"/>
+        <noDataList bandNo="3" useSrcNoData="0"/>
+        <noDataList bandNo="4" useSrcNoData="0"/>
+        <noDataList bandNo="5" useSrcNoData="0"/>
+        <noDataList bandNo="6" useSrcNoData="0"/>
+        <noDataList bandNo="7" useSrcNoData="0"/>
+        <noDataList bandNo="8" useSrcNoData="0"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="1" alphaBand="0" blueBand="6" greenBand="3" type="multibandcolor" redBand="2">
+          <rasterTransparency/>
+          <redContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>207.637</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </redContrastEnhancement>
+          <greenContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>184.949</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </greenContrastEnhancement>
+          <blueContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>134.659</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </blueContrastEnhancement>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>249118</xmin>
+        <ymin>8031222</ymin>
+        <xmax>260384</xmax>
+        <ymax>8041246</ymax>
+      </extent>
+      <id>mosaiced_00220180503173450970</id>
+      <datasource>F:/Images/processed_Fiji_files/mosaiced_002.TIF</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>mosaiced_002</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=1 +south +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3151</srsid>
+          <srid>32701</srid>
+          <authid>EPSG:32701</authid>
+          <description>WGS 84 / UTM zone 1S</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="embeddedWidgets/count" value="0"/>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="0"/>
+        <noDataList bandNo="2" useSrcNoData="0"/>
+        <noDataList bandNo="3" useSrcNoData="0"/>
+        <noDataList bandNo="4" useSrcNoData="0"/>
+        <noDataList bandNo="5" useSrcNoData="0"/>
+        <noDataList bandNo="6" useSrcNoData="0"/>
+        <noDataList bandNo="7" useSrcNoData="0"/>
+        <noDataList bandNo="8" useSrcNoData="0"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="1" alphaBand="0" blueBand="2" greenBand="3" type="multibandcolor" redBand="5">
+          <rasterTransparency/>
+          <redContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>250</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </redContrastEnhancement>
+          <greenContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>250</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </greenContrastEnhancement>
+          <blueContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>250</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </blueContrastEnhancement>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>249118</xmin>
+        <ymin>8031222</ymin>
+        <xmax>260384</xmax>
+        <ymax>8041246</ymax>
+      </extent>
+      <id>mosaiced_00320180501155916909</id>
+      <datasource>F:/Images/processed_Fiji_files/mosaiced_003.TIF</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>mosaiced_003</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=1 +south +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3151</srsid>
+          <srid>32701</srid>
+          <authid>EPSG:32701</authid>
+          <description>WGS 84 / UTM zone 1S</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="embeddedWidgets/count" value="0"/>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="0"/>
+        <noDataList bandNo="2" useSrcNoData="0"/>
+        <noDataList bandNo="3" useSrcNoData="0"/>
+        <noDataList bandNo="4" useSrcNoData="0"/>
+        <noDataList bandNo="5" useSrcNoData="0"/>
+        <noDataList bandNo="6" useSrcNoData="0"/>
+        <noDataList bandNo="7" useSrcNoData="0"/>
+        <noDataList bandNo="8" useSrcNoData="0"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="1" alphaBand="-1" blueBand="6" greenBand="3" type="multibandcolor" redBand="2">
+          <rasterTransparency/>
+          <redContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>191.927</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </redContrastEnhancement>
+          <greenContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>166.883</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </greenContrastEnhancement>
+          <blueContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>144.27</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </blueContrastEnhancement>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="6"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="0"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>328844</xmin>
+        <ymin>7877552</ymin>
+        <xmax>341288</xmax>
+        <ymax>7889290</ymax>
+      </extent>
+      <id>mosaiced_00520180502180346096</id>
+      <datasource>F:/Images/processed_Fiji_files/mosaiced_005.TIF</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>mosaiced_005</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=1 +south +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3151</srsid>
+          <srid>32701</srid>
+          <authid>EPSG:32701</authid>
+          <description>WGS 84 / UTM zone 1S</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="embeddedWidgets/count" value="0"/>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="0"/>
+        <noDataList bandNo="2" useSrcNoData="0"/>
+        <noDataList bandNo="3" useSrcNoData="0"/>
+        <noDataList bandNo="4" useSrcNoData="0"/>
+        <noDataList bandNo="5" useSrcNoData="0"/>
+        <noDataList bandNo="6" useSrcNoData="0"/>
+        <noDataList bandNo="7" useSrcNoData="0"/>
+        <noDataList bandNo="8" useSrcNoData="0"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="1" alphaBand="0" blueBand="1" greenBand="3" type="multibandcolor" redBand="5">
+          <rasterTransparency/>
+          <redContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>200</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </redContrastEnhancement>
+          <greenContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>200</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </greenContrastEnhancement>
+          <blueContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>200</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </blueContrastEnhancement>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>291400</xmin>
+        <ymin>7896936</ymin>
+        <xmax>298342</xmax>
+        <ymax>7908544</ymax>
+      </extent>
+      <id>mosaiced_01120180502181651207</id>
+      <datasource>F:/Images/processed_Fiji_files/mosaiced_011.TIF</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>mosaiced_011</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=1 +south +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3151</srsid>
+          <srid>32701</srid>
+          <authid>EPSG:32701</authid>
+          <description>WGS 84 / UTM zone 1S</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="embeddedWidgets/count" value="0"/>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="0"/>
+        <noDataList bandNo="2" useSrcNoData="0"/>
+        <noDataList bandNo="3" useSrcNoData="0"/>
+        <noDataList bandNo="4" useSrcNoData="0"/>
+        <noDataList bandNo="5" useSrcNoData="0"/>
+        <noDataList bandNo="6" useSrcNoData="0"/>
+        <noDataList bandNo="7" useSrcNoData="0"/>
+        <noDataList bandNo="8" useSrcNoData="0"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="1" alphaBand="0" blueBand="2" greenBand="3" type="multibandcolor" redBand="5">
+          <rasterTransparency/>
+          <redContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>200</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </redContrastEnhancement>
+          <greenContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>200</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </greenContrastEnhancement>
+          <blueContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>200</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </blueContrastEnhancement>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>293506</xmin>
+        <ymin>7896936</ymin>
+        <xmax>298342</xmax>
+        <ymax>7908544</ymax>
+      </extent>
+      <id>mosaiced_01220180502181840411</id>
+      <datasource>F:/Images/processed_Fiji_files/mosaiced_012.TIF</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>mosaiced_012</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=1 +south +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3151</srsid>
+          <srid>32701</srid>
+          <authid>EPSG:32701</authid>
+          <description>WGS 84 / UTM zone 1S</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="embeddedWidgets/count" value="0"/>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="0"/>
+        <noDataList bandNo="2" useSrcNoData="0"/>
+        <noDataList bandNo="3" useSrcNoData="0"/>
+        <noDataList bandNo="4" useSrcNoData="0"/>
+        <noDataList bandNo="5" useSrcNoData="0"/>
+        <noDataList bandNo="6" useSrcNoData="0"/>
+        <noDataList bandNo="7" useSrcNoData="0"/>
+        <noDataList bandNo="8" useSrcNoData="0"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="1" alphaBand="0" blueBand="2" greenBand="3" type="multibandcolor" redBand="5">
+          <rasterTransparency/>
+          <redContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>200</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </redContrastEnhancement>
+          <greenContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>200</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </greenContrastEnhancement>
+          <blueContrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>200</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </blueContrastEnhancement>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+    <maplayer minimumScale="inf" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>249118</xmin>
+        <ymin>8031222</ymin>
+        <xmax>260384</xmax>
+        <ymax>8041246</ymax>
+      </extent>
+      <id>truth_classes_wcldMask_00320180507140741132</id>
+      <datasource>F:/Images/Fiji/truth_classes_wcldMask_003.TIF</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>truth_classes_wcldMask_003</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=1 +south +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3151</srsid>
+          <srid>32701</srid>
+          <authid>EPSG:32701</authid>
+          <description>WGS 84 / UTM zone 1S</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="embeddedWidgets/count" value="0"/>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="0"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer opacity="1" alphaBand="0" classificationMax="43" classificationMinMaxOrigin="User" band="1" classificationMin="1" type="singlebandpseudocolor">
+          <rasterTransparency/>
+          <rastershader>
+            <colorrampshader colorRampType="INTERPOLATED" clip="0">
+              <item alpha="255" value="1" label="1" color="#d79118"/>
+              <item alpha="255" value="2" label="2" color="#db2722"/>
+              <item alpha="255" value="3" label="3" color="#820800"/>
+              <item alpha="255" value="4" label="4" color="#d9e230"/>
+              <item alpha="255" value="5" label="5" color="#ff0000"/>
+              <item alpha="255" value="6" label="6" color="#ea603d"/>
+              <item alpha="255" value="7" label="7" color="#5b4c46"/>
+              <item alpha="255" value="8" label="8" color="#aa978f"/>
+              <item alpha="255" value="9" label="9" color="#f48b50"/>
+              <item alpha="255" value="10" label="10" color="#f89957"/>
+              <item alpha="255" value="11" label="11" color="#fca75e"/>
+              <item alpha="255" value="12" label="12" color="#feb265"/>
+              <item alpha="255" value="13" label="13" color="#feba6e"/>
+              <item alpha="255" value="14" label="14" color="#fec277"/>
+              <item alpha="255" value="15" label="15" color="#fec980"/>
+              <item alpha="255" value="16" label="16" color="#fed189"/>
+              <item alpha="255" value="17" label="17" color="#ffd992"/>
+              <item alpha="255" value="18" label="18" color="#ffe19b"/>
+              <item alpha="255" value="19" label="19" color="#ffe8a4"/>
+              <item alpha="255" value="20" label="20" color="#fff0ad"/>
+              <item alpha="255" value="21" label="21" color="#fff8b6"/>
+              <item alpha="255" value="22" label="22" color="#ffffbf"/>
+              <item alpha="255" value="23" label="23" color="#f7fcbd"/>
+              <item alpha="255" value="24" label="24" color="#eff9ba"/>
+              <item alpha="255" value="25" label="25" color="#e7f6b8"/>
+              <item alpha="255" value="26" label="26" color="#dff2b5"/>
+              <item alpha="255" value="27" label="27" color="#d7efb2"/>
+              <item alpha="255" value="28" label="28" color="#cfecb0"/>
+              <item alpha="255" value="29" label="29" color="#c7e9ad"/>
+              <item alpha="255" value="30" label="30" color="#bfe5ab"/>
+              <item alpha="255" value="31" label="31" color="#b7e2a8"/>
+              <item alpha="255" value="32" label="32" color="#afdfa5"/>
+              <item alpha="255" value="33" label="33" color="#a5d9a5"/>
+              <item alpha="255" value="34" label="34" color="#99d0a7"/>
+              <item alpha="255" value="35" label="35" color="#8dc8a9"/>
+              <item alpha="255" value="36" label="36" color="#80bfac"/>
+              <item alpha="255" value="37" label="37" color="#74b7ae"/>
+              <item alpha="255" value="38" label="38" color="#68aeb0"/>
+              <item alpha="255" value="39" label="39" color="#5ca5b2"/>
+              <item alpha="255" value="40" label="40" color="#4f9db4"/>
+              <item alpha="255" value="41" label="41" color="#4394b6"/>
+              <item alpha="255" value="42" label="42" color="#378cb8"/>
+              <item alpha="255" value="43" label="43" color="#2b83ba"/>
+            </colorrampshader>
+          </rastershader>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+    <maplayer minimumScale="0" maximumScale="1e+08" type="raster" hasScaleBasedVisibilityFlag="0">
+      <extent>
+        <xmin>291400</xmin>
+        <ymin>7896936</ymin>
+        <xmax>298342</xmax>
+        <ymax>7908544</ymax>
+      </extent>
+      <id>truth_classes_wcldMask_01120180502182006237</id>
+      <datasource>F:/Images/processed_Fiji_files/truth_classes_wcldMask_011.TIF</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>truth_classes_wcldMask_011</layername>
+      <srs>
+        <spatialrefsys>
+          <proj4>+proj=utm +zone=1 +south +datum=WGS84 +units=m +no_defs</proj4>
+          <srsid>3151</srsid>
+          <srid>32701</srid>
+          <authid>EPSG:32701</authid>
+          <description>WGS 84 / UTM zone 1S</description>
+          <projectionacronym>utm</projectionacronym>
+          <ellipsoidacronym>WGS84</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <customproperties>
+        <property key="identify/format" value="Value"/>
+      </customproperties>
+      <provider>gdal</provider>
+      <noData>
+        <noDataList bandNo="1" useSrcNoData="0"/>
+      </noData>
+      <map-layer-style-manager current="">
+        <map-layer-style name=""/>
+      </map-layer-style-manager>
+      <pipe>
+        <rasterrenderer gradient="BlackToWhite" opacity="1" alphaBand="-1" type="singlebandgray" grayBand="1">
+          <rasterTransparency/>
+          <contrastEnhancement>
+            <minValue>1</minValue>
+            <maxValue>39</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </contrastEnhancement>
+        </rasterrenderer>
+        <brightnesscontrast brightness="0" contrast="0"/>
+        <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+        <rasterresampler maxOversampling="2"/>
+      </pipe>
+      <blendMode>0</blendMode>
+    </maplayer>
+  </projectlayers>
+  <properties>
+    <Measurement>
+      <DistanceUnits type="QString"></DistanceUnits>
+      <AreaUnits type="QString"></AreaUnits>
+    </Measurement>
+    <SpatialRefSys>
+      <ProjectCRSProj4String type="QString">+proj=longlat +datum=WGS84 +no_defs</ProjectCRSProj4String>
+      <ProjectCrs type="QString">EPSG:4326</ProjectCrs>
+      <ProjectCRSID type="int">3452</ProjectCRSID>
+    </SpatialRefSys>
+    <Paths>
+      <Absolute type="bool">false</Absolute>
+    </Paths>
+    <Gui>
+      <SelectionColorBluePart type="int">0</SelectionColorBluePart>
+      <CanvasColorGreenPart type="int">255</CanvasColorGreenPart>
+      <CanvasColorRedPart type="int">255</CanvasColorRedPart>
+      <SelectionColorRedPart type="int">255</SelectionColorRedPart>
+      <SelectionColorAlphaPart type="int">255</SelectionColorAlphaPart>
+      <SelectionColorGreenPart type="int">255</SelectionColorGreenPart>
+      <CanvasColorBluePart type="int">255</CanvasColorBluePart>
+    </Gui>
+    <Digitizing>
+      <DefaultSnapToleranceUnit type="int">2</DefaultSnapToleranceUnit>
+      <LayerSnappingList type="QStringList"/>
+      <LayerSnappingEnabledList type="QStringList"/>
+      <SnappingMode type="QString">current_layer</SnappingMode>
+      <AvoidIntersectionsList type="QStringList"/>
+      <LayerSnappingToleranceUnitList type="QStringList"/>
+      <LayerSnapToList type="QStringList"/>
+      <DefaultSnapType type="QString">off</DefaultSnapType>
+      <DefaultSnapTolerance type="double">0</DefaultSnapTolerance>
+      <LayerSnappingToleranceList type="QStringList"/>
+    </Digitizing>
+    <PositionPrecision>
+      <DecimalPlaces type="int">2</DecimalPlaces>
+      <Automatic type="bool">true</Automatic>
+    </PositionPrecision>
+    <Legend>
+      <filterByMap type="bool">false</filterByMap>
+    </Legend>
+  </properties>
+  <visibility-presets/>
+</qgis>
