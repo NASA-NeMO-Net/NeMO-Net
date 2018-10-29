@@ -122,6 +122,38 @@ validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
 conv_layers = 3
 full_layers = 0
 
+# Upsampling with 2d transpose convolution
+
+# conv_params = {"filters":[64,64,64],
+#     "conv_size": [[([(1,1),(3,3)], [(1,1),(6,6)], [(3,3),(1,1)]), (3,3)], (3,3), (3,3)],
+#     "conv_strides": [(1,1), (1,1), (1,1)],
+#     "padding": ['same','same', 'same'],
+#     "dilation_rate": [(1,1), (1,1), (1,1)],
+#     "filters_up": [None, 64, 64],
+#     "upconv_size": [None, (3,3), (3,3)],
+#     "upconv_strides": [None, (2,2), (2,2)],
+#     "upconv_type": ["","2dtranspose","2dtranspose"],
+#     "layercombo": [[("cbacba","cbacba","cbacba"),"c"], [([("cbacbacbacba",""), "cbacbacbacba"], ""), "uba"], [([("cbacbacbacba",""), "cbacbacbacba"], ""), "uba"]],
+#     "layercombine": ["cat",["sum","sum"], ["sum","sum"]],
+#     "full_filters": [1024,1024],
+#     "dropout": [0,0]}
+
+# bridge_params = {"filters": [None,num_channels,num_channels],
+#     "conv_size": [None,(3,3),(3,3)],
+#     "conv_strides": [None,(1,1),(1,1)],
+#     "padding": ['same','same','same'],
+#     "dilation_rate": [None, (1,1), (1,1)],
+#     "layercombo": ["", "ca", "ca"]}
+
+# prev_params = {"filters_up": [None,num_channels,num_channels],
+#     "upconv_size": [None, (3,3), (3,3)],
+#     "upconv_strides": [None, (2,2), (2,2)],
+#     "upconv_type": ["","2dtranspose", "2dtranspose"],
+#     "layercombo": ["", "u", "u"]} 
+
+# next_params = {"layercombo": ["", "", ""]} 
+
+# Upsampling with NN upsampling followed by 2d conv
 conv_params = {"filters":[64,64,64],
     "conv_size": [[([(1,1),(3,3)], [(1,1),(6,6)], [(3,3),(1,1)]), (3,3)], (3,3), (3,3)],
     "conv_strides": [(1,1), (1,1), (1,1)],
@@ -130,8 +162,8 @@ conv_params = {"filters":[64,64,64],
     "filters_up": [None, 64, 64],
     "upconv_size": [None, (3,3), (3,3)],
     "upconv_strides": [None, (2,2), (2,2)],
-    "upconv_type": ["","2dtranspose","2dtranspose"],
-    "layercombo": [[("cbacba","cbacba","cbacba"),"c"], [([("cbacbacbacba",""), "cbacbacbacba"], ""), "uba"], [([("cbacbacbacba",""), "cbacbacbacba"], ""), "uba"]],
+    "upconv_type": ["","nn","nn"],
+    "layercombo": [[("cbacba","cbacba","cbacba"),"c"], [([("cbacbacbacba",""), "cbacbacbacba"], ""), "ucba"], [([("cbacbacbacba",""), "cbacbacbacba"], ""), "ucba"]],
     "layercombine": ["cat",["sum","sum"], ["sum","sum"]],
     "full_filters": [1024,1024],
     "dropout": [0,0]}
@@ -143,39 +175,19 @@ bridge_params = {"filters": [None,num_channels,num_channels],
     "dilation_rate": [None, (1,1), (1,1)],
     "layercombo": ["", "ca", "ca"]}
 
-prev_params = {"filters_up": [None,num_channels,num_channels],
+prev_params = {"filters":[None,num_channels,num_channels],
+    "conv_size": [None, (3,3), (3,3)],
+    "conv_strides": [None, (1,1), (1,1)],
+    "padding": [None, 'same', 'same'],
+    "dilation_rate"; [None, (1,1), (1,1)],
+    "filters_up": [None,num_channels,num_channels],
     "upconv_size": [None, (3,3), (3,3)],
     "upconv_strides": [None, (2,2), (2,2)],
-    "upconv_type": ["","2dtranspose", "2dtranspose"],
-    "layercombo": ["", "u", "u"]} 
+    "upconv_type": ["","nn", "nn"],
+    "layercombo": ["", "uc", "uc"]} 
 
 next_params = {"layercombo": ["", "", ""]} 
 
-# conv_params = {"filters":[([64,128],[64,128],[64,128]), 128, ([128],[]), ([128],[]), ([128],[]), ([128],[]),[], ([128],[]), ([128],[]), ([128],[]), ([128],[]),[]],
-#     "conv_size": [([(1,1),(3,3)],[(1,1),(6,6)],[(3,3),(1,1)]), (3,3), ((3,3),[]), ((3,3),[]), ((3,3),[]), ((3,3),[]), [], ((3,3),[]), ((3,3),[]), ((3,3),[]), ((3,3),[]), []],
-#     "conv_strides": [(1,1), (1,1), (1,1), (1,1), (1,1), (1,1), [], (1,1), (1,1), (1,1), (1,1), []],
-#     "padding": ['same','same','same','same','same','same','same', 'same','same','same','same','same'],
-#     "dilation_rate": [(1,1), (1,1), (1,1), (1,1), (1,1), (1,1), [], (1,1), (1,1), (1,1), (1,1), []],
-#     "pool_size": [(2,2), (2,2), (2,2), (2,2), (2,2), (2,2),[], (2,2), (2,2), (2,2), (2,2),[]],
-#     "pool_strides": [(2,2), (2,2), (2,2), (2,2), (2,2), (2,2),[], (2,2), (2,2), (2,2), (2,2),[]],
-#     "pad_size": [(0,0), (0,0), (0,0), (0,0), (0,0), (0,0), [], (0,0), (0,0), (0,0), (0,0), []],
-#     "filters_up": [[], [], [], [], [], [], 3, [], [], [], [], 3],
-#     "upconv_size": [[], [], [], [], [], [], (3,3), [], [], [], [], (3,3)],
-#     "upconv_strides": [[], [], [], [], [], [], (2,2), [], [], [], [], (2,2)],
-#     "layercombo": [("cbacba","cbacba","cbacba"), "c", ("cba",""), ("cba",""), ("cba",""), ("cba",""), "uba", ("cba",""), ("cba",""), ("cba",""), ("cba",""), "uba"],
-#     "full_filters": [1024],
-#     "dropout": [0,0]}
-
-# bridge_params = {"filters": [3],
-#     "conv_size": [(2,2)],
-#     "layercombo": ["", "ca", "ca"]}
-
-# prev_params = { "filters_up": [3],
-#     "upconv_size": [(2,2)],
-#     "upconv_strides": [(2,2)],
-#     "layercombo": ["", "u", "u"]} 
-
-# next_params = {"layercombo": ["", "", "",""]} 
 
 decoder_index = [1,0,2]     # Input is added manually in the model, last one is not used
 scales= [1,1,1]
