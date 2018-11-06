@@ -33,7 +33,7 @@ from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 256
 batch_size = 16
-model_name = 'SharpMask_Jarrett256_v2'
+model_name = 'SharpMask_Jarrett256_v2_RGB_NIR'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
@@ -51,10 +51,11 @@ with open("init_args - Jarrett.yml", 'r') as stream:
 train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
 val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
 
-if train_loader.color_mode == 'rgb':
-    num_channels = 3
-elif train_loader.color_mode == '8channel':
-    num_channels = 8
+# if train_loader.color_mode == 'rgb':
+#     num_channels = 3
+# elif train_loader.color_mode == '8channel':
+#     num_channels = 8
+num_channels = 4 # hard-coded for 4 channel
 
 y = train_loader.target_size[1]
 x = train_loader.target_size[0]
@@ -94,17 +95,17 @@ train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     FCN_directory=train_loader.label_dir,
     source_size=(x,y),
     target_size=(x,y),
-    color_mode=train_loader.color_mode,
+    color_mode='4channel',
     passedclasses = labelkey,
     class_mode = 'categorical',
-    batch_size = batch_size,
+    batch_size = batch_size,                               
     shuffle=True)
 
 validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
     FCN_directory=val_loader.label_dir,
     source_size=(x,y),
     target_size=(x,y),
-    color_mode=val_loader.color_mode,
+    color_mode='4channel',
     passedclasses = labelkey,
     class_mode = 'categorical',
     batch_size = batch_size,
@@ -144,12 +145,13 @@ prev_params = {"filters": [None, [128,64], [64,32], [32,16], [16,8]],
     "upconv_strides": [None]*5,
     "layercombo": ["", "cbac", "cbac", "cbac", "cbac"]} 
 
-next_params = {"filters": [None, 128,64,32,16],
-    "conv_size": [None, (3,3),(3,3),(3,3), (3,3)],
+next_params = {"filters": [None]*5,
+    "conv_size": [None]*5,
     "filters_up": [None]*5,
     "upconv_size": [None]*5,
-    "upconv_strides": [None]*5,
-    "layercombo": ["", "ba", "ba", "ba", "ba"]} 
+    "upconv_strides": [None, (2,2), (2,2), (2,2), (2,2)],
+    "upconv_type": [None, "bilinear", "bilinear", "bilinear", "bilinear"],
+    "layercombo": ["", "bau", "bau", "bau", "bau"]} 
 
 decoder_index = [0,1,2,3,4]
 upsample = [False,True,True,True,True]
@@ -157,7 +159,7 @@ scales= [1,1,1,1,1]
 
 SharpMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, decoder_index = decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
     conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params, scales=scales, 
-    bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, upsample=upsample)
+    bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
 
 # SharpMask = load_model('./tmp/SharpMask_Jarrett256_v2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D})
 
@@ -168,10 +170,10 @@ SharpMask.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=
 
 print("Memory required (GB): ", get_model_memory_usage(batch_size, SharpMask))
 
-# SharpMask.fit_generator(train_generator,
-#     steps_per_epoch=50,
-#     epochs=100,
-#     validation_data=validation_generator,
-#     validation_steps=5,
-#     verbose=1,
-#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+SharpMask.fit_generator(train_generator,
+    steps_per_epoch=50,
+    epochs=100,
+    validation_data=validation_generator,
+    validation_steps=10,
+    verbose=1,
+    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])

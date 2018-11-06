@@ -186,6 +186,13 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_boo
               xsize[2] = int(xsize[2]*f(strides_up,u_count)[1])
               xsize = tuple(xsize)
               x = BilinearUpSampling2D(target_shape=xsize, name='{}_BiUp{}'.format(block_name, u_count+1))(x)
+          elif f(upconv_type,u_count) == "nn":
+              xsize = K.int_shape(x)
+              xsize = [i for i in xsize]
+              xsize[1] = int(xsize[1]*f(strides_up,u_count)[0])
+              xsize[2] = int(xsize[2]*f(strides_up,u_count)[1])
+              xsize = tuple(xsize)
+              x = BilinearUpSampling2D(target_shape=xsize, method='nn', name='{}_NNUp{}'.format(block_name, u_count+1))(x)
           elif f(upconv_type,u_count) == "2dtranspose":
               print("size: ", K.int_shape(x))
               x = Conv2DTranspose(f(filters_up,u_count), f(kernel_size_up,u_count), strides=f(strides_up,u_count), padding='same', kernel_initializer='he_normal', 

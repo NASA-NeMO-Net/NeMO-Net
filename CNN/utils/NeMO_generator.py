@@ -268,7 +268,7 @@ class NeMODirectoryIterator(Iterator):
         else:
             self.target_size = tuple(target_size)
 
-        if color_mode not in {'rgb', 'grayscale','8channel'}:
+        if color_mode not in {'rgb', 'grayscale','8channel','4channel'}:
             raise ValueError('Invalid color mode:', color_mode,
                              '; expected "rgb", "grayscale", or "8channel.')
         self.color_mode = color_mode
@@ -283,6 +283,11 @@ class NeMODirectoryIterator(Iterator):
                 self.image_shape = self.source_size + (8,)
             else:
                 self.image_shape = (8,) + self.source_size
+        elif self.color_mode == "4channel":
+            if self.data_format == 'channels_last':
+                self.image_shape = self.source_size + (4,)
+            else:
+                self.image_shape = (4,) + self.source_size
         else:
             if self.data_format == 'channels_last':
                 self.image_shape = self.source_size + (1,)
@@ -344,6 +349,7 @@ class NeMODirectoryIterator(Iterator):
             tempclasses, filenames = res.get()
             self.classes[i:i + len(tempclasses)] = tempclasses
             self.class_idx_startend.append([i,i+len(tempclasses)])
+            filenames.sort()
             self.filenames += filenames
             i += len(tempclasses)
 
@@ -367,8 +373,8 @@ class NeMODirectoryIterator(Iterator):
 
             for res in FCN_results:
                 tempclasses, filenames = res.get()
+                filenames.sort()
                 self.FCN_filenames += filenames
-
         pool.close()
         pool.join()
         super(NeMODirectoryIterator, self).__init__(self.samples, batch_size, shuffle, seed) #n, batch_size, shuffle, seed
@@ -420,10 +426,13 @@ class NeMODirectoryIterator(Iterator):
         if self.image_data_generator.random_rotation:
             batch_flip = np.zeros(current_batch_size)
             batch_rot90 = np.zeros(current_batch_size)
-        if self.color_mode == "8channel":
+        if self.color_mode == "8channel" or self.color_mode == "4channel":
             for i, j in enumerate(index_array):
                 fname = self.filenames[j]
+                # print('image filename: ', fname, j)
                 img = coralutils.CoralData(os.path.join(self.directory, fname), load_type="raster").image
+                if self.color_mode == "4channel":
+                    img = np.delete(img, [0,3,5,7], 2) # harded coded for BGR + NIR
                 x = img_to_array(img, data_format=self.data_format)
                 x = self.image_data_generator.standardize(x) # standardize and rescaling is done here
                 if self.image_data_generator.channel_shift_range != 0:
@@ -460,6 +469,7 @@ class NeMODirectoryIterator(Iterator):
                 
                 for i, j in enumerate(index_array):
                     fname = self.FCN_filenames[j]
+                    # print("FCN filename: ", fname, j)
                     
                     if self.image_or_label == "label":
                         y = self._load_seg(fname)
@@ -481,6 +491,8 @@ class NeMODirectoryIterator(Iterator):
                         batch_y[i] = y
                     elif self.image_or_label == "image":
                         img = coralutils.CoralData(os.path.join(self.FCN_directory, fname), load_type="raster").image # if image and 8channel, then this must also be 8channel
+                        if self.color_mode == "4channel":
+                            img = np.delete(img,[0,3,5,7], 2) # hard coded for BGR + NIR
                         y = img_to_array(img, data_format=self.data_format)
                         if self.image_data_generator.random_rotation:           # flip and rotate according to previous batch_x images
                             y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])

@@ -1,6 +1,7 @@
 # Images and output files #
 ###############
 *.tif
+*.TIF
 *.tiff
 *.png
 *.out

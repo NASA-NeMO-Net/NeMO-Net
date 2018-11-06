@@ -152,13 +152,15 @@ class CoralData:
 
 					gdal_truthimg = gdal.Open(Truthpath)
 					gdal_truthimg_gt = gdal_truthimg.GetGeoTransform()
-					x_min, x_max, y_min, y_max = gdal_truthimg_gt[0], gdal_truthimg_gt[0]+self.truthimage.shape[1]*gdal_truthimg_gt[1], \
-						gdal_truthimg_gt[3]-self.truthimage.shape[0]*gdal_truthimg_gt[1], gdal_truthimg_gt[3]
-					
-					image_xstart = np.max([0, int((x_min - self.geotransform[0])/pixel_size)])
-					truth_xstart = np.max([0, int((self.geotransform[0] - x_min)/pixel_size)])
-					image_ystart = np.max([0, int((self.geotransform[3] - y_max)/pixel_size)])
-					truth_ystart = np.max([0, int((y_max - self.geotransform[3])/pixel_size)])
+					if gdal_truthimg_gt[0] == 0 and gdal_truthimg_gt[3] == 0:
+						print("Truthimage geotransform is not set! Reverting to default image's geotransform...")
+						x_min, x_max, y_min, y_max = self.geotransform[0], self.geotransform[0]+self.truthimage.shape[1]*self.geotransform[1], self.geotransform[3]+self.truthimage.shape[0]*self.geotransform[5], self.geotransform[3]
+					else:
+						x_min, x_max, y_min, y_max = gdal_truthimg_gt[0], gdal_truthimg_gt[0]+self.truthimage.shape[1]*gdal_truthimg_gt[1], gdal_truthimg_gt[3]+self.truthimage.shape[0]*gdal_truthimg_gt[5], gdal_truthimg_gt[3]
+					image_xstart = np.max([0, int((x_min - self.geotransform[0])//pixel_size)])
+					truth_xstart = np.max([0, int((self.geotransform[0] - x_min)//pixel_size)])
+					image_ystart = np.max([0, int((self.geotransform[3] - y_max)//pixel_size)])
+					truth_ystart = np.max([0, int((y_max - self.geotransform[3])//pixel_size)])
 
 					total_cols = int((np.min([xsize*pixel_size + self.geotransform[0], x_max]) - np.max([self.geotransform[0], x_min]))//pixel_size)
 					total_rows = int((np.min([self.geotransform[3], y_max]) - np.max([-ysize*pixel_size + self.geotransform[3], y_min]))//pixel_size)
