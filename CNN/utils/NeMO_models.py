@@ -135,12 +135,12 @@ def SharpMask_FCN(input_shape, classes, decoder_index, weight_decay=0., trainabl
 
     # Decode feature pyramid
     outputs = VGG_DecoderBlock(feat_pyramid,  classes=classes, scales=scales, weight_decay=weight_decay, 
-        bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, upsample=upsample)
+        bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
 
     final_1b1conv = Conv2D(classes, (1,1), padding="same", kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay), name='final_1b1conv')(outputs)
 
     scores = Activation('softmax')(final_1b1conv)
-    scores = Reshape((input_shape[0]*input_shape[1], classes))(scores)  # for class weight purposes
+    scores = Reshape((input_shape[0]*input_shape[1], classes))(scores)  # for class weight purposes, (sample_weight_mode: 'temporal')
 
     # return model
     return Model(inputs=inputs, outputs=scores)

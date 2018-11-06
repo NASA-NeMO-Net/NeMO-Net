@@ -7,7 +7,7 @@ import keras
 import keras.backend as K
 import tensorflow as tf
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 global _SESSION
 config = tf.ConfigProto(allow_soft_placement=True)
@@ -33,7 +33,7 @@ from NeMO_losses import charbonnierLoss
 image_size = 64
 batch_size = 12
 mag = 4
-model_name = 'SRx4_Fiji_4channel'
+model_name = 'SRx4_Fiji_4channel_2dTranpose_ConvUpsample'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
@@ -179,11 +179,11 @@ prev_params = {"filters":[None,num_channels,num_channels],
     "conv_size": [None, (3,3), (3,3)],
     "conv_strides": [None, (1,1), (1,1)],
     "padding": [None, 'same', 'same'],
-    "dilation_rate"; [None, (1,1), (1,1)],
+    "dilation_rate": [None, (1,1), (1,1)],
     "filters_up": [None,num_channels,num_channels],
     "upconv_size": [None, (3,3), (3,3)],
     "upconv_strides": [None, (2,2), (2,2)],
-    "upconv_type": ["","nn", "nn"],
+    "upconv_type": ["","2dtranspose", "2dtranspose"],
     "layercombo": ["", "uc", "uc"]} 
 
 next_params = {"layercombo": ["", "", ""]} 
@@ -206,10 +206,10 @@ TestArchitecture.summary()
 TestArchitecture.compile(loss=charbonnierLoss, optimizer=optimizer)
 print("Memory required (GB): ", get_model_memory_usage(batch_size, TestArchitecture))
 
-# TestArchitecture.fit_generator(train_generator,
-#     steps_per_epoch=400,
-#     epochs=100,
-#     validation_data=validation_generator,
-#     validation_steps=20,
-#     verbose=1,
-#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+TestArchitecture.fit_generator(train_generator,
+    steps_per_epoch=400,
+    epochs=100,
+    validation_data=validation_generator,
+    validation_steps=20,
+    verbose=1,
+    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])

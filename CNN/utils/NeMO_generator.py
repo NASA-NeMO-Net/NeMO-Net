@@ -349,6 +349,7 @@ class NeMODirectoryIterator(Iterator):
             tempclasses, filenames = res.get()
             self.classes[i:i + len(tempclasses)] = tempclasses
             self.class_idx_startend.append([i,i+len(tempclasses)])
+            filenames.sort()
             self.filenames += filenames
             i += len(tempclasses)
 
@@ -372,8 +373,8 @@ class NeMODirectoryIterator(Iterator):
 
             for res in FCN_results:
                 tempclasses, filenames = res.get()
+                filenames.sort()
                 self.FCN_filenames += filenames
-
         pool.close()
         pool.join()
         super(NeMODirectoryIterator, self).__init__(self.samples, batch_size, shuffle, seed) #n, batch_size, shuffle, seed
@@ -428,6 +429,7 @@ class NeMODirectoryIterator(Iterator):
         if self.color_mode == "8channel" or self.color_mode == "4channel":
             for i, j in enumerate(index_array):
                 fname = self.filenames[j]
+                # print('image filename: ', fname, j)
                 img = coralutils.CoralData(os.path.join(self.directory, fname), load_type="raster").image
                 if self.color_mode == "4channel":
                     img = np.delete(img, [0,3,5,7], 2) # harded coded for BGR + NIR
@@ -467,6 +469,7 @@ class NeMODirectoryIterator(Iterator):
                 
                 for i, j in enumerate(index_array):
                     fname = self.FCN_filenames[j]
+                    # print("FCN filename: ", fname, j)
                     
                     if self.image_or_label == "label":
                         y = self._load_seg(fname)
