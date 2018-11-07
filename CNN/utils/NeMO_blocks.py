@@ -314,12 +314,63 @@ def vgg_convblock(filters, kernel_size, convs=1, conv_strides=(1,1), padding='sa
       return x
     return f
 
+def recursive_conv_wparams(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_bool=False, pad_size=(0,0),
+  pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), filters_up=None, kernel_size_up=None, strides_up=None, upconv_type="bilinear", dropout=0, 
+  layercombo='capb', layercombine='sum', combinecount=[-1], weight_decay=0., block_name='convblock'):
+    def f(input):
+      x = input
+      g = lambda input,c_count: input[c_count] if type(input) is list else input
+
+      if type(layercombo) is tuple:
+        startx = x
+        end_x = []
+        for i in range(len(layercombo)):
+          x = recursive_conv(h_f(filters,i), h(kernel_size,i), h(conv_strides,i), h(padding,i), h(pad_bool,i), h(pad_size,i), h(pool_size,i),
+            h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h_f(upconv_type,i), h(dropout,i), 
+            layercombo[i], layercombine, combinecount, weight_decay, block_name='{}_par{}'.format(block_name, i+1))(startx)
+          # tempcombinecount += 1
+          end_x.append(x)
+        combinecount[0] = combinecount[0]+1
+
+        # Code for figuring out layercombine... not very efficient currently but works
+        if type(layercombine) is list:
+          if layercombine[combinecount[0]] is "cat":
+            x = concatenate(end_x, axis=-1)
+          elif layercombine[combinecount[0]] is "sum":
+            x = add(end_x)
+          else:
+            print("Undefined layercombine!")
+            raise ValueError
+        else:
+          if layercombine is "cat":
+            x = concatenate(end_x, axis=-1)
+          elif layercombine is "sum":
+            x = add(end_x)
+          else:
+            print("Undefined layercombine!")
+            raise ValueError
+
+      elif type(layercombo) is list:
+        for i in range(len(layercombo)):
+          x = recursive_conv(h_f(filters,i), h(kernel_size,i), h(conv_strides,i), h(padding,i), h(pad_bool,i), h(pad_size,i), h(pool_size,i),
+            h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h_f(upconv_type,i), h(dropout,i), 
+            layercombo[i], layercombine, combinecount, weight_decay, block_name='{}_str{}'.format(block_name, i+1))(x)
+          # tempcombinecount += 1
+      else:
+        x = alex_conv(filters, kernel_size, conv_strides, padding, pad_bool, pad_size, pool_size, pool_strides, dilation_rate, filters_up, kernel_size_up, strides_up, upconv_type, dropout, 
+          layercombo, weight_decay, block_name)(x)
+      return x
+
+
 def vgg_deconvblock(classes, scale, bridge_params=None, prev_params=None, next_params=None, weight_decay=0., block_name='vgg_deconvblock', count=0):
-  # bridge_params are organized as [filter, conv_size, layercombo]
+  # params in this order:
+  # filters, conv_size, filters_up, upconv_size, upconv_strides, upconv_type, layercombo, layercombine
     def f(x, y):
         if bridge_params is not None:
-          x = alex_conv(bridge_params[0], bridge_params[1], padding='same', pad_size=(0,0), dilation_rate=(1,1), filters_up=bridge_params[2], kernel_size_up=bridge_params[3], strides_up=bridge_params[4],
-            upconv_type=bridge_params[5], layercombo=bridge_params[6], weight_decay=weight_decay, block_name='{}_bridgeconv{}'.format(block_name,count))(x)
+          x = recursive_conv_wparams(filters=bridge_params[0], kernel_size=bridge_params[1], padding='same', filters_up=bridge_params[2], kernel_size_up=bridge_params[3], strides_up=bridge_params[4],
+            upconv_type=bridge_params[5], layercombo=bridge_params[6], layercombine=bridge_params[7], combinecount=[-1], weight_decay=weight_decay, block_name='{}_bridgeconv{}'.format(block_name,count))(x)
+          # x = alex_conv(bridge_params[0], bridge_params[1], padding='same', pad_size=(0,0), dilation_rate=(1,1), filters_up=bridge_params[2], kernel_size_up=bridge_params[3], strides_up=bridge_params[4],
+          #   upconv_type=bridge_params[5], layercombo=bridge_params[6], weight_decay=weight_decay, block_name='{}_bridgeconv{}'.format(block_name,count))(x)
 
         if y is not None:
           if prev_params is not None:
@@ -334,10 +385,6 @@ def vgg_deconvblock(classes, scale, bridge_params=None, prev_params=None, next_p
           x = alex_conv(next_params[0], next_params[1], padding='same', pad_size=(0,0), dilation_rate=(1,1), filters_up=next_params[2], kernel_size_up=next_params[3], strides_up=next_params[4],
             upconv_type=next_params[5], layercombo=next_params[6], weight_decay=weight_decay, block_name='{}_nextconv{}'.format(block_name,count))(x)
 
-#         if upsample:
-#           upscore = BilinearUpSampling2D(target_shape=target_shape, name='{}_BilinearUpsample'.format(block_name))(x)
-#         else:
-#           upscore = x
         return x
     return f
 
