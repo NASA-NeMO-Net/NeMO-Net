@@ -360,13 +360,14 @@ def recursive_conv_wparams(filters, kernel_size, conv_strides=(1,1), padding='va
         x = alex_conv(filters, kernel_size, conv_strides, padding, pad_bool, pad_size, pool_size, pool_strides, dilation_rate, filters_up, kernel_size_up, strides_up, upconv_type, dropout, 
           layercombo, weight_decay, block_name)(x)
       return x
-
+    return f
 
 def vgg_deconvblock(classes, scale, bridge_params=None, prev_params=None, next_params=None, weight_decay=0., block_name='vgg_deconvblock', count=0):
   # params in this order:
   # filters, conv_size, filters_up, upconv_size, upconv_strides, upconv_type, layercombo, layercombine
     def f(x, y):
         if bridge_params is not None:
+          print("Bridge params: ", bridge_params[0], bridge_params[1], bridge_params[2], bridge_params[3], bridge_params[4], bridge_params[5], bridge_params[6], bridge_params[7])        
           x = recursive_conv_wparams(filters=bridge_params[0], kernel_size=bridge_params[1], padding='same', filters_up=bridge_params[2], kernel_size_up=bridge_params[3], strides_up=bridge_params[4],
             upconv_type=bridge_params[5], layercombo=bridge_params[6], layercombine=bridge_params[7], combinecount=[-1], weight_decay=weight_decay, block_name='{}_bridgeconv{}'.format(block_name,count))(x)
           # x = alex_conv(bridge_params[0], bridge_params[1], padding='same', pad_size=(0,0), dilation_rate=(1,1), filters_up=bridge_params[2], kernel_size_up=bridge_params[3], strides_up=bridge_params[4],

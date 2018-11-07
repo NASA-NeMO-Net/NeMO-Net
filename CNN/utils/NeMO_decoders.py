@@ -52,7 +52,7 @@ def load_deconv_params(deconv_layers, default_deconv_params, deconv_params, bloc
     layercombo = load_specific_param(deconv_layers, deconv_params, "layercombo", "", "", default_deconv_params, layer_str="deconvolutional")
     supercombo = recursive_concatcombo(layercombo) # turns list + tuples into all lists
     supercombo = ''.join(flatten_list(supercombo)) # flattens list recursively
-    layercombine = load_specific_param(deconv_layers, deconv_params, "layercombine", '', '', default_conv_params)
+    layercombine = load_specific_param(deconv_layers, deconv_params, "layercombine", '', '', default_deconv_params)
 
     filters = load_specific_param(deconv_layers, deconv_params, "filters", 'c', supercombo, default_deconv_params, layer_str="deconvolutional")
     conv_size = load_specific_param(deconv_layers, deconv_params, "conv_size", 'c', supercombo, default_deconv_params, layer_str="deconvolutional")
@@ -168,8 +168,8 @@ def VGG_DecoderBlock(pyramid, classes, scales, weight_decay=0., bridge_params=No
             "upconv_size": [(2,2)],
             "upconv_strides": [(1,1)],
             "layercombo": ["cacab","cacab","cacab","cacab","cacab"]}
-        bridge_filters, bridge_conv_size, bridge_filters_up, bridge_upconv_size, bridge_upconv_strides, bridge_upconv_type, bridge_layercombo, bridge_layercombine 
-            = load_deconv_params(len(scales), default_bridge_params, bridge_params, "BRIDGE")
+        bridge_filters, bridge_conv_size, bridge_filters_up, bridge_upconv_size, bridge_upconv_strides, bridge_upconv_type, bridge_layercombo, bridge_layercombine = \
+            load_deconv_params(len(scales), default_bridge_params, bridge_params, "BRIDGE")
     if prev_params is not None:
         default_prev_params = {"filters": p_filters[:-1],
             "conv_size": [(2,2),(2,2),(2,2),(2,2),(2,2)],
@@ -177,8 +177,8 @@ def VGG_DecoderBlock(pyramid, classes, scales, weight_decay=0., bridge_params=No
             "upconv_size": [(2,2)],
             "upconv_strides": [(1,1)],
             "layercombo": ["cba","cba","cba","cba","cba"]}
-        prev_filters, prev_conv_size, prev_filters_up, prev_upconv_size, prev_upconv_strides, prev_upconv_type, prev_layercombo, prev_layercombine 
-            = load_deconv_params(len(scales), default_prev_params, prev_params, "PREV")
+        prev_filters, prev_conv_size, prev_filters_up, prev_upconv_size, prev_upconv_strides, prev_upconv_type, prev_layercombo, prev_layercombine = \
+            load_deconv_params(len(scales), default_prev_params, prev_params, "PREV")
     if next_params is not None:
         default_next_params = {"filters": p_filters[:-1],
             "conv_size": [(2,2),(2,2),(2,2),(2,2),(2,2)],
@@ -186,8 +186,8 @@ def VGG_DecoderBlock(pyramid, classes, scales, weight_decay=0., bridge_params=No
             "upconv_size": [(2,2)],
             "upconv_strides": [(1,1)],
             "layercombo": ["ba","ba","ba","ba","ba"]}
-        next_filters, next_conv_size, next_filters_up, next_upconv_size, next_upconv_strides, next_upconv_type, next_layercombo, next_layercombine
-            = load_deconv_params(len(scales), default_next_params, next_params, "NEXT")
+        next_filters, next_conv_size, next_filters_up, next_upconv_size, next_upconv_strides, next_upconv_type, next_layercombo, next_layercombine = \
+            load_deconv_params(len(scales), default_next_params, next_params, "NEXT")
 
     blocks = []
     for i in range(len(scales)):
