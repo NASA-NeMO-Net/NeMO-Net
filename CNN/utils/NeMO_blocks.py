@@ -315,7 +315,7 @@ def vgg_convblock(filters, kernel_size, convs=1, conv_strides=(1,1), padding='sa
     return f
 
 def recursive_conv_wparams(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_bool=False, pad_size=(0,0),
-  pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), filters_up=None, kernel_size_up=None, strides_up=None, upconv_type="bilinear", dropout=0, 
+  pool_size=(2,2), pool_strides=(1,1), dilation_rate=(1,1), filters_up=None, kernel_size_up=None, strides_up=None, upconv_type="bilinear", dropout=0, 
   layercombo='capb', layercombine='sum', combinecount=[-1], weight_decay=0., block_name='convblock'):
     def f(input):
       x = input
@@ -367,25 +367,28 @@ def vgg_deconvblock(classes, scale, bridge_params=None, prev_params=None, next_p
   # filters, conv_size, filters_up, upconv_size, upconv_strides, upconv_type, layercombo, layercombine
     def f(x, y):
         if bridge_params is not None:
-          print("Bridge params: ", bridge_params[0], bridge_params[1], bridge_params[2], bridge_params[3], bridge_params[4], bridge_params[5], bridge_params[6], bridge_params[7])        
-          x = recursive_conv_wparams(filters=bridge_params[0], kernel_size=bridge_params[1], padding='same', filters_up=bridge_params[2], kernel_size_up=bridge_params[3], strides_up=bridge_params[4],
-            upconv_type=bridge_params[5], layercombo=bridge_params[6], layercombine=bridge_params[7], combinecount=[-1], weight_decay=weight_decay, block_name='{}_bridgeconv{}'.format(block_name,count))(x)
+#           print("Bridge params: ", bridge_params[0], bridge_params[1], bridge_params[2], bridge_params[3], bridge_params[4], bridge_params[5], bridge_params[6], bridge_params[7])        
+          x = recursive_conv_wparams(filters=bridge_params[0], kernel_size=bridge_params[1], pool_size=bridge_params[2], padding='same', filters_up=bridge_params[3], kernel_size_up=bridge_params[4], strides_up=bridge_params[5],
+            upconv_type=bridge_params[6], layercombo=bridge_params[7], layercombine=bridge_params[8], combinecount=[-1], weight_decay=weight_decay, block_name='{}_bridgeconv{}'.format(block_name,count))(x)
           # x = alex_conv(bridge_params[0], bridge_params[1], padding='same', pad_size=(0,0), dilation_rate=(1,1), filters_up=bridge_params[2], kernel_size_up=bridge_params[3], strides_up=bridge_params[4],
           #   upconv_type=bridge_params[5], layercombo=bridge_params[6], weight_decay=weight_decay, block_name='{}_bridgeconv{}'.format(block_name,count))(x)
 
         if y is not None:
           if prev_params is not None:
-            y = alex_conv(prev_params[0], prev_params[1], padding='same', pad_size=(0,0), dilation_rate=(1,1), filters_up=prev_params[2], kernel_size_up=prev_params[3], strides_up=prev_params[4],
-              upconv_type=prev_params[5], layercombo=prev_params[6], weight_decay=weight_decay, block_name='{}_prevconv{}'.format(block_name,count))(y)
+            y = recursive_conv_wparams(filters=prev_params[0], kernel_size=prev_params[1], pool_size=prev_params[2], padding='same', filters_up=prev_params[3], kernel_size_up=prev_params[4], strides_up=prev_params[5],
+            upconv_type=prev_params[6], layercombo=prev_params[7], layercombine=prev_params[8], combinecount=[-1], weight_decay=weight_decay, block_name='{}_prevconv{}'.format(block_name,count))(y)
+#             y = alex_conv(prev_params[0], prev_params[1], padding='same', pad_size=(0,0), dilation_rate=(1,1), filters_up=prev_params[2], kernel_size_up=prev_params[3], strides_up=prev_params[4],
+#               upconv_type=prev_params[5], layercombo=prev_params[6], weight_decay=weight_decay, block_name='{}_prevconv{}'.format(block_name,count))(y)
           def scaling(xx, ss=1):
             return xx * ss
           scaled = Lambda(scaling, arguments={'ss': scale}, name='{}_scale'.format(block_name))(x)
           x = add([y, scaled])
 
         if next_params is not None:
-          x = alex_conv(next_params[0], next_params[1], padding='same', pad_size=(0,0), dilation_rate=(1,1), filters_up=next_params[2], kernel_size_up=next_params[3], strides_up=next_params[4],
-            upconv_type=next_params[5], layercombo=next_params[6], weight_decay=weight_decay, block_name='{}_nextconv{}'.format(block_name,count))(x)
-
+          x = recursive_conv_wparams(filters=next_params[0], kernel_size=next_params[1], pool_size=next_params[2], padding='same', filters_up=next_params[3], kernel_size_up=next_params[4], strides_up=next_params[5],
+            upconv_type=next_params[6], layercombo=next_params[7], layercombine=next_params[8], combinecount=[-1], weight_decay=weight_decay, block_name='{}_nextconv{}'.format(block_name,count))(x)
+#           x = alex_conv(next_params[0], next_params[1], padding='same', pad_size=(0,0), dilation_rate=(1,1), filters_up=next_params[2], kernel_size_up=next_params[3], strides_up=next_params[4],
+#             upconv_type=next_params[5], layercombo=next_params[6], weight_decay=weight_decay, block_name='{}_nextconv{}'.format(block_name,count))(x)
         return x
     return f
 

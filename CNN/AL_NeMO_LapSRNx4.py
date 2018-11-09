@@ -122,36 +122,6 @@ validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
 conv_layers = 3
 full_layers = 0
 
-# Upsampling with 2d transpose convolution
-
-# conv_params = {"filters":[64,64,64],
-#     "conv_size": [[([(1,1),(3,3)], [(1,1),(6,6)], [(3,3),(1,1)]), (3,3)], (3,3), (3,3)],
-#     "conv_strides": [(1,1), (1,1), (1,1)],
-#     "padding": ['same','same', 'same'],
-#     "dilation_rate": [(1,1), (1,1), (1,1)],
-#     "filters_up": [None, 64, 64],
-#     "upconv_size": [None, (3,3), (3,3)],
-#     "upconv_strides": [None, (2,2), (2,2)],
-#     "upconv_type": ["","2dtranspose","2dtranspose"],
-#     "layercombo": [[("cbacba","cbacba","cbacba"),"c"], [([("cbacbacbacba",""), "cbacbacbacba"], ""), "uba"], [([("cbacbacbacba",""), "cbacbacbacba"], ""), "uba"]],
-#     "layercombine": ["cat",["sum","sum"], ["sum","sum"]],
-#     "full_filters": [1024,1024],
-#     "dropout": [0,0]}
-
-# bridge_params = {"filters": [None,num_channels,num_channels],
-#     "conv_size": [None,(3,3),(3,3)],
-#     "conv_strides": [None,(1,1),(1,1)],
-#     "padding": ['same','same','same'],
-#     "dilation_rate": [None, (1,1), (1,1)],
-#     "layercombo": ["", "ca", "ca"]}
-
-# prev_params = {"filters_up": [None,num_channels,num_channels],
-#     "upconv_size": [None, (3,3), (3,3)],
-#     "upconv_strides": [None, (2,2), (2,2)],
-#     "upconv_type": ["","2dtranspose", "2dtranspose"],
-#     "layercombo": ["", "u", "u"]} 
-
-# next_params = {"layercombo": ["", "", ""]} 
 
 # Upsampling with NN upsampling followed by 2d conv
 conv_params = {"filters":[64,64,64],
@@ -192,16 +162,13 @@ next_params = {"layercombo": ["", "", ""]}
 decoder_index = [1,0,2]     # Input is added manually in the model, last one is not used
 scales= [1,1,1]
 
-# SharpMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, decoder_index = decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
-#     conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params, scales=scales, 
-#     bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, upsample=upsample)
-
 TestArchitecture = TestModel(input_shape=(y, x, num_channels), classes=num_classes, decoder_index=decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
     conv_layers=conv_layers, full_layers=0, conv_params=conv_params, scales=scales, bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
 
 optimizer = keras.optimizers.Adam(1e-4)
 
-TestArchitecture.summary()
+keras.utils.layer_utils.print_summary(TestArchitecture, line_length=150, positions=[.35, .55, .65, 1.])
+# TestArchitecture.summary()
 # TestArchitecture.compile(loss=charbonnierLoss, optimizer=optimizer, metrics=['accuracy'], sample_weight_mode='temporal')
 TestArchitecture.compile(loss=charbonnierLoss, optimizer=optimizer)
 print("Memory required (GB): ", get_model_memory_usage(batch_size, TestArchitecture))

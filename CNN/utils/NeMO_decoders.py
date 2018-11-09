@@ -59,7 +59,8 @@ def load_deconv_params(deconv_layers, default_deconv_params, deconv_params, bloc
     # Assume conv_strides = 1
     # Assume padding = same
     # Assume dilation_rate = 1
-    # Assume no pooling layers (no pool_size and no pool_strides)
+    pool_size = load_specific_param(deconv_layers, deconv_params, "pool_size", "p", supercombo, default_deconv_params, layer_str="deconvolutional")
+    # Assume pool_strides = 1
     # Assume no padding layers (no pad_size)
 
     filters_up = load_specific_param(deconv_layers, deconv_params, "filters_up", 'u', supercombo, default_deconv_params, layer_str="deconvolutional")
@@ -67,7 +68,7 @@ def load_deconv_params(deconv_layers, default_deconv_params, deconv_params, bloc
     upconv_strides = load_specific_param(deconv_layers, deconv_params, "upconv_strides", 'u', supercombo, default_deconv_params, layer_str="deconvolutional")
     upconv_type = load_specific_param(deconv_layers, deconv_params, "upconv_type", 'u', supercombo, default_deconv_params, layer_str="deconvolutional")
 
-    return filters, conv_size, filters_up, upconv_size, upconv_strides, upconv_type, layercombo, layercombine
+    return filters, conv_size, pool_size, filters_up, upconv_size, upconv_strides, upconv_type, layercombo, layercombine
 
 
 def VGGDecoder(pyramid, scales, classes):
@@ -168,7 +169,7 @@ def VGG_DecoderBlock(pyramid, classes, scales, weight_decay=0., bridge_params=No
             "upconv_size": [(2,2)],
             "upconv_strides": [(1,1)],
             "layercombo": ["cacab","cacab","cacab","cacab","cacab"]}
-        bridge_filters, bridge_conv_size, bridge_filters_up, bridge_upconv_size, bridge_upconv_strides, bridge_upconv_type, bridge_layercombo, bridge_layercombine = \
+        bridge_filters, bridge_conv_size, bridge_pool_size, bridge_filters_up, bridge_upconv_size, bridge_upconv_strides, bridge_upconv_type, bridge_layercombo, bridge_layercombine = \
             load_deconv_params(len(scales), default_bridge_params, bridge_params, "BRIDGE")
     if prev_params is not None:
         default_prev_params = {"filters": p_filters[:-1],
@@ -177,7 +178,7 @@ def VGG_DecoderBlock(pyramid, classes, scales, weight_decay=0., bridge_params=No
             "upconv_size": [(2,2)],
             "upconv_strides": [(1,1)],
             "layercombo": ["cba","cba","cba","cba","cba"]}
-        prev_filters, prev_conv_size, prev_filters_up, prev_upconv_size, prev_upconv_strides, prev_upconv_type, prev_layercombo, prev_layercombine = \
+        prev_filters, prev_conv_size, prev_pool_size, prev_filters_up, prev_upconv_size, prev_upconv_strides, prev_upconv_type, prev_layercombo, prev_layercombine = \
             load_deconv_params(len(scales), default_prev_params, prev_params, "PREV")
     if next_params is not None:
         default_next_params = {"filters": p_filters[:-1],
@@ -186,24 +187,24 @@ def VGG_DecoderBlock(pyramid, classes, scales, weight_decay=0., bridge_params=No
             "upconv_size": [(2,2)],
             "upconv_strides": [(1,1)],
             "layercombo": ["ba","ba","ba","ba","ba"]}
-        next_filters, next_conv_size, next_filters_up, next_upconv_size, next_upconv_strides, next_upconv_type, next_layercombo, next_layercombine = \
+        next_filters, next_conv_size, next_pool_size, next_filters_up, next_upconv_size, next_upconv_strides, next_upconv_type, next_layercombo, next_layercombine = \
             load_deconv_params(len(scales), default_next_params, next_params, "NEXT")
 
     blocks = []
     for i in range(len(scales)):
         block_name = 'vgg_deconvblock{}'.format(i+1)
         if bridge_params is not None:
-            tempbridgeparams = [bridge_filters[i], bridge_conv_size[i], bridge_filters_up[i], bridge_upconv_size[i], bridge_upconv_strides[i], bridge_upconv_type[i], bridge_layercombo[i], bridge_layercombine[i]]
+            tempbridgeparams = [bridge_filters[i], bridge_conv_size[i], bridge_pool_size[i], bridge_filters_up[i], bridge_upconv_size[i], bridge_upconv_strides[i], bridge_upconv_type[i], bridge_layercombo[i], bridge_layercombine[i]]
         else:
             tempbridgeparams = None
 
         if prev_params is not None:
-            tempprevparams = [prev_filters[i], prev_conv_size[i], prev_filters_up[i], prev_upconv_size[i], prev_upconv_strides[i], prev_upconv_type[i], prev_layercombo[i], prev_layercombine[i]]
+            tempprevparams = [prev_filters[i], prev_conv_size[i], prev_pool_size[i], prev_filters_up[i], prev_upconv_size[i], prev_upconv_strides[i], prev_upconv_type[i], prev_layercombo[i], prev_layercombine[i]]
         else:
             tempprevparams = None
 
         if next_params is not None:
-            tempnextparams = [next_filters[i], next_conv_size[i], next_filters_up[i], next_upconv_size[i], next_upconv_strides[i], next_upconv_type[i], next_layercombo[i], next_layercombine[i]]
+            tempnextparams = [next_filters[i], next_conv_size[i], next_pool_size[i], next_filters_up[i], next_upconv_size[i], next_upconv_strides[i], next_upconv_type[i], next_layercombo[i], next_layercombine[i]]
         else:
             tempnextparams = None
 
