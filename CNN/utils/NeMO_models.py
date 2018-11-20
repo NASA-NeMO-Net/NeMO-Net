@@ -17,6 +17,7 @@ from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Recursive_Hyperopt_Encoder
 from NeMO_decoders import VGGDecoder, VGGUpsampler, VGG_DecoderBlock
 from NeMO_backend import get_model_memory_usage
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
+from keras.layers import Lambda
 
 def AlexNet(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None):
     inputs = Input(shape=input_shape)
@@ -115,6 +116,32 @@ def TestModel_EncoderDecoder(input_shape, classes, decoder_index, weight_decay=0
 
     # return model
     return Model(inputs=inputs, outputs=outputs)
+
+def SRModel_FeatureWise(hr_input_shape, lr_input_shape, SRModel, FeatureModel, FeatureLayerName):
+    hr_inputs = Input(shape=hr_input_shape)
+    lr_inputs = Input(shape=lr_input_shape)
+    
+    SR_output = SRModel(lr_inputs)
+    
+    Feature_layer = FeatureModel.get_layer(FeatureLayerName).output
+    newFeatureModel = Model(FeatureModel.input, outputs=Feature_layer)
+    keras.utils.layer_utils.print_summary(newFeatureModel, line_length=150, positions=[.35, .55, .65, 1.])
+
+    # Set FeatureModel as untrainable
+    for l in newFeatureModel.layers:
+        l.trainable=False
+    
+#     FeatureModel_content = Model(inputs=hr_inputs, outputs=Feature_layer)
+#     keras.utils.layer_utils.print_summary(FeatureModel_content, line_length=150, positions=[.35, .55, .65, 1.])
+    
+    FeatureModel_hr_content = newFeatureModel(hr_inputs)
+    FeatureModel_SR_content = newFeatureModel(SR_output)
+    
+#     loss = K.sqrt(K.mean((FeatureModel_hr_content - FeatureModel_SR_content)**2, (1,2))) 
+    loss = Lambda(lambda x: K.sqrt(K.mean((x[0]-x[1])**2, (1,2))))([FeatureModel_hr_content, FeatureModel_SR_content])
+    
+    return Model([lr_inputs, hr_inputs], loss)
+    
 
 def FCN(*args, **kwargs):
     """Fully Convolutional Networks for semantic segmentation with VGG16.

@@ -32,7 +32,7 @@ from keras.callbacks import (
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 256
-batch_size = 16
+batch_size = 64
 model_name = 'RefineMask_Jarrett256_RGB_NIR'
 
 jsonpath = './utils/CoralClasses.json'
