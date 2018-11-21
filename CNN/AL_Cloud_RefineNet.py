@@ -32,17 +32,18 @@ from keras.callbacks import (
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 256
-batch_size = 64
-model_name = 'RefineMask_Jarrett256_RGB_NIR'
+batch_size = 12
+model_name = 'RefineMask_Cloud'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
     json_data = json.load(json_file)
 
-labelkey = json_data["VedConsolidated_ClassDict"]
+# labelkey = json_data["VedConsolidated_ClassDict"]
+labelkey = {'Clouds': 0, 'No clouds': 1}
 num_classes = len(labelkey)
 
-with open("init_args - Jarrett.yml", 'r') as stream:
+with open("init_args - MichalClouds.yml", 'r') as stream:
     try:
         init_args = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -59,9 +60,9 @@ num_channels = 4 # hard-coded for 4 channel
 
 y = train_loader.target_size[1]
 x = train_loader.target_size[0]
-pixel_mean =0*np.ones(num_channels)
-pixel_std = 1*np.ones(num_channels)
-# channel_shift_range = [0.01]*num_channels
+pixel_mean =100*np.ones(num_channels)
+pixel_std = 100*np.ones(num_channels)
+channel_shift_range = [0.5]*num_channels
 # rescale = np.asarray([[0.95,1.05]]*num_channels)
 
 checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, monitor='val_acc', mode='max', save_best_only=True)
@@ -179,11 +180,12 @@ RefineMask.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics
 
 print("Memory required (GB): ", get_model_memory_usage(batch_size, RefineMask))
 
-# RefineMask.fit_generator(train_generator,
-#     steps_per_epoch=50,
-#     epochs=100,
-#     validation_data=validation_generator,
-#     validation_steps=10,
-#     verbose=1,
-#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+RefineMask.fit_generator(train_generator,
+    steps_per_epoch=100,
+    epochs=50,
+    validation_data=validation_generator,
+    validation_steps=20,
+    verbose=1,
+    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+
 

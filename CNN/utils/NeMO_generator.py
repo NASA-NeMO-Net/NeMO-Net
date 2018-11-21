@@ -271,14 +271,14 @@ class NeMODirectoryIterator(Iterator):
         else:
             self.target_size = tuple(target_size)
 
-        if color_mode not in {'rgb', 'grayscale','8channel','4channel'}:
+        if color_mode not in {'rgb', 'grayscale','8channel','4channel','4channel_delete'}:
             raise ValueError('Invalid color mode:', color_mode,
                              '; expected "rgb", "grayscale", or "8channel.')
         self.color_mode = color_mode
         self.data_format = data_format
         
         if len(self.directory) == 1:
-            source_size = [source_size]
+            self.source_size = [source_size]
         self.image_shape = []
         for dcount in range(0, len(self.directory)):
             if self.color_mode == 'rgb':
@@ -291,7 +291,7 @@ class NeMODirectoryIterator(Iterator):
                     self.image_shape.append(self.source_size[dcount] + (8,))
                 else:
                     self.image_shape.append((8,) + self.source_size[dcount])
-            elif self.color_mode == "4channel":
+            elif self.color_mode == "4channel" or self.color_mode == "4channel_delete":
                 if self.data_format == 'channels_last':
                     self.image_shape.append(self.source_size[dcount] + (4,))
                 else:
@@ -447,14 +447,14 @@ class NeMODirectoryIterator(Iterator):
         if self.image_data_generator.random_rotation:
             batch_flip = np.zeros(current_batch_size)
             batch_rot90 = np.zeros(current_batch_size)
-        if self.color_mode == "8channel" or self.color_mode == "4channel":
+        if self.color_mode == "8channel" or self.color_mode == "4channel" or self.color_mode == "4channel_delete":
             # iterate over directory?
             for dcount in range(0,len(self.directory)):
                 for i, j in enumerate(index_array):
                     fname = self.filenames[dcount][j]
                     # print('image filename: ', fname, j)
                     img = coralutils.CoralData(os.path.join(self.directory[dcount], fname), load_type="raster").image
-                    if self.color_mode == "4channel": # assumes target AND source are starting off as 8 channel
+                    if self.color_mode == "4channel_delete": # assumes target AND source are starting off as 8 channel
                         img = np.delete(img, [0,3,5,7], 2) # harded coded for BGR + NIR
                     x = img_to_array(img, data_format=self.data_format)
                     x = self.image_data_generator.standardize(x) # standardize and rescaling is done here
@@ -488,10 +488,10 @@ class NeMODirectoryIterator(Iterator):
                 batch_y = self.classes[index_array].astype(K.floatx())
             elif self.FCN_directory is not None:
                 if self.image_or_label == "image":
-                    batch_y = np.zeros((len(batch_x),) + self.label_shape, dtype=K.floatx()) # N x R x C x D
+                    batch_y = np.zeros((current_batch_size,) + self.label_shape, dtype=K.floatx()) # N x R x C x D
                 elif self.image_or_label == "label":
-                    batch_y = np.zeros((len(batch_x),) + self.label_shape, dtype=np.int8) # N x R x C x D
-                batch_weights = np.zeros((len(batch_x), self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float)
+                    batch_y = np.zeros((current_batch_size,) + self.label_shape, dtype=np.int8) # N x R x C x D
+                batch_weights = np.zeros((current_batch_size, self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float)
                 
                 for i, j in enumerate(index_array):
                     fname = self.FCN_filenames[j]
@@ -517,7 +517,7 @@ class NeMODirectoryIterator(Iterator):
                         batch_y[i] = y
                     elif self.image_or_label == "image":
                         img = coralutils.CoralData(os.path.join(self.FCN_directory, fname), load_type="raster").image # if image and 8channel, then this must also be 8channel
-                        if self.color_mode == "4channel":
+                        if self.color_mode == "4channel_delete":
                             img = np.delete(img,[0,3,5,7], 2) # hard coded for BGR + NIR
                         y = img_to_array(img, data_format=self.data_format)
                         if self.image_data_generator.random_rotation:           # flip and rotate according to previous batch_x images
@@ -579,11 +579,11 @@ class NeMODirectoryIterator(Iterator):
                 batch_y = self.classes[index_array].astype(K.floatx())
             elif self.FCN_directory is not None:
                 if self.image_or_label == "image":
-                    batch_y = np.zeros((len(batch_x),) + self.label_shape, dtype=K.floatx()) # N x R x C x D
+                    batch_y = np.zeros((current_batch_size,) + self.label_shape, dtype=K.floatx()) # N x R x C x D
                 elif self.image_or_label == "label":
-                    batch_y = np.zeros((len(batch_x),) + self.label_shape, dtype=np.int8) # N x R x C x D
+                    batch_y = np.zeros((current_batch_size,) + self.label_shape, dtype=np.int8) # N x R x C x D
 
-                batch_weights = np.zeros((len(batch_x), self.image_shape[0], self.image_shape[1]), dtype=np.float)
+                batch_weights = np.zeros((current_batch_size, self.image_shape[0], self.image_shape[1]), dtype=np.float)
                 for i, j in enumerate(index_array):
                     fname = self.FCN_filenames[j]
                     if self.image_or_label == "label":
@@ -623,7 +623,7 @@ class NeMODirectoryIterator(Iterator):
                             y = self.image_data_generator.random_channel_shift(y)  
                         batch_y[i] = y
             elif self.class_mode == 'categorical':
-                batch_y = np.zeros((len(batch_x), self.num_consolclass), dtype=K.floatx())
+                batch_y = np.zeros((current_batch_size, self.num_consolclass), dtype=K.floatx())
                 for i, label in enumerate(self.classes[index_array]):
                     batch_y[i, label] = 1.
             elif self.class_mode == 'fixed_RGB':        # Testing for skew comparisons (ignore)
@@ -631,7 +631,7 @@ class NeMODirectoryIterator(Iterator):
                 # Temporarily pass in FCN_directory as fixed RGB values of size [N x N_channels]
                 # batch_y = self.FCN_directory  # probably want to rethink this
                 midpoint = int(self.source_size[0]-1/2)
-                batch_y = np.zeros((len(batch_x), 3), dtype=K.floatx())
+                batch_y = np.zeros((current_batch_size, 3), dtype=K.floatx())
                 for i, label in enumerate(self.classes[index_array]):
                     # print("batch_x shape: ", batch_x.shape, midpoint)
                     batch_y[i] = batch_x[i,midpoint,midpoint,:]   # batch_x has already been standardized
@@ -665,7 +665,7 @@ class NeMODirectoryIterator(Iterator):
         if label_path.endswith('.tif'):
             img = pil_image.open(label_path)
             if self.source_size:
-                wh_tuple = (self.source_size[1], self.source_size[0])
+                wh_tuple = (self.source_size[0][1], self.source_size[0][0])
             if img.size != wh_tuple:
                 img = img.resize(wh_tuple)
             y = img_to_array(img, data_format=self.data_format)
@@ -767,7 +767,7 @@ class ImageSetLoader(object):
             raise ValueError('Invalid image format:', label_format,
                              '; expected "png", "jpg", "jpeg" or "bmp"')
 
-        if color_mode not in {'rgb', 'grayscale', '8channel'}:
+        if color_mode not in {'rgb', 'grayscale', '8channel', '4channel'}:
             raise ValueError('Invalid color mode:', color_mode,
                              '; expected "rgb" or "grayscale".')
         self.color_mode = color_mode
