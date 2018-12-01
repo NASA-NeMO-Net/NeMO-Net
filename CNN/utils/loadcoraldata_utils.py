@@ -147,10 +147,10 @@ class CoralData:
 				self.truthimage = cv2.imread(Truthpath)
 				class_indices = np.unique(self.truthimage)
 				num_classes = len(class_indices)
-				try:
-					self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in class_indices)
-
+				if self.truthimage == None:
+# 					self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in class_indices)
 					gdal_truthimg = gdal.Open(Truthpath)
+					self.truthimage = gdal_truthimg.GetRasterBand(1).ReadAsArray()
 					gdal_truthimg_gt = gdal_truthimg.GetGeoTransform()
 					if gdal_truthimg_gt[0] == 0 and gdal_truthimg_gt[3] == 0:
 						print("Truthimage geotransform is not set! Reverting to default image's geotransform...")
@@ -167,7 +167,7 @@ class CoralData:
 
 					self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
 					self.truthimage = self.truthimage[truth_ystart:truth_ystart+int(total_rows*pixel_size//gdal_truthimg_gt[1]), truth_xstart:truth_xstart+int(total_cols*pixel_size//gdal_truthimg_gt[1])]
-				except:
+				else:
 					print("Warning! Truth image not in expected format... loading directly whole image using cv2...")
 
 				if len(self.truthimage.shape) >= 3:
