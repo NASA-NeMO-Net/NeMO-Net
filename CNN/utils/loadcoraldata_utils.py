@@ -667,6 +667,7 @@ class CoralData:
 # 	spacing: Spacing between each image (row,col)
 # 	predict_size: size of prediction area square (starting from center); FCN will use predict_size = image_size
 # 	lastchannelremove: Remove last channel or not
+# 	predict_mid: Only predict the middle of the image (e.g. 256x256 -> only predict on middle 128x128
 # Output:
 # 	whole_predict: Predicted class array
 #   num_predict: Number of times per prediction in array
@@ -676,14 +677,18 @@ class CoralData:
 	def predict_on_whole_image(self, model, image_size, num_classes, num_lines = None, spacing = (1,1), predict_size = 1, lastchannelremove = True):
 		crop_len = int(np.floor(image_size/2)) # lengths from sides to not take into account in the calculation of num_lines
 		offstart = crop_len-int(np.floor(predict_size/2))
-
+            
 		if image_size%spacing[0] != 0 or image_size%spacing[1] != 0:
 			print("Error: Spacing does not divide into image size!")
+			raise ValueError
+            
+		if spacing[0] > predict_size or spacing[1] > predict_size:
+			print("Spacing must be smaller than predict_size!")
 			raise ValueError
 
 		if image_size%2 == 0:
 			if num_lines is None:
-				num_lines = int(np.floor((self.testimage.shape[0] - image_size)/spacing[0])+1) # Predict on whole image
+				num_lines = int(np.floor((self.testimage.shape[0] - image_size + spacing[0])/spacing[0])) # Predict on whole image
 
 			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
 			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
@@ -697,18 +702,19 @@ class CoralData:
 						temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1, toremove=3)
 					else:
 						temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1)
+					# print(temp_dataset.shape)
 					temp_prob_predict = model.predict_on_batch(temp_dataset)
 					# print(temp_prob_predict.shape)
 					temp_predict = self._classifyback(temp_prob_predict)
 					
 					for predict_mat in temp_predict: 	# this is incorrect if temp_predict has more than 1 prediction (e.g. cols>1, lines>1)
 						whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = \
-							whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.reshape(predict_mat, (predict_size,predict_size))
+							whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.reshape(predict_mat, (image_size,image_size))[offstart:offstart+predict_size,offstart:offstart+predict_size]
 						num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = \
-							num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones((predict_size,predict_size))
+							num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones((image_size,image_size))[offstart:offstart+predict_size,offstart:offstart+predict_size]
 						prob_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size,:] = \
-							prob_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size,:] + np.reshape(temp_prob_predict, (predict_size,predict_size,num_classes))
-					print("Line: " + str(offset-crop_len) + " Col: " + str(cols-crop_len) + '/ ' + str(self.testimage.shape[1]-image_size+1) + ' completed', end='\r')
+							prob_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size,:] + np.reshape(temp_prob_predict, (1,image_size,image_size,num_classes))[0][offstart:offstart+predict_size,offstart:offstart+predict_size,:]
+					print("Line: " + str(offset-crop_len) + " Col: " + str(cols-crop_len) + '/ ' + str(self.testimage.shape[1]-image_size+1) + ' completed')
 		else:
 			if num_lines is None:
 				num_lines = int(np.floor((self.testimage.shape[0] - image_size)/spacing[0])+1) # Predict on whole image
