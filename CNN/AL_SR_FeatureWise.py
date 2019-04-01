@@ -36,14 +36,13 @@ Jarrett_4channel_model = load_model('./tmp/RefineMask_Jarrett256_RGB_NIR.h5', cu
 image_size = 64
 batch_size = 12
 mag = 4
-model_name = 'SR_FeatureWise'
+model_name = 'SR_FeatureWise2'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
     json_data = json.load(json_file)
 
 labelkey = json_data["Fiji_ClassDict"]
-# labelkey = {'Sand': 0, 'Branching': 1, 'Mounding': 2, 'Rock':3}
 num_classes = len(labelkey)
 
 with open("init_args - SRx4_Fiji.yml", 'r') as stream:
@@ -92,7 +91,7 @@ train_generator = datagen.flow_from_NeMOdirectory(directory=[train_loader.image_
     FCN_directory=None,
     source_size=[(x,y),(x*mag,y*mag)],
     target_size=[128],
-    color_mode="4channel",
+    color_mode="4channel_delete",
     passedclasses = labelkey,
     class_mode = 'zeros',
     batch_size = batch_size,
@@ -106,7 +105,7 @@ validation_generator = datagen.flow_from_NeMOdirectory(directory=[val_loader.ima
     FCN_directory=None,
     source_size=[(x,y),(x*mag,y*mag)],
     target_size=[128],
-    color_mode="4channel",
+    color_mode="4channel_delete",
     passedclasses = labelkey,
     class_mode = 'zeros',
     batch_size = batch_size,

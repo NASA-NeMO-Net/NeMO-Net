@@ -282,6 +282,17 @@ def vgg_deconvblock(classes, scale, bridge_params=None, prev_params=None, next_p
         return x
     return f
 
+def vgg_fcblock(filters, dropout=0.5, weight_decay=0., block_name='vgg_fcblock', first_time=False):
+    def f(input):
+      x = input
+      if first_time:
+          x = Flatten()(x)
+
+      x = Dropout(dropout)(x)
+      x = Dense(filters, activation='relu', kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay), name='{}_Dense'.format(block_name))(x)
+      x = BatchNormalization(name='{}_BatchNorm'.format(block_name))(x)
+      return x
+    return f
 
 def alex_fc(filters, flatten_bool=False, dropout_bool=False, dropout=0.5, weight_decay=0., block_name='alexfc'):
     def f(input):

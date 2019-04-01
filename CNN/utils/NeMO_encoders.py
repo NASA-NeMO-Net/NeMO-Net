@@ -18,6 +18,7 @@ from NeMO_blocks import (
     alex_conv,
     alex_fc,
     vgg_conv,
+    vgg_fcblock,
     vgg_fc
 )
 from NeMO_backend import load_weights
@@ -375,9 +376,13 @@ class Recursive_Hyperopt_Encoder(Res_Encoder):
             blocks.append(block)
 
         if full_layers > 0:
-            block_name = 'vgg_fcblock'
-            block = vgg_fcblock(full_filters, full_layers, dropout_bool=True, dropout=dropout, weight_decay=weight_decay, block_name=block_name)
-            blocks.append(block)
+            for i in range(full_layers):
+                block_name = 'vgg_fcblock{}'.format(i+1)
+                if i==0:
+                    block = vgg_fcblock(full_filters[i], dropout=dropout[i], weight_decay=weight_decay, block_name=block_name, first_time=True)
+                else:
+                    block = vgg_fcblock(full_filters[i], dropout=dropout[i], weight_decay=weight_decay, block_name=block_name, first_time=False)
+                blocks.append(block)
 
         super(Recursive_Hyperopt_Encoder, self).__init__(inputs=inputs, blocks=blocks, weights=weights, trainable = trainable)
 

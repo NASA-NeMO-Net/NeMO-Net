@@ -10,7 +10,7 @@ import keras.backend as K
 from keras.models import Model
 from keras.layers import Input, Flatten, Activation, Reshape, Dense, Cropping2D
 
-from NeMO_layers import CroppingLike2D, BilinearUpSampling2D
+from NeMO_layers import CroppingLike2D, BilinearUpSampling2D, GradientReversal
 from keras.regularizers import l2
 from keras.layers.convolutional import Conv2D, AveragePooling2D
 from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Recursive_Hyperopt_Encoder
@@ -72,7 +72,6 @@ def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, w
 
     return Model(inputs=inputs, output=encoder_output)
 
-
 def SharpMask_FCN(input_shape, classes, decoder_index, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, full_layers=0, conv_params=None, 
     scales = 1, bridge_params=None, prev_params=None, next_params=None):
     inputs = Input(shape=input_shape)
@@ -126,7 +125,7 @@ def SRModel_FeatureWise(hr_input_shape, lr_input_shape, SRModel, FeatureModel, F
     Feature_layer = FeatureModel.get_layer(FeatureLayerName).output
     newFeatureModel = Model(FeatureModel.input, outputs=Feature_layer)
     keras.utils.layer_utils.print_summary(newFeatureModel, line_length=150, positions=[.35, .55, .65, 1.])
-
+    keras.utils.layer_utils.print_summary(SRModel, line_length=150, positions=[.35, .55, .65, 1.])
     # Set FeatureModel as untrainable
     for l in newFeatureModel.layers:
         l.trainable=False
@@ -141,6 +140,22 @@ def SRModel_FeatureWise(hr_input_shape, lr_input_shape, SRModel, FeatureModel, F
     loss = Lambda(lambda x: K.sqrt(K.mean((x[0]-x[1])**2, (1,2))))([FeatureModel_hr_content, FeatureModel_SR_content])
     
     return Model([lr_inputs, hr_inputs], loss)
+
+def DANN_Model(source_input_shape, source_model, domain_model, FeatureLayerName):
+    source_inputs = Input(shape=source_input_shape)
+    
+    feature_layer = source_model.get_layer(FeatureLayerName).output
+    tempmodel = Model(source_model.input, feature_layer)
+    
+    # source_output = source_model(source_inputs)
+    temp_output = tempmodel(source_inputs)
+    Flip = GradientReversal(1)
+    temp_output = Flip(temp_output)
+    
+    domain_output = domain_model(temp_output)
+    source_output = source_model(source_inputs)
+    
+    return Model(inputs=source_inputs, outputs=[source_output,domain_output])
     
 
 def FCN(*args, **kwargs):

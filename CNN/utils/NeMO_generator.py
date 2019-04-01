@@ -46,6 +46,7 @@ class NeMOImageGenerator(ImageDataGenerator):
                  height_shift_range=0.,
                  shear_range=0.,
                  zoom_range=0.,
+                 augmentation=0.,
                  channel_shift_range=0.,
                  random_rotation=False,
                  fill_mode='nearest',
@@ -64,6 +65,7 @@ class NeMOImageGenerator(ImageDataGenerator):
         self.pixelwise_std_normalization = pixelwise_std_normalization
         self.pixel_std = np.array(pixel_std)
         self.NeMO_rescale = NeMO_rescale
+        self.augmentation = augmentation
         self.random_rotation = random_rotation
         self.image_or_label = image_or_label
 
@@ -86,6 +88,24 @@ class NeMOImageGenerator(ImageDataGenerator):
             vertical_flip = vertical_flip,
             preprocessing_function = preprocessing_function,
             data_format = data_format)
+    
+    def augmentation_shift(self, x):
+        x = np.rollaxis(x, self.channel_axis-1, 0) # make channel_axis the first axis
+        x = x*100+100
+        for i in range(0,x.shape[0]):
+            alpha = np.random.uniform(-0.25,0.25)
+            beta = np.random.randint(0,4)
+            if beta == 0:
+                x[i] = x[i] + alpha*x[i]
+            elif beta == 1:
+                x[i] = x[i] + alpha*20/x[i]
+            elif beta == 2:
+                x[i] = x[i] - alpha*x[i]
+            elif beta == 3:
+                x[i] = x[i] - alpha*20/x[i]
+        x = 1/100*(x-100)
+        x = np.rollaxis(x,0,self.channel_axis)
+        return x
 
     def random_channel_shift(self, x):
         #Perform a random channel shift.
@@ -352,6 +372,7 @@ class NeMODirectoryIterator(Iterator):
         self.classes = np.zeros((len(self.directory),self.samples,), dtype='int32')
         self.class_idx_startend = [] # for keeping track of the starting and ending idx of each class, in case they are of different lengths 
         dcount = 0
+        print(classes)
         for d in self.directory:
             tempresults = []
             for dirpath in (os.path.join(d, subdir) for subdir in classes):
@@ -457,6 +478,8 @@ class NeMODirectoryIterator(Iterator):
                     if self.color_mode == "4channel_delete": # assumes target AND source are starting off as 8 channel
                         img = np.delete(img, [0,3,5,7], 2) # harded coded for BGR + NIR
                     x = img_to_array(img, data_format=self.data_format)
+                    if self.image_data_generator.augmentation:
+                        x = self.image_data_generator.augmentation_shift(x)
                     x = self.image_data_generator.standardize(x) # standardize and rescaling is done here
                     if self.image_data_generator.channel_shift_range != 0:
                         x = self.image_data_generator.random_channel_shift(x)   
@@ -742,11 +765,11 @@ class ImageSetLoader(object):
             raise IOError('Image set {} does not exist. Please provide a'
                           'valid file.'.format(image_set))
 
-        try:
-            self.filenames = np.loadtxt(image_set, dtype=bytes)
-            self.filenames = [fn.decode('utf-8') for fn in self.filenames]
-        except:
-            pass
+#         try:
+#             self.filenames = np.loadtxt(image_set, dtype=bytes)
+#             self.filenames = [fn.decode('utf-8') for fn in self.filenames]
+#         except:
+#             pass
 
         if not os.path.exists(image_dir):
             raise IOError('Directory {} does not exist. Please provide a '
