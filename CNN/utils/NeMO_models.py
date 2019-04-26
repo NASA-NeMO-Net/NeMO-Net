@@ -66,6 +66,7 @@ def TestModel(input_shape, classes, decoder_index, weight_decay=0., trainable_en
 
 def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=0, full_layers=0, conv_params=None):
     inputs = Input(shape=input_shape)
+    # Note that classes is never used for Recursive_Hyperopt_Encoder!!! Manually enter it in at layer level!
     encoder = Recursive_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, 
         conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
     encoder_output = encoder.outputs[0]
@@ -149,8 +150,8 @@ def DANN_Model(source_input_shape, source_model, domain_model, FeatureLayerName)
     
     # source_output = source_model(source_inputs)
     temp_output = tempmodel(source_inputs)
-    Flip = GradientReversal(1)
-    temp_output = Flip(temp_output)
+    # Flip = GradientReversal(1.0)
+    # temp_output = Flip(temp_output)
     
     domain_output = domain_model(temp_output)
     source_output = source_model(source_inputs)

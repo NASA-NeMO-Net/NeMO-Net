@@ -174,7 +174,7 @@ RefineMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, 
     bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
 
 # SharpMask = load_model('./tmp/SharpMask_Jarrett256_v2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D})
-RefineMask = load_model('./tmp/RefineMask_Jarrett256_RGB_NIR2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D, 'charbonnierLoss': charbonnierLoss})
+# RefineMask = load_model('./tmp/RefineMask_Jarrett256_RGB_NIR2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D, 'charbonnierLoss': charbonnierLoss})
 
 optimizer = keras.optimizers.Adam(1e-4)
 
@@ -184,11 +184,11 @@ RefineMask.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics
 
 print("Memory required (GB): ", get_model_memory_usage(batch_size, RefineMask))
 
-# RefineMask.fit_generator(train_generator,
-#     steps_per_epoch=100,
-#     epochs=100,
-#     validation_data=validation_generator,
-#     validation_steps=20,
-#     verbose=1,
+RefineMask.fit_generator(train_generator,
+    steps_per_epoch=50,
+    epochs=10,
+    validation_data=validation_generator,
+    validation_steps=10,
+    verbose=1)
 #     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 

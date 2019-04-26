@@ -183,65 +183,27 @@ class NeMOImageGenerator(ImageDataGenerator):
             directory, self, FCN_directory=FCN_directory, target_size=target_size, source_size=source_size, color_mode=color_mode, passedclasses=passedclasses, class_mode=class_mode,
             data_format=self.data_format, batch_size=batch_size, class_weights=class_weights, shuffle=shuffle, seed=seed,
             save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format, follow_links=follow_links, image_or_label=image_or_label)
+    
+    def DANN_flow_from_NeMOdirectory(self, source_directory, label_directory, target_directory,
+                            source_size=(64,64), color_mode='rgb',
+                            passedclasses=None, class_mode='categorical',
+                            batch_size=32, class_weights = None, shuffle=True, seed=None,
+                            save_to_dir=None,
+                            save_prefix='',
+                            save_format='png',
+                            follow_links=False):
+        return DANN_NeMODirectoryIterator(
+            source_directory, self, label_directory, target_directory, source_size=source_size, color_mode=color_mode, passedclasses=passedclasses, class_mode=class_mode,
+            data_format=self.data_format, batch_size=batch_size, class_weights=class_weights, shuffle=shuffle, seed=seed,
+            save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format, follow_links=follow_links)
 
-
-# Currently unused (here from previous code)
-class IndexIterator(Iterator):
-    """Iterator over index."""
-
-    def __init__(self, image_set_loader, image_data_generator,
-                 class_mode='categorical', classes=None,
-                 batch_size=1, shuffle=False, seed=None, labelkey=[0,63,127,191]):
-        """Init."""
-        self.image_set_loader = image_set_loader
-        self.image_data_generator = image_data_generator
-
-        self.filenames = image_set_loader.filenames
-        self.image_shape = image_set_loader.image_shape
-        self.labelkey = labelkey
-
-        self.classes = classes
-        if class_mode == 'binary':
-            label_shape = list(self.image_shape).pop(self.channel_axis - 1)
-            self.label_shape = tuple(label_shape)
-        elif class_mode == 'categorical':
-            label_shape = list(self.image_shape)
-            label_shape[self.image_data_generator.channel_axis - 1] \
-                = self.classes
-            self.label_shape = tuple(label_shape)
-
-        super(IndexIterator, self).__init__(len(self.filenames), batch_size,
-                                            shuffle, seed)
-
-    def _get_batches_of_transformed_samples(self, index_array):
-        batch_x = np.zeros(
-            (self.batch_size,) + self.image_shape,
-            dtype=K.floatx())
-        batch_y = np.zeros(
-            (self.batch_size,) + self.label_shape,
-            dtype=np.int8)
-        #batch_y = np.reshape(batch_y, (current_batch_size, -1, self.classes))
-
-        for i, j in enumerate(index_array):
-            fn = self.filenames[j]
-            x = self.image_set_loader.load_img(fn)
-            x = self.image_data_generator.standardize(x)
-            batch_x[i] = x
-            y = self.image_set_loader.load_seg(fn,labelkey=self.labelkey)
-            y = to_categorical(y, self.classes).reshape(self.label_shape)
-            #y = np.reshape(y, (-1, self.classes))
-            batch_y[i] = y
-
-        return batch_x, batch_y
 
 class NeMODirectoryIterator(Iterator):
     """Iterator capable of reading images from a directory on disk.
 
     # Arguments
-        directory: Path to the directory to read images from.
-            Each subdirectory in this directory will be
-            considered to contain images from one class,
-            or alternatively you could specify class subdirectories
+        directory: Path to the directory to read images from. Each subdirectory in this directory will be
+            considered to contain images from one class,or alternatively you could specify class subdirectories
             via the `classes` argument.
         image_data_generator: Instance of `ImageDataGenerator`
             to use for random transformations and normalization.
@@ -746,6 +708,413 @@ class NeMODirectoryIterator(Iterator):
         # #        self.image_set_loader.save(x, y, current_index + i)
 
         # return batch_x, batch_y
+
+class DANN_NeMODirectoryIterator(Iterator):
+    """Iterator capable of reading images from a directory on disk.
+
+    # Arguments
+        source_directory: Path to the source directory to read images from. Each subdirectory in this directory will be
+            considered to contain images from one class,or alternatively you could specify class subdirectories
+            via the 'classes' argument.
+        image_data_generator: Instance of 'ImageDataGenerator'to use for random transformations and normalization.
+        label_directory: Path to label directory for truth data of source_directory
+        target_directory: path to target directory for images of another domain (different satellite, time of day, etc..)
+        source_size: tuple of integers, dimensions of input images
+        color_mode: 'rgb', 'grayscale', '8channel', or '4channel'
+        passedclasses: Class dictionary, try to always pass this in (e.g. {'Coral':1, 'Sediment':2, etc...})
+        class_mode: Mode for yielding the targets:
+            `"binary"`: binary targets (if there are only two classes),
+            `"categorical"`: categorical targets,
+            `"sparse"`: integer targets,
+            `"input"`: targets are images identical to input images (mainly
+                used to work with autoencoders),
+            `None`: no targets get yielded (only input images are yielded).
+        batch_size: Integer, size of a batch.
+        class_weights: Weights per class
+        shuffle: Boolean, whether to shuffle the data between epochs.
+        seed: Random seed for data shuffling.
+        data_format: String, one of `channels_first`, `channels_last`.
+        save_to_dir: Optional directory where to save the pictures being yielded, in a viewable format. This is useful
+            for visualizing the random transformations being applied, for debugging purposes.
+        save_prefix: String prefix to use for saving sample
+            images (if `save_to_dir` is set).
+        save_format: Format to use for saving sample images
+            (if `save_to_dir` is set).
+        follow_links: Set this to default (False)
+    """
+    
+    def __init__(self, source_directory, image_data_generator, label_directory, target_directory, source_size=(256,256), color_mode='rgb',
+                 passedclasses=None, class_mode='categorical', batch_size=32, class_weights=None, shuffle=True, seed=None,
+                 data_format=None, save_to_dir=None, save_prefix='', save_format='png', follow_links=False):
+        if data_format is None:
+            data_format = K.image_data_format() #channels_last
+        if type(source_directory) == list:
+            self.source_directory = source_directory
+            self.label_directory = label_directory
+            self.target_directory = target_directory
+        else:
+            self.source_directory = [source_directory]  # Make self.source)directory a list so we can iterate over it (matches it with if source_directory IS a list)
+            self.label_directory = [label_directory]
+            self.target_directory = [target_directory]
+        
+        self.image_data_generator = image_data_generator
+        self.source_size = tuple(source_size)
+        self.target_size = tuple(source_size) # same size as source for now
+
+        if color_mode not in {'rgb', 'grayscale','8channel','4channel','4channel_delete'}:
+            raise ValueError('Invalid color mode:', color_mode,
+                             '; expected "rgb", "grayscale", or "8channel.')
+        self.color_mode = color_mode
+        self.data_format = data_format
+        
+        if len(self.source_directory) == 1:
+            self.source_size = [source_size] # make source size into list
+        self.image_shape = []
+        for dcount in range(0, len(self.source_directory)): # set image_shape
+            if self.color_mode == 'rgb':
+                if self.data_format == 'channels_last':
+                    self.image_shape.append(self.source_size[dcount] + (3,))
+                else:
+                    self.image_shape.append((3,) + self.source_size[dcount])
+            elif self.color_mode == "8channel":
+                if self.data_format == 'channels_last':
+                    self.image_shape.append(self.source_size[dcount] + (8,))
+                else:
+                    self.image_shape.append((8,) + self.source_size[dcount])
+            elif self.color_mode == "4channel" or self.color_mode == "4channel_delete":
+                if self.data_format == 'channels_last':
+                    self.image_shape.append(self.source_size[dcount] + (4,))
+                else:
+                    self.image_shape.append((4,) + self.source_size[dcount])
+            else:
+                if self.data_format == 'channels_last':
+                    self.image_shape.append(self.source_size[dcount] + (1,))
+                else:
+                    self.image_shape.append((1,) + self.source_size[dcount])
+                            
+        if class_mode not in {'categorical', 'binary', 'sparse', 'input', 'fixed_RGB', 'zeros', None}:
+            raise ValueError('Invalid class_mode:', class_mode, '; expected one of "categorical", "binary", "sparse", "input", "fixed_RGB", "zeros", or None.')
+        self.class_mode = class_mode
+        self.save_to_dir = save_to_dir
+        self.save_prefix = save_prefix
+        self.save_format = save_format
+        self.class_weights = class_weights
+
+        white_list_formats = {'png', 'jpg', 'jpeg', 'bmp', 'ppm', 'tif'}
+
+        # first, count the number of samples and classes
+        self.samples = 0
+
+        # if not classes:
+        # Always determine number classes by the subdirectories (will not count classes that don't show up)
+        classes = [] 
+        for subdir in sorted(os.listdir(self.source_directory[0])): #if multiple directories, make sure that they all have the same class folders (here, it will only look in the first one)
+            if os.path.isdir(os.path.join(self.source_directory[0], subdir)):
+                classes.append(subdir) # classes reflect the directories in source_directory
+
+        if type(passedclasses) is dict:
+            self.class_indices = passedclasses   # Class indices will be a dictionary containing the maximum possible classes, which is passed in
+            self.num_consolclass = len(passedclasses) # number of consolidated classes, which passedclasses is a dictionary of
+            # classes = [k for k in self.class_indices] #redefine classes as a list
+        else:
+            self.class_indices = dict(zip(classes, range(len(passedclasses)))) # Class indices determined from number of directories, USE THIS ONLY AS LAST RESORT IF YOU HAVE NO PASSABLE DICTIONARY
+            self.num_consolclass = len(np.unique([self.class_indices[k] for k in self.class_indices]))
+        self.num_class = len(classes) # sets num_class to number of existing subdirectory classes (NOT ALL consolidated classes)
+
+        pool = multiprocessing.pool.ThreadPool()
+        function_partial = partial(_count_valid_files_in_directory, white_list_formats=white_list_formats, follow_links=follow_links)
+        
+        for d in self.source_directory:
+            self.samples = sum(pool.map(function_partial, (os.path.join(d, subdir) for subdir in classes))) # make sure number of samples same in both directories
+            print('Source %s: Found %d images belonging to %d subdirectory classes, split into %d consolidated classes.' % (d, self.samples, self.num_class, self.num_consolclass))
+        
+        for d in self.label_directory:
+            self.labelsamples = sum(pool.map(function_partial, (os.path.join(d, subdir) for subdir in classes))) # make sure number of samples same in both directories
+            if self.labelsamples != self.samples:
+                raise ValueError("Error! %d training images found by only %d labelled images found." %(self.samples, self.labelsamples))
+
+        for d in self.target_directory:
+            self.targetsamples = sum(pool.map(function_partial, (os.path.join(d, subdir) for subdir in classes))) # make sure number of samples same in both directories
+            print('Target %s: Found %d images belonging to %d subdirectory classes, split into %d consolidated classes.' % (d, self.targetsamples, self.num_class, self.num_consolclass))
+
+        # Build an index of the images in the different class subfolders
+        self.filenames = [] # all filenames of source images
+        self.classes = np.zeros((len(self.source_directory),self.samples,), dtype='int32')
+        self.sourceclass_idx_startend = [] # for keeping track of the starting and ending idx of each class, in case they are of different lengths 
+        dcount = 0
+        for d in self.source_directory:
+            results = []
+            for dirpath in (os.path.join(d, subdir) for subdir in classes):
+                results.append(pool.apply_async(_list_valid_filenames_in_directory, (dirpath, white_list_formats, self.class_indices, follow_links)))
+            
+            i = 0
+            tempfilenames = []
+            for res in results:
+                tempclasses, filenames = res.get()
+                self.classes[dcount,i:i + len(tempclasses)] = tempclasses
+                if dcount == 0: # assumes that all files have corresponding 1:1 between inputs
+                    self.sourceclass_idx_startend.append([i,i+len(tempclasses)])
+                filenames.sort()
+                tempfilenames += filenames
+                i += len(tempclasses)
+            self.filenames.append(tempfilenames)
+            dcount += 1
+            
+        # Build an index of images in label directory
+        for d in self.label_directory: # currently coded so that there is only 1 label_directory
+            label_results = []
+            self.label_filenames = []
+            self.min_labelkey = np.min([self.class_indices[k] for k in self.class_indices])
+            self.labelkey = [np.uint8(255/self.num_consolclass*i) for i in range(self.min_labelkey, self.min_labelkey+self.num_consolclass)] # Assuming labels are saved according to # of consolclass
+            label_shape = list(self.image_shape[0]) # R x C x D
+            label_shape[self.image_data_generator.channel_axis -1] = self.num_consolclass
+            self.label_shape = tuple(label_shape)
+            
+            for dirpath in (os.path.join(label_directory, subdir) for subdir in classes):
+                label_results.append(pool.apply_async(_list_valid_filenames_in_directory, (dirpath, white_list_formats, self.class_indices, follow_links)))
+            
+            for res in label_results:
+                tempclasses, filenames = res.get()
+                filenames.sort()
+                self.label_filenames += filenames
+        
+        # Build an index of images in target directory
+        dcount = 0
+        for d in self.target_directory: # currently coded so that there is only 1 target_directory
+            target_results = []
+            self.target_filenames = []
+            self.targetclasses = np.zeros((len(self.target_directory),self.targetsamples,), dtype='int32')
+            self.targetclass_idx_startend = [] # for keeping track of the starting and ending idx of each class, in case they are of different lengths 
+            
+            for dirpath in (os.path.join(d, subdir) for subdir in classes):
+                target_results.append(pool.apply_async(_list_valid_filenames_in_directory, (dirpath, white_list_formats, self.class_indices, follow_links)))
+            
+            i = 0
+            tempfilenames = []
+            for res in target_results:
+                tempclasses, filenames = res.get()
+                self.targetclasses[dcount,i:i + len(tempclasses)] = tempclasses
+                if dcount == 0: # assumes that all files have corresponding 1:1 between inputs
+                    self.targetclass_idx_startend.append([i,i+len(tempclasses)])
+                filenames.sort()
+                tempfilenames += filenames
+                i += len(tempclasses)
+            self.target_filenames.append(tempfilenames)
+            dcount += 1
+        
+        pool.close()
+        pool.join()
+        super(DANN_NeMODirectoryIterator, self).__init__(self.samples, batch_size, shuffle, seed) #n, batch_size, shuffle, seed
+
+    def _flow_index(self, n_source, n_target, batch_size=32, shuffle=False, seed=None): # n = total number of images in all folders
+        # batch_size refers to the size of only source, so actual batch size is batch_size*2
+        
+        # Ensure self.batch_index is 0.
+        self.reset() # sets self.batch_index = 0 (only done during first call)
+#         print("batch_size: ", batch_size)
+        if batch_size == True:
+            batch_size = 8 # hard coded
+        self.target_batch_index = 0 # this batch index is specific to the target images
+        # This assumes same number of files per class!
+        div_source = n_source/self.num_class
+        div_target = n_target/self.num_class
+        while 1:
+            index_array_source = []
+            index_array_target = []
+            np.asarray(index_array_source)
+            np.asarray(index_array_target)
+            if seed is not None:
+                np.random.seed(seed + self.total_batches_seen)
+
+            leftover = batch_size % self.num_class #remainder in case num_class doesn't divide into batch_size
+            random_c = np.random.choice(self.num_class,leftover,replace=False)
+            
+            # Chooses same number of images per class, starting and ending with class_idx_startend in case folders contain different # of files
+            for c in range(self.num_class):
+                index_array_source = np.append(index_array_source, np.random.randint(int(self.sourceclass_idx_startend[c][0]),int(self.sourceclass_idx_startend[c][1]),size=int(batch_size//self.num_class)))
+                index_array_target = np.append(index_array_target, np.random.randint(int(self.targetclass_idx_startend[c][0]),int(self.targetclass_idx_startend[c][1]),size=int(batch_size//self.num_class)))
+            for c in random_c: #choose random folders to pick from
+                index_array_source = np.append(index_array_source, np.random.randint(int(self.sourceclass_idx_startend[c][0]),int(self.sourceclass_idx_startend[c][1]),size=1))
+                index_array_target = np.append(index_array_target, np.random.randint(int(self.targetclass_idx_startend[c][0]),int(self.targetclass_idx_startend[c][1]),size=1))
+
+            current_index_source = (self.batch_index * batch_size) % n_source # remainder
+            current_index_target = (self.target_batch_index * batch_size) % n_target
+            
+            current_batch_size_source = int(batch_size)
+            if n_source > current_index_source + batch_size:
+                self.batch_index += 1  # batch number within n images
+            else:
+                # current_batch_size = n - current_index
+                self.batch_index = 0 # has gone through all n images, reset batch_index to 0
+                
+            current_batch_size_target = batch_size
+            if n_target > current_index_target + batch_size:
+                self.target_batch_index += 1  # batch number within n images
+            else:
+                self.target_batch_index = 0 # has gone through all n images, reset batch_index to 0
+            
+            self.total_batches_seen += 1
+            index_array_source = index_array_source.astype(np.int64)
+            index_array_target = index_array_target.astype(np.int64)
+            yield (index_array_source, current_index_source, current_batch_size_source, index_array_target, current_index_target, current_batch_size_target)
+
+    def next(self):
+        """For python 2.x.
+
+        # Returns
+            The next batch.
+        """
+        with self.lock:
+            index_array_source, current_index_source, current_batch_size_source, index_array_target, current_index_target, current_batch_size_target= next(self.index_generator)
+
+        # The transformation of images is not under thread lock so it can be done in parallel
+        
+        batch_x = [] # create batch as list, so it can support multiple inputs
+        for i in range(len(self.source_directory)):
+            batch_x.append(np.zeros((current_batch_size_source + current_batch_size_target,) + self.image_shape[i], dtype=K.floatx())) # total size will be source_batch_size + target_batch_size
+        
+        if self.image_data_generator.random_rotation:
+            batch_flip = np.zeros(current_batch_size_source)
+            batch_rot90 = np.zeros(current_batch_size_source) # reuse these flip and rotations for source and target 
+    
+        if self.color_mode == "8channel" or self.color_mode == "4channel" or self.color_mode == "4channel_delete":
+            # iterate over directory?
+            for dcount in range(0,len(self.source_directory)):
+                for i, j in enumerate(index_array_source):
+                    fsourcename = self.filenames[dcount][j]
+                    img = coralutils.CoralData(os.path.join(self.source_directory[dcount], fsourcename), load_type="raster").image
+                    if self.color_mode == "4channel_delete": # assumes target AND source are starting off as 8 channel
+                        img = np.delete(img, [0,3,5,7], 2) # harded coded for BGR + NIR
+                    x = img_to_array(img, data_format=self.data_format)
+                    if self.image_data_generator.augmentation:
+                        x = self.image_data_generator.augmentation_shift(x)
+                    x = self.image_data_generator.standardize(x) # standardize and rescaling is done here
+                    if self.image_data_generator.channel_shift_range != 0:
+                        x = self.image_data_generator.random_channel_shift(x)   
+                    if self.image_data_generator.random_rotation:
+                        if dcount == 0: # random rotation if first time, otherwise use same as before
+                            x, batch_flip[i], batch_rot90[i] = self.image_data_generator.random_flip_rotation(x)
+                        else:
+                            x, _, _ = self.image_data_generator.random_flip_rotation(x, batch_flip[i], batch_rot90[i])
+
+                    batch_x[dcount][i] = x
+                    if self.save_to_dir: # save to directory code
+                        img = (x*self.image_data_generator.pixel_std)+self.image_data_generator.pixel_mean
+                        fname = '{prefix}_{direct}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_sourceimg', direct=dcount, index=current_index_source+i, hash=index_array_source[i], format='tif')
+                        driver = gdal.GetDriverByName('GTiff')
+                        dataset = driver.Create(os.path.join(self.save_to_dir, fname), img.shape[0], img.shape[1], img.shape[2], gdal.GDT_Float32)
+                        for chan in range(img.shape[2]):
+                            dataset.GetRasterBand(chan+1).WriteArray((img[:,:,chan]))
+                            dataset.FlushCache()
+            
+            for dcount in range(0,len(self.target_directory)):
+                for i, j in enumerate(index_array_target):
+                    ftargetname = self.target_filenames[dcount][j]
+                    img = coralutils.CoralData(os.path.join(self.target_directory[dcount], ftargetname), load_type="raster").image
+                    if self.color_mode == "4channel_delete": # assumes target AND source are starting off as 8 channel
+                        img = np.delete(img, [0,3,5,7], 2) # harded coded for BGR + NIR
+                    x = img_to_array(img, data_format=self.data_format)
+                    if self.image_data_generator.augmentation:
+                        x = self.image_data_generator.augmentation_shift(x)
+                    x = self.image_data_generator.standardize(x) # standardize and rescaling is done here
+                    if self.image_data_generator.channel_shift_range != 0:
+                        x = self.image_data_generator.random_channel_shift(x)   
+                    if self.image_data_generator.random_rotation:
+                        x, _, _ = self.image_data_generator.random_flip_rotation(x, batch_flip[i], batch_rot90[i]) # rotations already determined by source
+
+                    batch_x[dcount][i+current_batch_size_source] = x
+                    if self.save_to_dir: # save to directory code
+                        img = (x*self.image_data_generator.pixel_std)+self.image_data_generator.pixel_mean
+                        fname = '{prefix}_{direct}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_targetimg', direct=dcount, index=current_index_target+i, hash=index_array_target[i], format='tif')
+                        driver = gdal.GetDriverByName('GTiff')
+                        dataset = driver.Create(os.path.join(self.save_to_dir, fname), img.shape[0], img.shape[1], img.shape[2], gdal.GDT_Float32)
+                        for chan in range(img.shape[2]):
+                            dataset.GetRasterBand(chan+1).WriteArray((img[:,:,chan]))
+                            dataset.FlushCache()
+                            
+
+            batch_y = np.zeros((current_batch_size_source + current_batch_size_target,) + self.label_shape, dtype=np.int8) # N x R x C x D
+            batch_weights = np.ones((current_batch_size_source + current_batch_size_target, self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float) # if every class has different weight
+            sample_weights_class = np.array(([1] * current_batch_size_source + [0] * current_batch_size_target))
+            sample_weights_domain = np.ones((current_batch_size_source + current_batch_size_target,))
+            
+            for i,j in enumerate(index_array_source):
+                fname = self.label_filenames[j]
+                
+                # assume all label data
+                y = self._load_seg(fname)
+                if self.image_data_generator.random_rotation: # flip and rotate according to previous batch_x images
+                    y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
+                if self.class_weights is not None:
+                    weights = np.zeros((self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float)
+                    for k in self.class_weights:
+                        weights[y == self.class_indices[k]] = self.class_weights[k]             # class_weights must be a dictionary
+                    batch_weights[i] = weights
+                batch_weights[i+current_batch_size_source] = np.zeros((self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float) # set batch weights of all target images to 0
+                
+                if self.save_to_dir:            # save to dir before y is transformed to categorical tensor
+                    img = y
+                    fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_labelimg', index=current_index_source + i, hash=index_array_source[i],format=self.save_format)
+                    cv2.imwrite(os.path.join(self.save_to_dir, fname), img)
+                y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
+                batch_y[i] = y
+                    
+        # Domain Classifier Branch
+        
+#         print(current_batch_size_source, current_batch_size_target)
+        domain_batch_y = np.zeros((current_batch_size_source + current_batch_size_target,2), dtype=np.int8)
+        domain_batch_y[:current_batch_size_source,0] = 1
+        domain_batch_y[current_batch_size_source:,1] = 1
+        domain_batch_y_weights = np.ones((current_batch_size_source + current_batch_size_target,2), dtype=np.int8) # N x 2 (1 for everything)
+            
+        if len(batch_x) == 1: # Check if there is only one directory
+            batch_x = batch_x[0]
+            
+        quick_shape1 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2],z.shape[3])) # convert to B x (C*R) x N_channel
+        quick_shape2 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2])) # convert to B x (C*R)
+        
+#         print("batch_x: ", batch_x.shape)
+#         print("batch_y reshape: ", quick_shape1(batch_y).shape)
+#         print("domain_batch_y: ", domain_batch_y.shape)
+#         print("batch_weights reshape: ", quick_shape2(batch_weights).shape)
+#         print("domain_batch_y_weights: ", domain_batch_y_weights.shape)
+
+        return batch_x, [quick_shape1(batch_y), domain_batch_y], [sample_weights_class, sample_weights_domain]
+
+    def _load_seg(self, fn):
+        """Segmentation load method.
+
+        # Arguments
+            fn: filename of the image (with extension suffix)
+        # Returns
+            arr: numpy array of shape self.source_size
+        """
+        if type(self.label_directory) == list:
+            label_path = os.path.join(self.label_directory[0], fn) # only one label directory for now
+        else:
+            label_path = os.path.join(self.label_directory, fn)
+        if label_path.endswith('.tif'):
+            img = pil_image.open(label_path)
+            if self.source_size:
+                wh_tuple = (self.source_size[0][1], self.source_size[0][0])
+            if img.size != wh_tuple:
+                img = img.resize(wh_tuple)
+            y = img_to_array(img, data_format=self.data_format)
+            y = y.reshape(wh_tuple)
+        elif label_path.endswith('.png'):
+            img = cv2.imread(label_path, cv2.IMREAD_GRAYSCALE)
+            y = img
+        else:
+            print('Unrecognized file format for _load_seg!')
+            raise ValueError
+
+        item_counter = 0
+        # print(np.unique(y))
+        # print(np.unique(self.labelkey))
+        for item in self.labelkey:
+            y[y == item] = self.class_indices[list(self.class_indices.keys())[item_counter]] - self.min_labelkey # Set 0-255 gray level to 0-num_consolclass
+            item_counter+=1
+        return y
 
 
 class ImageSetLoader(object):

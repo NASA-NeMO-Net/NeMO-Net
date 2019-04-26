@@ -19,7 +19,7 @@ import sys
 sys.path.append("./utils/") # Adds higher directory to python modules path.
 import loadcoraldata_utils as coralutils
 from NeMO_models import AlexNetLike, SharpMask_FCN, DANN_Model
-from NeMO_generator import NeMOImageGenerator, ImageSetLoader
+from NeMO_generator import NeMOImageGenerator, ImageSetLoader, DANN_NeMODirectoryIterator
 from NeMO_backend import get_model_memory_usage
 from NeMO_losses import charbonnierLoss
 import NeMO_layers
@@ -34,7 +34,7 @@ from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 256
 batch_size = 8
-model_name = 'RefineMask_Jarrett256_RGB_NIR3'
+model_name = 'RefineMask_DANN256'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
@@ -51,6 +51,7 @@ with open("init_args - Jarrett.yml", 'r') as stream:
 
 train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
 val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
+target_dir = '../Images/CiciaDANN_Target_256/'
 
 # if train_loader.color_mode == 'rgb':
 #     num_channels = 3
@@ -65,12 +66,12 @@ pixel_std = 1*np.ones(num_channels)
 # channel_shift_range = [0.01]*num_channels
 # rescale = np.asarray([[0.95,1.05]]*num_channels)
 
-checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, monitor='val_acc', mode='max', save_best_only=True)
-lr_reducer = ReduceLROnPlateau(monitor='val_loss',
+checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, monitor='model_2_loss', mode='min', save_best_only=True)
+lr_reducer = ReduceLROnPlateau(monitor='model_2_loss',
                                factor=np.sqrt(0.1),
                                cooldown=0,
                                patience=10, min_lr=1e-12)
-early_stopper = EarlyStopping(monitor='val_loss',
+early_stopper = EarlyStopping(monitor='model_2_loss',
                               min_delta=0.001,
                               patience=30)
 nan_terminator = TerminateOnNaN()
@@ -84,40 +85,40 @@ SaveWeights = WeightsSaver(filepath='./weights/', model_name=model_name, N=10)
 # log history during model fit
 csv_logger = CSVLogger('output/log.csv', append=True, separator=';')
 
-# datagen = NeMOImageGenerator(image_shape=[y, x, num_channels],
-#                                     image_resample=True,
-#                                     pixelwise_center=True,
-#                                     pixel_mean=pixel_mean,
-#                                     pixelwise_std_normalization=True,
-#                                     augmentation = 1,
-#                                     channel_shift_range = 0,
-#                                     random_rotation=True,
-#                                     pixel_std=pixel_std)
-# train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
-#     FCN_directory=train_loader.label_dir,
-#     source_size=(x,y),
-#     target_size=(x,y),
-#     color_mode='4channel_delete',
-#     passedclasses = labelkey,
-#     class_mode = 'categorical',
-#     batch_size = batch_size,
-# #    save_to_dir = './Generator_Outputs/',
-#     shuffle=True)
+datagen = NeMOImageGenerator(image_shape=[y, x, num_channels],
+                                    image_resample=True,
+                                    pixelwise_center=True,
+                                    pixel_mean=pixel_mean,
+                                    pixelwise_std_normalization=True,
+                                    augmentation = 0,
+                                    channel_shift_range = 0,
+                                    random_rotation=True,
+                                    pixel_std=pixel_std)
+train_generator = datagen.DANN_flow_from_NeMOdirectory(train_loader.image_dir,
+    label_directory = train_loader.label_dir,
+    target_directory = target_dir,
+    source_size=(x,y),
+    color_mode='4channel_delete',
+    passedclasses = labelkey,
+    class_mode = 'categorical',
+    batch_size = batch_size,
+#     save_to_dir = './Generator_Outputs/',
+    shuffle=True)
 
-# validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
-#     FCN_directory=val_loader.label_dir,
-#     source_size=(x,y),
-#     target_size=(x,y),
-#     color_mode='4channel_delete',
-#     passedclasses = labelkey,
-#     class_mode = 'categorical',
-#     batch_size = batch_size,
-#     shuffle=True)
+validation_generator = datagen.DANN_flow_from_NeMOdirectory(val_loader.image_dir,
+    label_directory = val_loader.label_dir,
+    target_directory = target_dir,
+    source_size=(x,y),
+    color_mode='4channel_delete',
+    passedclasses = labelkey,
+    class_mode = 'categorical',
+    batch_size = batch_size,
+    shuffle=True)
 
 ## AlexNet for domain ----------------- 
 
 conv_layers = 0
-full_layers = 2
+full_layers = 3
 
 conv_params = {"filters": [None],
     "conv_size": [None],
@@ -132,10 +133,10 @@ conv_params = {"filters": [None],
     "upconv_strides": [None],
     "layercombo": [None], 
     "layercombine": [None],           
-    "full_filters": [64,64], 
-    "dropout": [0.5,0.5]}
+    "full_filters": [64,64,2], 
+    "dropout": [0,0,0.5]}
 
-Domain_Predictor = AlexNetLike(input_shape=(64,64,128), classes=2, weight_decay=3e-3, trainable_encoder=True, weights=None, conv_layers=0, full_layers=2, conv_params=conv_params)
+Domain_Predictor = AlexNetLike(input_shape=(64,64,128), classes=2, weight_decay=3e-3, trainable_encoder=True, weights=None, conv_layers=0, full_layers=full_layers, conv_params=conv_params)
 keras.utils.layer_utils.print_summary(Domain_Predictor,line_length=150, positions=[.35, .55, .65, 1.])
 
 
@@ -208,18 +209,22 @@ keras.utils.layer_utils.print_summary(DANN, line_length=150, positions=[.35, .55
 
 optimizer = keras.optimizers.Adam(1e-4)
 
+# model 1: domain, model 2: source 
+DANN.compile(optimizer=optimizer,loss={'model_1': 'categorical_crossentropy', 'model_2': 'categorical_crossentropy'}, loss_weights={'model_1': 0, 'model_2': 1}, metrics=['accuracy'])
+                                       
+
 # SharpMask.summary()
 
 # RefineMask.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'], sample_weight_mode='temporal')
 
-# print("Memory required (GB): ", get_model_memory_usage(batch_size, RefineMask))
+print("Memory required (GB): ", get_model_memory_usage(batch_size, DANN))
 
-# RefineMask.fit_generator(train_generator,
-#     steps_per_epoch=100,
-#     epochs=100,
-#     validation_data=validation_generator,
-#     validation_steps=20,
-#     verbose=1,
+DANN.fit_generator(train_generator,
+    steps_per_epoch=50,
+    epochs=10,
+    validation_data=validation_generator,
+    validation_steps=20,
+    verbose=1)
 #     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 
 

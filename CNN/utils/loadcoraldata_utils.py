@@ -147,7 +147,7 @@ class CoralData:
 				self.truthimage = cv2.imread(Truthpath)
 				class_indices = np.unique(self.truthimage)
 				num_classes = len(class_indices)
-				if self.truthimage == None:
+				if self.truthimage is None:
 # 					self.class_weights = dict((i,(self.truthimage.shape[0]*self.truthimage.shape[1])/(self.truthimage==i).sum()) for i in class_indices)
 					gdal_truthimg = gdal.Open(Truthpath)
 					self.truthimage = gdal_truthimg.GetRasterBand(1).ReadAsArray()
@@ -441,6 +441,7 @@ class CoralData:
 # 	subdir: Create subdirectories for each class
 # 	cont: Continuously add to folder (True), or overwrite (False)
 # 	consolidated: Export consolidated classes instead
+# 	classestoexport: List of strings of classes to export (must match with export_class_dict eventually)... 'None' means export all classes
 # 	mosaic_mean: Channel means
 #	mosaic_std: Channel std
 #	bandstoexport: specific bands to export from raster
@@ -448,7 +449,7 @@ class CoralData:
 #	label_cmap: cmap IN ORDER of export_class_dict
 
 	def export_segmentation_map(self, exporttrainpath, exportlabelpath, txtfilename, image_size=25, N=20000, magnification=1, magimg_path=None,
-		lastchannelremove = True, labelkey = None, subdir=False, cont = False, consolidated = False, mosaic_mean = 0, mosaic_std = 1, 
+		lastchannelremove = True, labelkey = None, subdir=False, cont = False, consolidated = False, classestoexport=None, mosaic_mean = 0, mosaic_std = 1, 
 		bandstoexport=None, exporttype = gdal.GDT_Float32, label_cmap=None):
 		crop_len = int(np.floor(image_size/2)) # crop_len of the MAGNIFIED image
 		m = magnification
@@ -483,12 +484,18 @@ class CoralData:
 
 		# If consolidation of classes is required
 		if consolidated:
-			export_class_dict = self.consolidated_class_dict
+			if classestoexport is None:
+				export_class_dict = self.consolidated_class_dict
+			else:             
+				export_class_dict = {x:self.consolidated_class_dict[x] for x in classestoexport}
 			truthimage = self.truthimage_consolidated
 			truthcrop = self.truthimage_consolidated[crop_len:self.truthimage_consolidated.shape[0]-crop_len, crop_len:self.truthimage_consolidated.shape[1]-crop_len]
 			num_classes = self.consolidated_num_classes
 		else:
-			export_class_dict = self.class_dict
+			if classestoexport is None:
+				export_class_dict = self.class_dict
+			else:
+				export_class_dict = {x:self.class_dict[x] for x in classestoexport}
 			truthimage = self.truthimage
 			truthcrop = self.truthimage[crop_len:self.truthimage.shape[0]-crop_len, crop_len:self.truthimage.shape[1]-crop_len]
 			num_classes = self.num_classes
