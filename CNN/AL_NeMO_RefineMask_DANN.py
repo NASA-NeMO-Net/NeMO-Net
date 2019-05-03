@@ -210,7 +210,7 @@ keras.utils.layer_utils.print_summary(DANN, line_length=150, positions=[.35, .55
 optimizer = keras.optimizers.Adam(1e-4)
 
 # model 1: domain, model 2: source 
-DANN.compile(optimizer=optimizer,loss={'model_1': 'categorical_crossentropy', 'model_2': 'categorical_crossentropy'}, loss_weights={'model_1': 0, 'model_2': 1}, metrics=['accuracy'])
+DANN.compile(optimizer=optimizer,loss={'model_1': 'categorical_crossentropy', 'model_2': 'categorical_crossentropy'}, loss_weights={'model_1': 0.1, 'model_2': 1.0}, metrics=['accuracy'])
                                        
 
 # SharpMask.summary()
@@ -219,12 +219,12 @@ DANN.compile(optimizer=optimizer,loss={'model_1': 'categorical_crossentropy', 'm
 
 print("Memory required (GB): ", get_model_memory_usage(batch_size, DANN))
 
-DANN.fit_generator(train_generator,
-    steps_per_epoch=50,
-    epochs=10,
-    validation_data=validation_generator,
-    validation_steps=20,
-    verbose=1)
+# DANN.fit_generator(train_generator,
+#     steps_per_epoch=50,
+#     epochs=10,
+#     validation_data=validation_generator,
+#     validation_steps=20,
+#     verbose=1)
 #     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 
 

@@ -115,6 +115,10 @@
   	"Wave breaking": 8,
   	"Other or Unknown": 9
   },
+  "Clouds_ClassDict":{
+  	"Clouds": 1,
+  	"NoClouds": 2
+  },
   "MajorConsolidated_ClassDict":{
     "Shallows": 1,
     "Crest": 2,
@@ -281,6 +285,17 @@
     "Seagrass Meadows": "Seagrass",
     "Deep Ocean Water": "Deep water",
     "Other": "Other or Unknown"
+  },
+  "VedConsolidated2Clouds_Dict":{
+  	"Coral": "NoClouds",
+  	"Sediment": "NoClouds",
+  	"Beach": "NoClouds",
+  	"Seagrass": "NoClouds",
+  	"Terrestrial vegetation": "NoClouds",
+  	"Deep water": "NoClouds",
+  	"Clouds": "Clouds",
+  	"Wave breaking": "NoClouds",
+  	"Other or Unknown": "NoClouds"
   },
   "L32MajorConsolidated_Dict":{
     "Reef Crest - coralline algae ridge": "Crest",

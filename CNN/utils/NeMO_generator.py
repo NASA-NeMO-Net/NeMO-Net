@@ -331,7 +331,7 @@ class NeMODirectoryIterator(Iterator):
         # second, build an index of the images in the different class subfolders
         results = []
         self.filenames = []
-        self.classes = np.zeros((len(self.directory),self.samples,), dtype='int32')
+        self.classes = np.zeros((len(self.directory),self.samples,), dtype='int32') # len(directory) x len(samples)
         self.class_idx_startend = [] # for keeping track of the starting and ending idx of each class, in case they are of different lengths 
         dcount = 0
         print(classes)
@@ -526,7 +526,7 @@ class NeMODirectoryIterator(Iterator):
                 batch_y = np.zeros((current_batch_size,) + self.target_size, dtype=K.floatx())
             elif self.class_mode == 'categorical':
                 batch_y = np.zeros((current_batch_size, self.num_consolclass), dtype=K.floatx())
-                for i, label in enumerate(self.classes[index_array]):
+                for i, label in enumerate(self.classes[0,index_array]):
                     batch_y[i, label] = 1.
             else:
                 return batch_x
@@ -1007,10 +1007,12 @@ class DANN_NeMODirectoryIterator(Iterator):
                             dataset.GetRasterBand(chan+1).WriteArray((img[:,:,chan]))
                             dataset.FlushCache()
             
-            for dcount in range(0,len(self.target_directory)):
-                for i, j in enumerate(index_array_target):
-                    ftargetname = self.target_filenames[dcount][j]
-                    img = coralutils.CoralData(os.path.join(self.target_directory[dcount], ftargetname), load_type="raster").image
+            for dcount in range(0,len(self.source_directory)):
+                for i, j in enumerate(index_array_source):
+#                     ftargetname = self.target_filenames[dcount][j]
+                    ftargetname = self.filenames[dcount][j]
+#                     img = coralutils.CoralData(os.path.join(self.target_directory[dcount], ftargetname), load_type="raster").image
+                    img = coralutils.CoralData(os.path.join(self.source_directory[dcount], ftargetname), load_type="raster").image
                     if self.color_mode == "4channel_delete": # assumes target AND source are starting off as 8 channel
                         img = np.delete(img, [0,3,5,7], 2) # harded coded for BGR + NIR
                     x = img_to_array(img, data_format=self.data_format)
@@ -1035,12 +1037,11 @@ class DANN_NeMODirectoryIterator(Iterator):
 
             batch_y = np.zeros((current_batch_size_source + current_batch_size_target,) + self.label_shape, dtype=np.int8) # N x R x C x D
             batch_weights = np.ones((current_batch_size_source + current_batch_size_target, self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float) # if every class has different weight
-            sample_weights_class = np.array(([1] * current_batch_size_source + [0] * current_batch_size_target))
+            sample_weights_class = np.array(([1] * current_batch_size_source + [1] * current_batch_size_target))
             sample_weights_domain = np.ones((current_batch_size_source + current_batch_size_target,))
             
             for i,j in enumerate(index_array_source):
                 fname = self.label_filenames[j]
-                
                 # assume all label data
                 y = self._load_seg(fname)
                 if self.image_data_generator.random_rotation: # flip and rotate according to previous batch_x images
@@ -1058,13 +1059,29 @@ class DANN_NeMODirectoryIterator(Iterator):
                     cv2.imwrite(os.path.join(self.save_to_dir, fname), img)
                 y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
                 batch_y[i] = y
+            
+            for i,j in enumerate(index_array_source):
+                fname = self.label_filenames[j]
+                # assume all label data
+                y = self._load_seg(fname)
+                if self.image_data_generator.random_rotation: # flip and rotate according to previous batch_x images
+                    y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
+                if self.class_weights is not None:
+                    weights = np.zeros((self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float)
+                    for k in self.class_weights:
+                        weights[y == self.class_indices[k]] = self.class_weights[k]             # class_weights must be a dictionary
+                    batch_weights[i] = weights
+                batch_weights[i+current_batch_size_source] = np.zeros((self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float) # set batch weights of all target images to 0
+                y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
+                batch_y[i+current_batch_size_source] = y
+                
                     
         # Domain Classifier Branch
         
 #         print(current_batch_size_source, current_batch_size_target)
         domain_batch_y = np.zeros((current_batch_size_source + current_batch_size_target,2), dtype=np.int8)
         domain_batch_y[:current_batch_size_source,0] = 1
-        domain_batch_y[current_batch_size_source:,1] = 1
+        domain_batch_y[current_batch_size_source:,0] = 1
         domain_batch_y_weights = np.ones((current_batch_size_source + current_batch_size_target,2), dtype=np.int8) # N x 2 (1 for everything)
             
         if len(batch_x) == 1: # Check if there is only one directory

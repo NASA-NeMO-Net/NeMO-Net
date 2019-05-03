@@ -146,18 +146,42 @@ def DANN_Model(source_input_shape, source_model, domain_model, FeatureLayerName)
     source_inputs = Input(shape=source_input_shape)
     
     feature_layer = source_model.get_layer(FeatureLayerName).output
-    tempmodel = Model(source_model.input, feature_layer)
+    index = None
+    for idx, layer in enumerate(source_model.layers):
+        if layer.name == FeatureLayerName:
+            index = idx
+            break
     
-    # source_output = source_model(source_inputs)
-    temp_output = tempmodel(source_inputs)
+    classifier_input = Input(source_model.layers[index+1].input_shape[1:])
+    classifier_layer = classifier_input
+    layer_dict = {source_model.layers[index].name: classifier_input}
+    for layer in source_model.layers[index+1:]:
+        print("layer: ", layer.name)
+        predecessor_layers = layer.input
+        if type(predecessor_layers) is list: # assume maximum of 2 input layers at most
+            print(layer.input[0].name)
+            print(layer.input[1].name)
+            classifier_layer = layer([layer_dict[layer.input[0].name.split('/')[0]],layer_dict[layer.input[1].name.split('/')[0]]])
+            layer_dict.update({layer.name:classifier_layer})
+        else:
+            predecessor_name = layer.input.name.split('/')[0]
+            classifier_layer = layer(layer_dict[predecessor_name])
+            layer_dict.update({layer.name:classifier_layer})
+        
+    classifier_model = Model(inputs=classifier_input, outputs=classifier_layer)
+#     classifier_input = Input(model.layers[index+1].input_shape[1:])
+#     classifer_model = Model(input=source_model.layers[index+1].input, output=source_model.layers[-1].output)
+
+    feature_extractor = Model(source_model.input, feature_layer)
+    feature_output = feature_extractor(source_inputs)
     # Flip = GradientReversal(1.0)
     # temp_output = Flip(temp_output)
     
-    domain_output = domain_model(temp_output)
-    source_output = source_model(source_inputs)
+    domain_output = domain_model(feature_output)
+    classifier_output = classifier_model(feature_output)
     
-    return Model(inputs=source_inputs, outputs=[source_output,domain_output])
-    
+    return Model(inputs=source_inputs, outputs=[classifier_output,domain_output])
+
 
 def FCN(*args, **kwargs):
     """Fully Convolutional Networks for semantic segmentation with VGG16.
