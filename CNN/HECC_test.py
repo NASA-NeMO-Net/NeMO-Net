@@ -7,7 +7,7 @@ import keras
 import keras.backend as K
 import tensorflow as tf
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
 global _SESSION
 config = tf.ConfigProto(allow_soft_placement=True)
@@ -36,12 +36,12 @@ image_size = 256
 batch_size = 8
 model_name = 'VGG16_DANN256'
 
-# jsonpath = './utils/CoralClasses.json'
-# with open(jsonpath) as json_file:
-#     json_data = json.load(json_file)
+jsonpath = './utils/CoralClasses.json'
+with open(jsonpath) as json_file:
+    json_data = json.load(json_file)
 
-# labelkey = json_data["VedConsolidated_ClassDict"]
-# num_classes = len(labelkey)
+labelkey = json_data["VedConsolidated_ClassDict"]
+num_classes = len(labelkey)
 
 # with open("init_args - Jarrett.yml", 'r') as stream:
 #     try:
@@ -210,6 +210,9 @@ next_params = {"filters": [9,9,9],
 decoder_index = [0,1,2]
 scales= [1,1,1]
 
+y = 256
+x = 256
+num_channels = 4
 VGG16_DANN = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, decoder_index = decoder_index, weight_decay=1e-3, trainable_encoder=True, weights=None,
     conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params, scales=scales, 
     bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
