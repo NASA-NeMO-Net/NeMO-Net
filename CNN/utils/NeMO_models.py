@@ -144,43 +144,98 @@ def SRModel_FeatureWise(hr_input_shape, lr_input_shape, SRModel, FeatureModel, F
 
 def DANN_Model(source_input_shape, source_model, domain_model, FeatureLayerName):
     source_inputs = Input(shape=source_input_shape)
+    index = 0
     
-    feature_layer = source_model.get_layer(FeatureLayerName).output
-    index = None
-    for idx, layer in enumerate(source_model.layers):
-        if layer.name == FeatureLayerName:
-            index = idx
-            break
+    layer_dict = {}
+#     classifier_input = Input(source_model.layers[index+1].input_shape[1:])
+#     layer_dict = {source_model.layers[0].name: source_model.layers[0].input}
+#     print(source_model.layers[index+1].input_shape[1:])
     
-    classifier_input = Input(source_model.layers[index+1].input_shape[1:])
-    classifier_layer = classifier_input
-    layer_dict = {source_model.layers[index].name: classifier_input}
     for layer in source_model.layers[index+1:]:
-        print("layer: ", layer.name)
         predecessor_layers = layer.input
+                      
         if type(predecessor_layers) is list: # assume maximum of 2 input layers at most
-            print(layer.input[0].name)
-            print(layer.input[1].name)
             classifier_layer = layer([layer_dict[layer.input[0].name.split('/')[0]],layer_dict[layer.input[1].name.split('/')[0]]])
             layer_dict.update({layer.name:classifier_layer})
         else:
-            predecessor_name = layer.input.name.split('/')[0]
-            classifier_layer = layer(layer_dict[predecessor_name])
+            predecessor_name = layer.input.name.split('/')[0] # if another layer with the same input name exists, a '_#' is appended automatically
+            if "input" in predecessor_name:
+                classifier_layer = layer(source_inputs)
+            else:
+                classifier_layer = layer(layer_dict[predecessor_name])
             layer_dict.update({layer.name:classifier_layer})
-        
-    classifier_model = Model(inputs=classifier_input, outputs=classifier_layer)
-#     classifier_input = Input(model.layers[index+1].input_shape[1:])
-#     classifer_model = Model(input=source_model.layers[index+1].input, output=source_model.layers[-1].output)
+                
+    d_index = 0
+    for dlayer in domain_model.layers[d_index+1:]:
+        dpredecessor_layers = dlayer.input
+        if dpredecessor_layers is list:
+            print("")
+        else:
+            dpredecessor_name = dlayer.input.name.split('/')[0]
+            
+            if "input" in dpredecessor_name:
+                dpredecessor_name = FeatureLayerName
+                Flip = GradientReversal(1.0)
+                dclassifier_layer = Flip(layer_dict[dpredecessor_name])
+                layer_dict.update({dclassifier_layer.name:dclassifier_layer})
+                dpredecessor_name = dclassifier_layer.name
+                
+            dclassifier_layer = dlayer(layer_dict[dpredecessor_name])
+            count = 0
+            templayername = dlayer.name
+            while templayername in layer_dict:
+                count = count + 1
+                templayername = dlayer.name + '_' + str(count)
+            dlayer.name = templayername 
 
-    feature_extractor = Model(source_model.input, feature_layer)
-    feature_output = feature_extractor(source_inputs)
-    # Flip = GradientReversal(1.0)
-    # temp_output = Flip(temp_output)
+            if count > 0:
+                layer_dict.update({templayername:dclassifier_layer})
+            else:
+                layer_dict.update({dlayer.name:dclassifier_layer})
+
     
-    domain_output = domain_model(feature_output)
-    classifier_output = classifier_model(feature_output)
+    classifier_output = classifier_layer
+    domain_output = dclassifier_layer
     
-    return Model(inputs=source_inputs, outputs=[classifier_output,domain_output])
+#     feature_layer = source_model.get_layer(FeatureLayerName).output
+#     index = None
+#     for idx, layer in enumerate(source_model.layers):
+#         if layer.name == FeatureLayerName:
+#             index = idx
+#             break
+    
+#     classifier_input = Input(source_model.layers[index+1].input_shape[1:])
+#     classifier_layer = classifier_input
+#     layer_dict = {source_model.layers[index].name: classifier_input}
+#     for layer in source_model.layers[index+1:]:
+# #         print("layer: ", layer.name)
+#         predecessor_layers = layer.input
+#         if type(predecessor_layers) is list: # assume maximum of 2 input layers at most
+# #             print(layer.input[0].name)
+# #             print(layer.input[1].name)
+#             classifier_layer = layer([layer_dict[layer.input[0].name.split('/')[0]],layer_dict[layer.input[1].name.split('/')[0]]])
+#             layer_dict.update({layer.name:classifier_layer})
+#         else:
+#             predecessor_name = layer.input.name.split('/')[0]
+#             print(predecessor_name)
+#             classifier_layer = layer(layer_dict[predecessor_name])
+#             layer_dict.update({layer.name:classifier_layer})
+        
+#     classifier_model = Model(inputs=classifier_input, outputs=classifier_layer)
+#     keras.utils.layer_utils.print_summary(classifier_model, line_length=150, positions=[.35, .55, .65, 1.])
+# #     classifier_input = Input(model.layers[index+1].input_shape[1:])
+# #     classifer_model = Model(input=source_model.layers[index+1].input, output=source_model.layers[-1].output)
+
+#     feature_extractor = Model(source_model.input, feature_layer)
+#     feature_output = feature_extractor(source_inputs)
+#     Flip = GradientReversal(1.0)
+#     domain_output = Flip(feature_output)
+    
+#     domain_output = domain_model(domain_output)
+#     classifier_output = classifier_model(feature_output)
+    
+#     return Model(inputs=source_inputs, outputs=[classifier_output,domain_output])
+    return Model(inputs=source_inputs, outputs=[classifier_output, domain_output])
 
 
 def FCN(*args, **kwargs):

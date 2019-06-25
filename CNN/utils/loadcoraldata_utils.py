@@ -600,8 +600,16 @@ class CoralData:
 
 								# cv2.imwrite(exportlabelpath+subdirpath+truthstr, tempmagimage)
 						else:
-							cv2.imwrite(exporttrainpath+subdirpath+trainstr, tempimage)
-
+							if bandstoexport is not None:
+								tempimage_export = np.zeros((tempimage.shape[0], tempimage.shape[1], len(bandstoexport)))
+								counter2 = 0                    
+								for chan in bandstoexport:
+									tempchannel = (tempimage[:,:,chan-1] - mosaic_mean[counter2])/mosaic_std[counter2]
+									tempchannel[tempchannel > 255] = 255			# Artificial ceiling of 255 for RGB ONLY!
+									tempchannel[tempchannel < 0] = 0
+									tempimage_export[:,:,counter2] = tempchannel
+									counter2 += 1
+							cv2.imwrite(exporttrainpath+subdirpath+trainstr, tempimage_export)
 							# If need to export magnified image
 							if magimg_path is None:
 								cv2.imwrite(exportlabelpath+subdirpath+truthstr, templabel)

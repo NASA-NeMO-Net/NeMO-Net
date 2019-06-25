@@ -66,12 +66,12 @@ pixel_std = 1*np.ones(num_channels)
 # channel_shift_range = [0.01]*num_channels
 # rescale = np.asarray([[0.95,1.05]]*num_channels)
 
-checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, monitor='model_2_loss', mode='min', save_best_only=True)
-lr_reducer = ReduceLROnPlateau(monitor='model_2_loss',
+checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, monitor='val_reshape_1_loss', mode='min', save_best_only=True)
+lr_reducer = ReduceLROnPlateau(monitor='val_reshape_1_loss',
                                factor=np.sqrt(0.1),
                                cooldown=0,
                                patience=10, min_lr=1e-12)
-early_stopper = EarlyStopping(monitor='model_2_loss',
+early_stopper = EarlyStopping(monitor='val_reshape_1_loss',
                               min_delta=0.001,
                               patience=30)
 nan_terminator = TerminateOnNaN()
@@ -90,7 +90,7 @@ datagen = NeMOImageGenerator(image_shape=[y, x, num_channels],
                                     pixelwise_center=True,
                                     pixel_mean=pixel_mean,
                                     pixelwise_std_normalization=True,
-                                    augmentation = 0,
+                                    augmentation = 1,
                                     channel_shift_range = 0,
                                     random_rotation=True,
                                     pixel_std=pixel_std)
@@ -107,38 +107,14 @@ train_generator = datagen.DANN_flow_from_NeMOdirectory(train_loader.image_dir,
 
 validation_generator = datagen.DANN_flow_from_NeMOdirectory(val_loader.image_dir,
     label_directory = val_loader.label_dir,
-    target_directory = target_dir,
+    target_directory = val_loader.image_dir,
     source_size=(x,y),
     color_mode='4channel_delete',
     passedclasses = labelkey,
     class_mode = 'categorical',
     batch_size = batch_size,
-    shuffle=True)
-
-## AlexNet for domain ----------------- 
-
-conv_layers = 0
-full_layers = 3
-
-conv_params = {"filters": [None],
-    "conv_size": [None],
-    "conv_strides": [None],
-    "padding": ['same'],
-    "dilation_rate": [None],
-    "pool_size": [None],
-    "pool_strides": [None],
-    "pad_size": [None],
-    "filters_up": [None],
-    "upconv_size": [None],
-    "upconv_strides": [None],
-    "layercombo": [None], 
-    "layercombine": [None],           
-    "full_filters": [64,64,2], 
-    "dropout": [0,0,0.5]}
-
-Domain_Predictor = AlexNetLike(input_shape=(64,64,128), classes=2, weight_decay=3e-3, trainable_encoder=True, weights=None, conv_layers=0, full_layers=full_layers, conv_params=conv_params)
-keras.utils.layer_utils.print_summary(Domain_Predictor,line_length=150, positions=[.35, .55, .65, 1.])
-
+    shuffle=True,
+    validation=True)
 
 ## RefineMask ----------------
 
@@ -161,7 +137,7 @@ conv_params = {"filters": [[64] , [([64,64,128],128)]*3, [([128,128,256],256)]*4
     "layercombo": ["cbap", [("cbacbac","c")]+[("bacbacbac","")]*2, [("bacbacbac","c")]+[("bacbacbac","")]*3, [("bacbacbac","c")]+[("bacbacbac","")]*5, [("bacbacbac","c")]+[("bacbacbac","")]*2], 
     "layercombine": ["","sum","sum","sum","sum"],           
     "full_filters": [1024,1024], 
-    "dropout": [0,0]}
+    "dropout": [0.5,0.5]}
 
 RCU = ("bacbac","")
 CRPx2 = ([("pbc",""),"pbc"],"")
@@ -202,15 +178,39 @@ RefineMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, 
     bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
 keras.utils.layer_utils.print_summary(RefineMask, line_length=150, positions=[.35, .55, .65, 1.])
 
+## AlexNet for domain ----------------- 
+
+conv_layers = 1
+full_layers = 3
+
+conv_params = {"filters": [32],
+    "conv_size": [(1,1)],
+    "conv_strides": [(1,1)],
+    "padding": ['same'],
+    "dilation_rate": [(1,1)],
+    "pool_size": [None],
+    "pool_strides": [None],
+    "pad_size": [(0,0)],
+    "filters_up": [None],
+    "upconv_size": [None],
+    "upconv_strides": [None],
+    "layercombo": ["cba"], 
+    "layercombine": [""],           
+    "full_filters": [64,128,2], 
+    "dropout": [0.5,0.5,0]}
+
+Domain_Predictor = AlexNetLike(input_shape=(8,8,1024), classes=2, weight_decay=3e-3, trainable_encoder=True, weights=None, conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
+keras.utils.layer_utils.print_summary(Domain_Predictor,line_length=150, positions=[.35, .55, .65, 1.])
+
 ## Combine Models
 
-DANN = DANN_Model(source_input_shape=(y,x,num_channels), source_model=RefineMask, domain_model=Domain_Predictor, FeatureLayerName="add_1")
+DANN = DANN_Model(source_input_shape=(y,x,num_channels), source_model=RefineMask, domain_model=Domain_Predictor, FeatureLayerName="add_15")
 keras.utils.layer_utils.print_summary(DANN, line_length=150, positions=[.35, .55, .65, 1.])
 
 optimizer = keras.optimizers.Adam(1e-4)
 
-# model 1: domain, model 2: source 
-DANN.compile(optimizer=optimizer,loss={'model_1': 'categorical_crossentropy', 'model_2': 'categorical_crossentropy'}, loss_weights={'model_1': 0.1, 'model_2': 1.0}, metrics=['accuracy'])
+# model 1: domain, model 3: classifier
+DANN.compile(optimizer=optimizer,loss={'reshape_1': 'categorical_crossentropy', 'vgg_fcblock3_BatchNorm': 'categorical_crossentropy'}, loss_weights={'reshape_1': 1.0, 'vgg_fcblock3_BatchNorm': 1.0}, metrics=['accuracy'])
                                        
 
 # SharpMask.summary()
@@ -219,12 +219,12 @@ DANN.compile(optimizer=optimizer,loss={'model_1': 'categorical_crossentropy', 'm
 
 print("Memory required (GB): ", get_model_memory_usage(batch_size, DANN))
 
-# DANN.fit_generator(train_generator,
-#     steps_per_epoch=50,
-#     epochs=10,
-#     validation_data=validation_generator,
-#     validation_steps=20,
-#     verbose=1)
-#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+DANN.fit_generator(train_generator,
+    steps_per_epoch=100,
+    epochs=100,
+    validation_data=validation_generator,
+    validation_steps=20,
+    verbose=1,
+    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 
 

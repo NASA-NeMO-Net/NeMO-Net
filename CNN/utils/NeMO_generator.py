@@ -91,9 +91,9 @@ class NeMOImageGenerator(ImageDataGenerator):
     
     def augmentation_shift(self, x):
         x = np.rollaxis(x, self.channel_axis-1, 0) # make channel_axis the first axis
-        x = x*100+100
+        x = x*100+100 # hard coded
         for i in range(0,x.shape[0]):
-            alpha = np.random.uniform(-0.25,0.25)
+            alpha = np.random.uniform(-0.1,0.1)
             beta = np.random.randint(0,4)
             if beta == 0:
                 x[i] = x[i] + alpha*x[i]
@@ -191,11 +191,12 @@ class NeMOImageGenerator(ImageDataGenerator):
                             save_to_dir=None,
                             save_prefix='',
                             save_format='png',
-                            follow_links=False):
+                            follow_links=False,
+                            validation=False):
         return DANN_NeMODirectoryIterator(
             source_directory, self, label_directory, target_directory, source_size=source_size, color_mode=color_mode, passedclasses=passedclasses, class_mode=class_mode,
             data_format=self.data_format, batch_size=batch_size, class_weights=class_weights, shuffle=shuffle, seed=seed,
-            save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format, follow_links=follow_links)
+            save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format, follow_links=follow_links, validation=validation)
 
 
 class NeMODirectoryIterator(Iterator):
@@ -741,11 +742,12 @@ class DANN_NeMODirectoryIterator(Iterator):
         save_format: Format to use for saving sample images
             (if `save_to_dir` is set).
         follow_links: Set this to default (False)
+        validation: if this is a validation set, if true will set only source imagery data
     """
     
     def __init__(self, source_directory, image_data_generator, label_directory, target_directory, source_size=(256,256), color_mode='rgb',
                  passedclasses=None, class_mode='categorical', batch_size=32, class_weights=None, shuffle=True, seed=None,
-                 data_format=None, save_to_dir=None, save_prefix='', save_format='png', follow_links=False):
+                 data_format=None, save_to_dir=None, save_prefix='', save_format='png', follow_links=False, validation=False):
         if data_format is None:
             data_format = K.image_data_format() #channels_last
         if type(source_directory) == list:
@@ -760,6 +762,7 @@ class DANN_NeMODirectoryIterator(Iterator):
         self.image_data_generator = image_data_generator
         self.source_size = tuple(source_size)
         self.target_size = tuple(source_size) # same size as source for now
+        self.validation = validation
 
         if color_mode not in {'rgb', 'grayscale','8channel','4channel','4channel_delete'}:
             raise ValueError('Invalid color mode:', color_mode,
@@ -998,6 +1001,8 @@ class DANN_NeMODirectoryIterator(Iterator):
                             x, _, _ = self.image_data_generator.random_flip_rotation(x, batch_flip[i], batch_rot90[i])
 
                     batch_x[dcount][i] = x
+                    if self.validation:
+                        batch_x[dcount][i+current_batch_size_source] = x
                     if self.save_to_dir: # save to directory code
                         img = (x*self.image_data_generator.pixel_std)+self.image_data_generator.pixel_mean
                         fname = '{prefix}_{direct}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_sourceimg', direct=dcount, index=current_index_source+i, hash=index_array_source[i], format='tif')
@@ -1006,38 +1011,39 @@ class DANN_NeMODirectoryIterator(Iterator):
                         for chan in range(img.shape[2]):
                             dataset.GetRasterBand(chan+1).WriteArray((img[:,:,chan]))
                             dataset.FlushCache()
-            
-            for dcount in range(0,len(self.source_directory)):
-                for i, j in enumerate(index_array_source):
-#                     ftargetname = self.target_filenames[dcount][j]
-                    ftargetname = self.filenames[dcount][j]
-#                     img = coralutils.CoralData(os.path.join(self.target_directory[dcount], ftargetname), load_type="raster").image
-                    img = coralutils.CoralData(os.path.join(self.source_directory[dcount], ftargetname), load_type="raster").image
-                    if self.color_mode == "4channel_delete": # assumes target AND source are starting off as 8 channel
-                        img = np.delete(img, [0,3,5,7], 2) # harded coded for BGR + NIR
-                    x = img_to_array(img, data_format=self.data_format)
-                    if self.image_data_generator.augmentation:
-                        x = self.image_data_generator.augmentation_shift(x)
-                    x = self.image_data_generator.standardize(x) # standardize and rescaling is done here
-                    if self.image_data_generator.channel_shift_range != 0:
-                        x = self.image_data_generator.random_channel_shift(x)   
-                    if self.image_data_generator.random_rotation:
-                        x, _, _ = self.image_data_generator.random_flip_rotation(x, batch_flip[i], batch_rot90[i]) # rotations already determined by source
+                            
+            if self.validation == False:
+                for dcount in range(0,len(self.source_directory)):
+                    for i, j in enumerate(index_array_source):
+                        ftargetname = self.target_filenames[dcount][j]
+    #                     ftargetname = self.filenames[dcount][j]
+                        img = coralutils.CoralData(os.path.join(self.target_directory[dcount], ftargetname), load_type="raster").image
+    #                     img = coralutils.CoralData(os.path.join(self.source_directory[dcount], ftargetname), load_type="raster").image
+                        if self.color_mode == "4channel_delete": # assumes target AND source are starting off as 8 channel
+                            img = np.delete(img, [0,3,5,7], 2) # harded coded for BGR + NIR
+                        x = img_to_array(img, data_format=self.data_format)
+#                         if self.image_data_generator.augmentation:  # No augmentation for target data (it's already kind of augmented)
+#                             x = self.image_data_generator.augmentation_shift(x)
+                        x = self.image_data_generator.standardize(x) # standardize and rescaling is done here
+                        if self.image_data_generator.channel_shift_range != 0:
+                            x = self.image_data_generator.random_channel_shift(x)   
+                        if self.image_data_generator.random_rotation:
+                            x, _, _ = self.image_data_generator.random_flip_rotation(x, batch_flip[i], batch_rot90[i]) # rotations already determined by source
 
-                    batch_x[dcount][i+current_batch_size_source] = x
-                    if self.save_to_dir: # save to directory code
-                        img = (x*self.image_data_generator.pixel_std)+self.image_data_generator.pixel_mean
-                        fname = '{prefix}_{direct}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_targetimg', direct=dcount, index=current_index_target+i, hash=index_array_target[i], format='tif')
-                        driver = gdal.GetDriverByName('GTiff')
-                        dataset = driver.Create(os.path.join(self.save_to_dir, fname), img.shape[0], img.shape[1], img.shape[2], gdal.GDT_Float32)
-                        for chan in range(img.shape[2]):
-                            dataset.GetRasterBand(chan+1).WriteArray((img[:,:,chan]))
-                            dataset.FlushCache()
+                        batch_x[dcount][i+current_batch_size_source] = x
+                        if self.save_to_dir: # save to directory code
+                            img = (x*self.image_data_generator.pixel_std)+self.image_data_generator.pixel_mean
+                            fname = '{prefix}_{direct}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_targetimg', direct=dcount, index=current_index_target+i, hash=index_array_target[i], format='tif')
+                            driver = gdal.GetDriverByName('GTiff')
+                            dataset = driver.Create(os.path.join(self.save_to_dir, fname), img.shape[0], img.shape[1], img.shape[2], gdal.GDT_Float32)
+                            for chan in range(img.shape[2]):
+                                dataset.GetRasterBand(chan+1).WriteArray((img[:,:,chan]))
+                                dataset.FlushCache()
                             
 
             batch_y = np.zeros((current_batch_size_source + current_batch_size_target,) + self.label_shape, dtype=np.int8) # N x R x C x D
             batch_weights = np.ones((current_batch_size_source + current_batch_size_target, self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float) # if every class has different weight
-            sample_weights_class = np.array(([1] * current_batch_size_source + [1] * current_batch_size_target))
+            sample_weights_class = np.array(([1] * current_batch_size_source + [0] * current_batch_size_target))
             sample_weights_domain = np.ones((current_batch_size_source + current_batch_size_target,))
             
             for i,j in enumerate(index_array_source):
@@ -1051,29 +1057,29 @@ class DANN_NeMODirectoryIterator(Iterator):
                     for k in self.class_weights:
                         weights[y == self.class_indices[k]] = self.class_weights[k]             # class_weights must be a dictionary
                     batch_weights[i] = weights
-                batch_weights[i+current_batch_size_source] = np.zeros((self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float) # set batch weights of all target images to 0
-                
                 if self.save_to_dir:            # save to dir before y is transformed to categorical tensor
                     img = y
                     fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_labelimg', index=current_index_source + i, hash=index_array_source[i],format=self.save_format)
                     cv2.imwrite(os.path.join(self.save_to_dir, fname), img)
                 y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
                 batch_y[i] = y
+                if self.validation:
+                    batch_y[i+current_batch_size_source] = y
             
-            for i,j in enumerate(index_array_source):
-                fname = self.label_filenames[j]
-                # assume all label data
-                y = self._load_seg(fname)
-                if self.image_data_generator.random_rotation: # flip and rotate according to previous batch_x images
-                    y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
-                if self.class_weights is not None:
-                    weights = np.zeros((self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float)
-                    for k in self.class_weights:
-                        weights[y == self.class_indices[k]] = self.class_weights[k]             # class_weights must be a dictionary
-                    batch_weights[i] = weights
-                batch_weights[i+current_batch_size_source] = np.zeros((self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float) # set batch weights of all target images to 0
-                y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
-                batch_y[i+current_batch_size_source] = y
+#             for i,j in enumerate(index_array_source):
+#                 batch_y[i+current_batch_size_source] = np.zeros(self.label_shape, dtype=np.int8)
+#                 fname = self.label_filenames[j]
+#                 # assume all label data
+#                 y = self._load_seg(fname)
+#                 if self.image_data_generator.random_rotation: # flip and rotate according to previous batch_x images
+#                     y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
+#                 if self.class_weights is not None:
+#                     weights = np.zeros((self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float)
+#                     for k in self.class_weights:
+#                         weights[y == self.class_indices[k]] = self.class_weights[k]             # class_weights must be a dictionary
+#                     batch_weights[i] = weights
+#                 y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
+#                 batch_y[i+current_batch_size_source] = y
                 
                     
         # Domain Classifier Branch
@@ -1081,7 +1087,10 @@ class DANN_NeMODirectoryIterator(Iterator):
 #         print(current_batch_size_source, current_batch_size_target)
         domain_batch_y = np.zeros((current_batch_size_source + current_batch_size_target,2), dtype=np.int8)
         domain_batch_y[:current_batch_size_source,0] = 1
-        domain_batch_y[current_batch_size_source:,0] = 1
+        if self.validation:
+            domain_batch_y[current_batch_size_source:,0] = 1
+        else:
+            domain_batch_y[current_batch_size_source:,1] = 1
         domain_batch_y_weights = np.ones((current_batch_size_source + current_batch_size_target,2), dtype=np.int8) # N x 2 (1 for everything)
             
         if len(batch_x) == 1: # Check if there is only one directory
