@@ -184,7 +184,7 @@ class NeMOImageGenerator(ImageDataGenerator):
             data_format=self.data_format, batch_size=batch_size, class_weights=class_weights, shuffle=shuffle, seed=seed,
             save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format, follow_links=follow_links, image_or_label=image_or_label)
     
-    def DANN_flow_from_NeMOdirectory(self, source_directory, label_directory, target_directory,
+    def DANN_flow_from_NeMOdirectory(self, source_directory, target_directory, label_directory=None,
                             source_size=(64,64), color_mode='rgb',
                             passedclasses=None, class_mode='categorical',
                             batch_size=32, class_weights = None, shuffle=True, seed=None,
@@ -745,7 +745,7 @@ class DANN_NeMODirectoryIterator(Iterator):
         validation: if this is a validation set, if true will set only source imagery data
     """
     
-    def __init__(self, source_directory, image_data_generator, label_directory, target_directory, source_size=(256,256), color_mode='rgb',
+    def __init__(self, source_directory, image_data_generator, label_directory=None, target_directory=None, source_size=(256,256), color_mode='rgb',
                  passedclasses=None, class_mode='categorical', batch_size=32, class_weights=None, shuffle=True, seed=None,
                  data_format=None, save_to_dir=None, save_prefix='', save_format='png', follow_links=False, validation=False):
         if data_format is None:
@@ -831,10 +831,11 @@ class DANN_NeMODirectoryIterator(Iterator):
             self.samples = sum(pool.map(function_partial, (os.path.join(d, subdir) for subdir in classes))) # make sure number of samples same in both directories
             print('Source %s: Found %d images belonging to %d subdirectory classes, split into %d consolidated classes.' % (d, self.samples, self.num_class, self.num_consolclass))
         
-        for d in self.label_directory:
-            self.labelsamples = sum(pool.map(function_partial, (os.path.join(d, subdir) for subdir in classes))) # make sure number of samples same in both directories
-            if self.labelsamples != self.samples:
-                raise ValueError("Error! %d training images found by only %d labelled images found." %(self.samples, self.labelsamples))
+        if self.label_directory[0] is not None:
+            for d in self.label_directory:
+                self.labelsamples = sum(pool.map(function_partial, (os.path.join(d, subdir) for subdir in classes))) # make sure number of samples same in both directories
+                if self.labelsamples != self.samples:
+                    raise ValueError("Error! %d training images found by only %d labelled images found." %(self.samples, self.labelsamples))
 
         for d in self.target_directory:
             self.targetsamples = sum(pool.map(function_partial, (os.path.join(d, subdir) for subdir in classes))) # make sure number of samples same in both directories
@@ -864,22 +865,23 @@ class DANN_NeMODirectoryIterator(Iterator):
             dcount += 1
             
         # Build an index of images in label directory
-        for d in self.label_directory: # currently coded so that there is only 1 label_directory
-            label_results = []
-            self.label_filenames = []
-            self.min_labelkey = np.min([self.class_indices[k] for k in self.class_indices])
-            self.labelkey = [np.uint8(255/self.num_consolclass*i) for i in range(self.min_labelkey, self.min_labelkey+self.num_consolclass)] # Assuming labels are saved according to # of consolclass
-            label_shape = list(self.image_shape[0]) # R x C x D
-            label_shape[self.image_data_generator.channel_axis -1] = self.num_consolclass
-            self.label_shape = tuple(label_shape)
-            
-            for dirpath in (os.path.join(label_directory, subdir) for subdir in classes):
-                label_results.append(pool.apply_async(_list_valid_filenames_in_directory, (dirpath, white_list_formats, self.class_indices, follow_links)))
-            
-            for res in label_results:
-                tempclasses, filenames = res.get()
-                filenames.sort()
-                self.label_filenames += filenames
+        if self.label_directory[0] is not None:
+            for d in self.label_directory: # currently coded so that there is only 1 label_directory
+                label_results = []
+                self.label_filenames = []
+                self.min_labelkey = np.min([self.class_indices[k] for k in self.class_indices])
+                self.labelkey = [np.uint8(255/self.num_consolclass*i) for i in range(self.min_labelkey, self.min_labelkey+self.num_consolclass)] # Assuming labels are saved according to # of consolclass
+                label_shape = list(self.image_shape[0]) # R x C x D
+                label_shape[self.image_data_generator.channel_axis -1] = self.num_consolclass
+                self.label_shape = tuple(label_shape)
+
+                for dirpath in (os.path.join(label_directory, subdir) for subdir in classes):
+                    label_results.append(pool.apply_async(_list_valid_filenames_in_directory, (dirpath, white_list_formats, self.class_indices, follow_links)))
+
+                for res in label_results:
+                    tempclasses, filenames = res.get()
+                    filenames.sort()
+                    self.label_filenames += filenames
         
         # Build an index of images in target directory
         dcount = 0
@@ -916,7 +918,7 @@ class DANN_NeMODirectoryIterator(Iterator):
         self.reset() # sets self.batch_index = 0 (only done during first call)
 #         print("batch_size: ", batch_size)
         if batch_size == True:
-            batch_size = 8 # hard coded
+            batch_size = 32 # hard coded
         self.target_batch_index = 0 # this batch index is specific to the target images
         # This assumes same number of files per class!
         div_source = n_source/self.num_class
@@ -1014,7 +1016,7 @@ class DANN_NeMODirectoryIterator(Iterator):
                             
             if self.validation == False:
                 for dcount in range(0,len(self.source_directory)):
-                    for i, j in enumerate(index_array_source):
+                    for i, j in enumerate(index_array_target):
                         ftargetname = self.target_filenames[dcount][j]
     #                     ftargetname = self.filenames[dcount][j]
                         img = coralutils.CoralData(os.path.join(self.target_directory[dcount], ftargetname), load_type="raster").image
@@ -1041,71 +1043,89 @@ class DANN_NeMODirectoryIterator(Iterator):
                                 dataset.FlushCache()
                             
 
-            batch_y = np.zeros((current_batch_size_source + current_batch_size_target,) + self.label_shape, dtype=np.int8) # N x R x C x D
-            batch_weights = np.ones((current_batch_size_source + current_batch_size_target, self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float) # if every class has different weight
-            sample_weights_class = np.array(([1] * current_batch_size_source + [0] * current_batch_size_target))
-            sample_weights_domain = np.ones((current_batch_size_source + current_batch_size_target,))
-            
-            for i,j in enumerate(index_array_source):
-                fname = self.label_filenames[j]
-                # assume all label data
-                y = self._load_seg(fname)
-                if self.image_data_generator.random_rotation: # flip and rotate according to previous batch_x images
-                    y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
-                if self.class_weights is not None:
-                    weights = np.zeros((self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float)
-                    for k in self.class_weights:
-                        weights[y == self.class_indices[k]] = self.class_weights[k]             # class_weights must be a dictionary
-                    batch_weights[i] = weights
-                if self.save_to_dir:            # save to dir before y is transformed to categorical tensor
-                    img = y
-                    fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_labelimg', index=current_index_source + i, hash=index_array_source[i],format=self.save_format)
-                    cv2.imwrite(os.path.join(self.save_to_dir, fname), img)
-                y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
-                batch_y[i] = y
-                if self.validation:
-                    batch_y[i+current_batch_size_source] = y
-            
-#             for i,j in enumerate(index_array_source):
-#                 batch_y[i+current_batch_size_source] = np.zeros(self.label_shape, dtype=np.int8)
-#                 fname = self.label_filenames[j]
-#                 # assume all label data
-#                 y = self._load_seg(fname)
-#                 if self.image_data_generator.random_rotation: # flip and rotate according to previous batch_x images
-#                     y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
-#                 if self.class_weights is not None:
-#                     weights = np.zeros((self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float)
-#                     for k in self.class_weights:
-#                         weights[y == self.class_indices[k]] = self.class_weights[k]             # class_weights must be a dictionary
-#                     batch_weights[i] = weights
-#                 y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
-#                 batch_y[i+current_batch_size_source] = y
-                
-                    
-        # Domain Classifier Branch
-        
-#         print(current_batch_size_source, current_batch_size_target)
-        domain_batch_y = np.zeros((current_batch_size_source + current_batch_size_target,2), dtype=np.int8)
-        domain_batch_y[:current_batch_size_source,0] = 1
-        if self.validation:
-            domain_batch_y[current_batch_size_source:,0] = 1
-        else:
-            domain_batch_y[current_batch_size_source:,1] = 1
-        domain_batch_y_weights = np.ones((current_batch_size_source + current_batch_size_target,2), dtype=np.int8) # N x 2 (1 for everything)
-            
-        if len(batch_x) == 1: # Check if there is only one directory
-            batch_x = batch_x[0]
-            
-        quick_shape1 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2],z.shape[3])) # convert to B x (C*R) x N_channel
-        quick_shape2 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2])) # convert to B x (C*R)
-        
-#         print("batch_x: ", batch_x.shape)
-#         print("batch_y reshape: ", quick_shape1(batch_y).shape)
-#         print("domain_batch_y: ", domain_batch_y.shape)
-#         print("batch_weights reshape: ", quick_shape2(batch_weights).shape)
-#         print("domain_batch_y_weights: ", domain_batch_y_weights.shape)
+            if self.label_directory[0] is not None:
+                batch_y = np.zeros((current_batch_size_source) + self.label_shape, dtype=np.int8) # N x R x C x D
+                batch_weights = np.ones((current_batch_size_source + current_batch_size_target, self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float) # if every class has different weight
+                sample_weights_class = np.array(([1] * current_batch_size_source + [0] * current_batch_size_target))
+                sample_weights_domain = np.ones((current_batch_size_source + current_batch_size_target,))
 
-        return batch_x, [quick_shape1(batch_y), domain_batch_y], [sample_weights_class, sample_weights_domain]
+                for i,j in enumerate(index_array_source):
+                    fname = self.label_filenames[j]
+                    # assume all label data
+                    y = self._load_seg(fname)
+                    if self.image_data_generator.random_rotation: # flip and rotate according to previous batch_x images
+                        y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
+                    if self.class_weights is not None:
+                        weights = np.zeros((self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float)
+                        for k in self.class_weights:
+                            weights[y == self.class_indices[k]] = self.class_weights[k]             # class_weights must be a dictionary
+                        batch_weights[i] = weights
+                    if self.save_to_dir:            # save to dir before y is transformed to categorical tensor
+                        img = y
+                        fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_labelimg', index=current_index_source + i, hash=index_array_source[i],format=self.save_format)
+                        cv2.imwrite(os.path.join(self.save_to_dir, fname), img)
+                    y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
+                    batch_y[i] = y
+                    if self.validation:
+                        batch_y[i+current_batch_size_source] = y
+
+    #             for i,j in enumerate(index_array_source):
+    #                 batch_y[i+current_batch_size_source] = np.zeros(self.label_shape, dtype=np.int8)
+    #                 fname = self.label_filenames[j]
+    #                 # assume all label data
+    #                 y = self._load_seg(fname)
+    #                 if self.image_data_generator.random_rotation: # flip and rotate according to previous batch_x images
+    #                     y, _, _ = self.image_data_generator.random_flip_rotation(y, batch_flip[i], batch_rot90[i])
+    #                 if self.class_weights is not None:
+    #                     weights = np.zeros((self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float)
+    #                     for k in self.class_weights:
+    #                         weights[y == self.class_indices[k]] = self.class_weights[k]             # class_weights must be a dictionary
+    #                     batch_weights[i] = weights
+    #                 y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
+    #                 batch_y[i+current_batch_size_source] = y
+
+
+            # Domain Classifier Branch
+                domain_batch_y = np.zeros((current_batch_size_source + current_batch_size_target,2), dtype=np.int8)
+                domain_batch_y[:current_batch_size_source,0] = 1
+                if self.validation:
+                    domain_batch_y[current_batch_size_source:,0] = 1
+                else:
+                    domain_batch_y[current_batch_size_source:,1] = 1
+                domain_batch_y_weights = np.ones((current_batch_size_source + current_batch_size_target,2), dtype=np.int8) # N x 2 (1 for everything)
+
+                if len(batch_x) == 1: # Check if there is only one directory
+                    batch_x = batch_x[0]
+
+                quick_shape1 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2],z.shape[3])) # convert to B x (C*R) x N_channel
+                quick_shape2 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2])) # convert to B x (C*R)
+
+        #         print("batch_x: ", batch_x.shape)
+        #         print("batch_y reshape: ", quick_shape1(batch_y).shape)
+        #         print("domain_batch_y: ", domain_batch_y.shape)
+        #         print("batch_weights reshape: ", quick_shape2(batch_weights).shape)
+        #         print("domain_batch_y_weights: ", domain_batch_y_weights.shape)
+
+                return batch_x, [quick_shape1(batch_y), domain_batch_y], [sample_weights_class, sample_weights_domain]
+            else:
+                batch_y = np.zeros(((current_batch_size_source + current_batch_size_target), self.num_consolclass), dtype=K.floatx())
+                for i, label in enumerate(self.classes[0,index_array_source]):
+                    batch_y[i, label] = 1.
+                domain_batch_y = np.zeros((current_batch_size_source + current_batch_size_target,2), dtype=np.int8)
+                domain_batch_y[:current_batch_size_source,0] = 1
+                sample_weights_class = np.array(([1] * current_batch_size_source + [0] * current_batch_size_target))
+                sample_weights_domain = np.ones((current_batch_size_source + current_batch_size_target,))
+                if self.validation:
+                    domain_batch_y[current_batch_size_source:,0] = 1
+                else:
+                    domain_batch_y[current_batch_size_source:,1] = 1
+#                     print("batch_y:", batch_y)
+#                     print("domain_batch_y:", domain_batch_y)
+#                     print("sample_weights_class:", sample_weights_class)
+#                     print("sample_weights_domain:", sample_weights_domain)
+
+                return batch_x, [batch_y, domain_batch_y], [sample_weights_class, sample_weights_domain]
+
 
     def _load_seg(self, fn):
         """Segmentation load method.

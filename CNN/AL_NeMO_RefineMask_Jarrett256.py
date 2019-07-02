@@ -18,7 +18,7 @@ K.set_session(_SESSION)
 import sys
 sys.path.append("./utils/") # Adds higher directory to python modules path.
 import loadcoraldata_utils as coralutils
-from NeMO_models import AlexNetLike, SharpMask_FCN
+from NeMO_models import AlexNetLike, SharpMask_FCN, 
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 from NeMO_backend import get_model_memory_usage
 from NeMO_losses import charbonnierLoss

@@ -290,7 +290,7 @@ def vgg_fcblock(filters, dropout=0.5, weight_decay=0., block_name='vgg_fcblock',
 
       x = Dropout(dropout)(x)
       x = Dense(filters, activation='relu', kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay), name='{}_Dense'.format(block_name))(x)
-      x = BatchNormalization(name='{}_BatchNorm'.format(block_name))(x)
+#       x = BatchNormalization(name='{}_BatchNorm'.format(block_name))(x)
       return x
     return f
 

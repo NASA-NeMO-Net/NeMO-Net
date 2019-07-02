@@ -137,6 +137,34 @@ class CroppingLike2D(Layer):
         base_config = super(CroppingLike2D, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
+def tfsplit(x):    
+    x_shape = K.int_shape(x)
+    if (x_shape is not None) and (x_shape[0] is not None):
+        len_start = int_shape(start)[0] if K.is_tensor(start) else len(start)
+        len_size = int_shape(size)[0] if K.is_tensor(size) else len(size)
+        if not (len(K.int_shape(x)) == len_start == len_size):
+            raise ValueError('The dimension and the size of indices should match.')
+    split1, split2 = tf.split(x, num_or_size_splits=2, axis=0)
+    return split1
+    
+class Batch_Split(Layer):
+    '''Splits batch into two, but returns only first half'''
+    def __init__(self, **kwargs):
+        super(Batch_Split, self).__init__(**kwargs)
+    
+    def build(self, input_shape):
+        self.trainable_weights = []
+    
+    def call(self, inputs):
+        input_shape = K.int_shape(inputs)
+        total_batch_size = input_shape[0]
+        # assume size of tensor is 4 (num_batch x cols x rows x depth)
+        return tfsplit(inputs)
+        
+    def compute_output_shape(self, input_shape):
+        return input_shape
+    
+    
 def reverse_gradient(X, hp_lambda):
     '''Flips the sign of the incoming gradient during training.'''
     try:
@@ -145,7 +173,6 @@ def reverse_gradient(X, hp_lambda):
         reverse_gradient.num_calls = 1
 
     grad_name = "GradientReversal%d" % reverse_gradient.num_calls
-
     @tf.RegisterGradient(grad_name)
     def _flip_gradients(op, grad):
         return [tf.negative(grad) * hp_lambda]

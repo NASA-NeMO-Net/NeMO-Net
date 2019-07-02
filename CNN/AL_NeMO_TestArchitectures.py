@@ -7,7 +7,7 @@ import keras
 import keras.backend as K
 import tensorflow as tf
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 global _SESSION
 config = tf.ConfigProto(allow_soft_placement=True)
@@ -18,9 +18,12 @@ K.set_session(_SESSION)
 import sys
 sys.path.append("./utils/") # Adds higher directory to python modules path.
 import loadcoraldata_utils as coralutils
-from NeMO_models import AlexNetLike, SharpMask_FCN, TestModel
+from NeMO_models import AlexNetLike, SharpMask_FCN, StyleTransfer
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 from NeMO_backend import get_model_memory_usage
+from NeMO_losses import charbonnierLoss
+import NeMO_layers
+from keras.models import load_model
 from keras.callbacks import (
     ReduceLROnPlateau,
     CSVLogger,
@@ -28,21 +31,19 @@ from keras.callbacks import (
     ModelCheckpoint,
     TerminateOnNaN)
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
-from NeMO_losses import charbonnierLoss
 
-image_size = 32
-batch_size = 64
-model_name = 'SRx2'
+image_size = 256
+batch_size = 8
+model_name = 'RefineMask_Jarrett256_RGB_NIR3'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
     json_data = json.load(json_file)
 
-#labelkey = json_data["VedConsolidated_ClassDict"]
-labelkey = {'Sand': 0, 'Branching': 1, 'Mounding': 2, 'Rock':3}
+labelkey = json_data["VedConsolidated_ClassDict"]
 num_classes = len(labelkey)
 
-with open("init_args - SR.yml", 'r') as stream:
+with open("init_args - Jarrett.yml", 'r') as stream:
     try:
         init_args = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -51,19 +52,20 @@ with open("init_args - SR.yml", 'r') as stream:
 train_loader = ImageSetLoader(**init_args['image_set_loader']['train'])
 val_loader = ImageSetLoader(**init_args['image_set_loader']['val'])
 
-if train_loader.color_mode == 'rgb':
-    num_channels = 3
-elif train_loader.color_mode == '8channel':
-    num_channels = 8
+# if train_loader.color_mode == 'rgb':
+#     num_channels = 3
+# elif train_loader.color_mode == '8channel':
+#     num_channels = 8
+num_channels = 4 # hard-coded for 4 channel
 
 y = train_loader.target_size[1]
 x = train_loader.target_size[0]
-pixel_mean =127.5*np.ones(num_channels)
-pixel_std = 127.5*np.ones(num_channels)
+pixel_mean =0*np.ones(num_channels)
+pixel_std = 1*np.ones(num_channels)
 # channel_shift_range = [0.01]*num_channels
 # rescale = np.asarray([[0.95,1.05]]*num_channels)
 
-checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, monitor='val_loss', mode='min', save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, monitor='val_acc', mode='max', save_best_only=True)
 lr_reducer = ReduceLROnPlateau(monitor='val_loss',
                                factor=np.sqrt(0.1),
                                cooldown=0,
@@ -76,6 +78,9 @@ SaveWeights = WeightsSaver(filepath='./weights/', model_name=model_name, N=10)
 #csv_logger = CSVLogger('output/tmp_fcn_vgg16.csv')
     #'output/{}_fcn_vgg16.csv'.format(datetime.datetime.now().isoformat()))
 
+#check_num = CheckNumericsOps(validation_data=[np.random.random((1, 224, 224, 3)), 1],
+#                             histogram_freq=100)
+
 # log history during model fit
 csv_logger = CSVLogger('output/log.csv', append=True, separator=';')
 
@@ -84,94 +89,109 @@ datagen = NeMOImageGenerator(image_shape=[y, x, num_channels],
                                     pixelwise_center=True,
                                     pixel_mean=pixel_mean,
                                     pixelwise_std_normalization=True,
-                                    random_rotation=False,
-                                    pixel_std=pixel_std,
-                                    image_or_label="image")
+                                    augmentation = 1,
+                                    channel_shift_range = 0,
+                                    random_rotation=True,
+                                    pixel_std=pixel_std)
 train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     FCN_directory=train_loader.label_dir,
     source_size=(x,y),
-    target_size=(x*2,y*2),
-    color_mode=train_loader.color_mode,
+    target_size=(x,y),
+    color_mode='4channel_delete',
     passedclasses = labelkey,
     class_mode = 'categorical',
     batch_size = batch_size,
-    shuffle=True,
-    image_or_label="image")
-    # save_to_dir='./tmpbatchsave/',
-    # save_format='png',
-    # image_or_label="image")
+#    save_to_dir = './Generator_Outputs/',
+    shuffle=True)
 
 validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
     FCN_directory=val_loader.label_dir,
     source_size=(x,y),
-    target_size=(x*2,y*2),
-    color_mode=val_loader.color_mode,
+    target_size=(x,y),
+    color_mode='4channel_delete',
     passedclasses = labelkey,
     class_mode = 'categorical',
     batch_size = batch_size,
-    shuffle=True,
-    image_or_label="image")
-    # save_to_dir='./tmpbatchsave/',
-    # save_format='png',
-    # image_or_label="image")
+    shuffle=True)
 
-conv_layers = 6
+conv_layers = 5
 full_layers = 0
 
-classes = 10
+# First 4 megablocks of the resnet-50 architecture
 
-conv_params = {"filters":[64,128,256,512,512, ([1024,1024,classes],)],
-    "conv_size": [(3,3),(3,3),(3,3),(3,3),(3,3), ([(3,3),(1,1),(1,1)],)],
-    "conv_strides": [(1,1),(1,1),(1,1),(1,1),(1,1), (1,1)],
-    "padding": ['same','same','same','same','same','valid'],
-    "dilation_rate": [(1,1), (1,1), (1,1), (1,1), (2,2), ([(6,6),(1,1),(1,1)], [(12,12),(1,1),(1,1)], [(18,18),(1,1),(1,1)], [(24,24),(1,1),(1,1)])],
-    "pool_size": [(2,2), (2,2), (2,2), (3,3), (3,3), (2,2)],
-    "pool_strides": [(2,2), (2,2), (2,2), (1,1), (1,1), (2,2)],
-    "pad_size": [(0,0), (0,0), (1,1), (1,1), (1,1), ((6,6),(12,12),(18,18),(24,24))],
-    "layercombo": ["cacapb", "cacapba", "cacacapb", "cacacazpb", "cacacapb", tuple(["zcadcadc"]*4)],
-    "layercombine": ["", "", "", "", "", "sum"],
-    "full_filters": [1024,1024],
+conv_params = {"filters": [[64] , [([64,64,128],128)]*3, [([128,128,256],256)]*4, [([256,256,512],512)]*6, [([512,512,1024],1024)]*3],
+    "conv_size": [[(7,7)] , [([(1,1),(3,3),(1,1)], (1,1))]*3, [([(1,1),(3,3),(1,1)], (1,1))]*4, [([(1,1),(3,3),(1,1)], (1,1))]*6, [([(1,1),(3,3),(1,1)], (1,1))]*3],
+    "conv_strides": [(2,2), [([(1,1),(1,1),(1,1)], (1,1))] + [(1,1)]*2 , [([(2,2),(1,1),(1,1)], (2,2))] + [(1,1)]*3 , [([(2,2),(1,1),(1,1)], (2,2))] + [(1,1)]*5, [([(2,2),(1,1),(1,1)], (2,2))] + [(1,1)]*2],
+    "padding": ['same', 'same', 'same', 'same', 'same'],
+    "dilation_rate": [(1,1), (1,1), (1,1), (1,1), (1,1)],
+    "pool_size": [(3,3), (1,1), (1,1), (1,1), (1,1)],
+    "pool_strides": [(2,2), (1,1), (1,1), (1,1), (1,1)],
+    "pad_size": [(0,0), (0,0), (0,0), (0,0), (0,0)],
+    "filters_up": [None]*conv_layers,
+    "upconv_size": [None]*conv_layers,
+    "upconv_strides": [None]*conv_layers,
+    "layercombo": ["cbap", [("cbacbac","c")]+[("bacbacbac","")]*2, [("bacbacbac","c")]+[("bacbacbac","")]*3, [("bacbacbac","c")]+[("bacbacbac","")]*5, [("bacbacbac","c")]+[("bacbacbac","")]*2], 
+    "layercombine": ["","sum","sum","sum","sum"],           
+    "full_filters": [1024,1024], 
     "dropout": [0,0]}
 
+RCU = ("bacbac","")
+CRPx2 = ([("pbc",""),"pbc"],"")
 
-# conv_params = {"filters": [64,128,256,512,512],
-#     "conv_size": [(3,3),(3,3),(3,3),(3,3),(3,3)],
-#     "conv_strides": [(1,1),(1,1),(1,1),(1,1),(1,1)],
-#     "padding": ['same','same','same','same','same'],
-#     "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(2,2)],
-#     "pool_size": [(2,2),(2,2),(2,2),(3,3),(3,3)],
-#     "pool_strides": [(2,2),(2,2),(2,2),(1,1),(1,1)],
-#     "pad_size": [(0,0),(0,0),(1,1),(1,1),(1,1)],
-#     "layercombo": ["cacapb","cacapb","cacacapb","cacacazpb","cacacazp"],
-#     "full_filters": [1024,1024],
-#     "dropout": [0,0]}
+bridge_params = {"filters": [[1024,1024,128], [512,512,64], [256,256,32], [128,128,16]],
+    "conv_size": [(3,3), (3,3), (3,3), (3,3)],
+    "filters_up": [None]*4,
+    "upconv_size": [None]*4,
+    "upconv_strides": [None]*4,
+    "layercombo": [[RCU,RCU,"bc"], [RCU,RCU,"bc"], [RCU,RCU,"bc"], [RCU,RCU,"bc"]],
+    "layercombine": ["sum","sum","sum","sum"]}
 
-# parallelconv_params = {"filters": [[1024,1024,num_classes]],
-#     "conv_size": [[(3,3),(1,1),(1,1)]],
-#     "conv_strides":  [[(1,1),(1,1),(1,1)]],
-#     "padding": ['valid','valid','valid','valid'],
-#     "dilation_rate": [[(6,6),(1,1),(1,1)], [(12,12),(1,1),(1,1)], [(18,18),(1,1),(1,1)], [(24,24),(1,1),(1,1)]],
-#     "pool_size": [[(2,2),(2,2),(2,2)]], #doesn't matter
-#     "pool_strides": [[(2,2),(2,2),(2,2)]], #doesn't matter
-#     "pad_size": [[(6,6),(0,0),(0,0)], [(12,12),(0,0),(0,0)], [(18,18),(0,0),(0,0)], [(24,24),(0,0),(0,0)]],
-#     "layercombo": ["zcadcadc","zcadcadc","zcadcadc","zcadcadc"],
-#     "full_filters": [4096,2048],
-#     "dropout": [0.5,0.5]}
+prev_params = {"filters": [None, [128,128,64], [64,64,32], [32,32,16]],
+    "conv_size": [None, (3,3),(3,3),(3,3)],
+    "filters_up": [None,None,None,None],
+    "upconv_size": [None,None,None,None],
+    "upconv_strides": [None,(2,2),(2,2),(2,2)],
+    "upconv_type": [None,"bilinear","bilinear","bilinear"],
+    "layercombo": ["", [RCU,RCU,"bcu"], [RCU,RCU,"bcu"], [RCU,RCU,"bcu"]],
+    "layercombine": [None,"sum","sum","sum"]} 
 
-TestArchitecture = AlexNetLike(input_shape=(y, x, num_channels), classes=num_classes, weight_decay=3e-3, trainable_encoder=True, weights=None,
-    conv_layers=conv_layers, full_layers=0, conv_params=conv_params)
+next_params = {"filters": [["",128,128], ["",64,64], ["",32,32], ["",16,16,16,None,16,None]],
+    "conv_size": [(3,3), (3,3), (3,3), (3,3)],
+    "pool_size": [(5,5), (5,5), (5,5), (5,5)],
+    "filters_up": [None,None,None,None],
+    "upconv_size": [None,None,None,None],
+    "upconv_strides": [None,None,None,(2,2)],
+    "upconv_type": [None,None,None,"bilinear"],
+    "layercombo": [["a",CRPx2,RCU], ["a",CRPx2,RCU], ["a",CRPx2,RCU], ["a",CRPx2,RCU,RCU,"u",RCU,"u"]],
+    "layercombine": ["sum","sum","sum","sum"]} 
 
-optimizer = keras.optimizers.Adam(1e-4)
+decoder_index = [0,1,2,3]
+# upsample = [False,True,True,True,True]
+scales= [1,1,1,1]
 
-TestArchitecture.summary()
-# TestArchitecture.compile(loss=charbonnierLoss, optimizer=optimizer, metrics=['accuracy'], sample_weight_mode='temporal')
-TestArchitecture.compile(loss='categorical_crossentropy', optimizer=optimizer)
-print("Memory required (GB): ", get_model_memory_usage(batch_size, TestArchitecture))
+RefineMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, decoder_index = decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
+    conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params, scales=scales, 
+    bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
 
-# TestArchitecture.fit_generator(train_generator,
-#     steps_per_epoch=125,
-#     epochs=100,
+TestModel = StyleTransfer(RefineMask, ['add_1', 'add_2'], 0.5)
+
+# SharpMask = load_model('./tmp/SharpMask_Jarrett256_v2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D})
+# RefineMask = load_model('./tmp/RefineMask_Jarrett256_RGB_NIR2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D, 'charbonnierLoss': charbonnierLoss})
+
+# optimizer = keras.optimizers.Adam(1e-4)
+
+# # SharpMask.summary()
+# keras.utils.layer_utils.print_summary(RefineMask, line_length=150, positions=[.35, .55, .65, 1.])
+# RefineMask.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'], sample_weight_mode='temporal')
+
+# print("Memory required (GB): ", get_model_memory_usage(batch_size, RefineMask))
+
+# RefineMask.fit_generator(train_generator,
+#     steps_per_epoch=50,
+#     epochs=10,
 #     validation_data=validation_generator,
-#     validation_steps=20,
-#     verbose=1,
-#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+#     validation_steps=10,
+#     verbose=1)
+# #     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+
+

@@ -10,7 +10,7 @@ import keras.backend as K
 from keras.models import Model
 from keras.layers import Input, Flatten, Activation, Reshape, Dense, Cropping2D
 
-from NeMO_layers import CroppingLike2D, BilinearUpSampling2D, GradientReversal
+from NeMO_layers import CroppingLike2D, BilinearUpSampling2D, GradientReversal, Batch_Split
 from keras.regularizers import l2
 from keras.layers.convolutional import Conv2D, AveragePooling2D
 from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Recursive_Hyperopt_Encoder
@@ -18,6 +18,21 @@ from NeMO_decoders import VGGDecoder, VGGUpsampler, VGG_DecoderBlock
 from NeMO_backend import get_model_memory_usage
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 from keras.layers import Lambda
+
+def gram_matrix(x): # Gram matrix of size [N_filter, rows x cols)], which contains the flattened features dotted with their transposes
+    features = K.batch_flatten(K.permute_dimensions(x, (2,0,1)))
+    gram = K.dot(features, K.transpose(features))
+    return gram
+
+def style_loss(style, combination):
+    S = gram_matrix(style)
+    C = gram_matrix(combination)
+    nrows, ncols, nchannels = style.shape
+    size = nrows*ncols
+    return K.sum(K.square(S - C)) / (4.0 * (nchannels ** 2) * (size ** 2))
+
+def content_loss(base, combination):
+    return K.sum(K.square(combination - base))
 
 def AlexNet(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None):
     inputs = Input(shape=input_shape)
@@ -117,6 +132,16 @@ def TestModel_EncoderDecoder(input_shape, classes, decoder_index, weight_decay=0
     # return model
     return Model(inputs=inputs, outputs=outputs)
 
+def StyleTransfer(FeatureModel, FeatureLayers, style_weight):
+    content_weight = 1 - style_weight
+    layer_output = []
+    for layer in FeatureLayers:
+        layer_output.append(FeatureModel.get_layer(layer).output)
+    newFeatureModel = Model(FeatureModel.input, outputs=layer_output)
+    keras.utils.layer_utils.print_summary(newFeatureModel, line_length=150, positions=[.35, .55, .65, 1.])
+    
+    return newFeatureModel
+
 def SRModel_FeatureWise(hr_input_shape, lr_input_shape, SRModel, FeatureModel, FeatureLayerName):
     hr_inputs = Input(shape=hr_input_shape)
     lr_inputs = Input(shape=lr_input_shape)
@@ -162,6 +187,11 @@ def DANN_Model(source_input_shape, source_model, domain_model, FeatureLayerName)
             if "input" in predecessor_name:
                 classifier_layer = layer(source_inputs)
             else:
+#                 if predecessor_name == FeatureLayerName: # if end of feature layer, split and take first half
+#                     TestSplit = Batch_Split()
+#                     split_layer = TestSplit(layer_dict[predecessor_name])
+#                     classifier_layer = layer(split_layer)
+#                 else:
                 classifier_layer = layer(layer_dict[predecessor_name])
             layer_dict.update({layer.name:classifier_layer})
                 
@@ -172,10 +202,10 @@ def DANN_Model(source_input_shape, source_model, domain_model, FeatureLayerName)
             print("")
         else:
             dpredecessor_name = dlayer.input.name.split('/')[0]
-            
             if "input" in dpredecessor_name:
                 dpredecessor_name = FeatureLayerName
                 Flip = GradientReversal(1.0)
+
                 dclassifier_layer = Flip(layer_dict[dpredecessor_name])
                 layer_dict.update({dclassifier_layer.name:dclassifier_layer})
                 dpredecessor_name = dclassifier_layer.name
