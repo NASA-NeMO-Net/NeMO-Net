@@ -89,6 +89,43 @@ class NeMOImageGenerator(ImageDataGenerator):
             preprocessing_function = preprocessing_function,
             data_format = data_format)
     
+    def augmentation_shift_4channel(self,x):
+        x = np.rollaxis(x, self.channel_axis-1, 0) # make channel_axis the first axis
+
+        x = x*100+100 # hard coded
+        # Assume bgr + NIR
+        fit1 = np.asarray([[-1.14243211e-02,1.74006653e+00,-7.41971633e-04,-2.27847582e-01,7.81802240e-03,-2.37788745e-01,0,0,2.64154330e+01],
+                          [9.11148733e-04,-1.46364262e+00,-4.90822080e-03,1.46584766e-01,1.48671030e-03,1.63453697e+00,0,0,8.56772131e+01],
+                          [7.47928597e-03,-2.45992530e+00,-3.75490029e-03,3.24331424e-01,-2.39503953e-03,1.55765285e+00,0,0,1.05204936e+02],
+                          [0,0,0,0,0,0,-0.05250297,2.22991288,4.85164778]])
+        fit2 = np.asarray([[-2.04295343e-02,3.64489475e+00,8.26687273e-03,-8.41662523e-01,9.44963864e-03,-6.06050531e-01,0,0,-5.16613993e+01],
+                          [-1.34827256e-02,1.68043246e+00,6.72071243e-03,-7.05877090e-01,5.27804649e-03,7.43471236e-01,0,0,-3.13653270e+01],
+                          [-6.07675802e-03,6.17908072e-01,6.08938030e-03,-4.44539262e-01,7.92493705e-04,6.39467461e-01,0,0,-1.17938458e+01],
+                          [0,0,0,0,0,0,-2.80239868e-03,1.69880579e-01,8.63254268e+00]])
+        fit3 = np.asarray([[-1.16126391e-02,2.23735380e+00,-1.40344430e-02,3.06320353e-02,1.32410016e-02,-6.57365715e-01,0,0,-2.30938626e+01],
+                          [-6.15389359e-03,1.16689906e+00,-1.14967466e-02,2.74771312e-02,5.29923732e-03,6.66334701e-01,0,0,-4.25799090e+01],
+                          [4.53015635e-03,-9.03508160e-01,5.52248862e-04,4.42759776e-02,-8.35786318e-03,1.68134937e+00,0,0,-1.15354561e+00],
+                          [0,0,0,0,0,0,-0.02869423,1.04414848,-2.43072596]])
+        
+        white_pixels = np.where(np.sqrt(x[0]**2+x[1]**2+x[2]**2) >= 250)
+        NIR_pixels = np.where(x[3] >= 50)
+        toremap = np.random.randint(0,4)
+        if toremap > 0:
+            for i in range(0, x.shape[0]):
+                xorig = np.copy(x[i])
+                if toremap == 1:
+                    x[i] = fit1[i,0]*x[0]**2 + fit1[i,1]*x[0] + fit1[i,2]*x[1]**2 + fit1[i,3]*x[1] + fit1[i,4]*x[2]**2 + fit1[i,5]*x[2] + fit1[i,6]*x[3]**2 + fit1[i,7]*x[3] + fit1[i,8] + np.random.uniform(-0.1,0.1,(x.shape[1],x.shape[2]))
+                elif toremap == 2:
+                    x[i] = fit2[i,0]*x[0]**2 + fit2[i,1]*x[0] + fit2[i,2]*x[1]**2 + fit2[i,3]*x[1] + fit2[i,4]*x[2]**2 + fit2[i,5]*x[2] + fit2[i,6]*x[3]**2 + fit2[i,7]*x[3] + fit2[i,8] + np.random.uniform(-0.1,0.1,(x.shape[1],x.shape[2]))
+                elif toremap == 3:
+                    x[i] = fit3[i,0]*x[0]**2 + fit3[i,1]*x[0] + fit3[i,2]*x[1]**2 + fit3[i,3]*x[1] + fit3[i,4]*x[2]**2 + fit3[i,5]*x[2] + fit3[i,6]*x[3]**2 + fit3[i,7]*x[3] + fit3[i,8] + np.random.uniform(-0.1,0.1,(x.shape[1],x.shape[2]))
+                x[i][white_pixels] = xorig[white_pixels]
+                x[i][NIR_pixels] = xorig[NIR_pixels]
+                   
+        x = 1/100*(x-100)
+        x = np.rollaxis(x,0,self.channel_axis)
+        return x
+    
     def augmentation_shift(self, x):
         x = np.rollaxis(x, self.channel_axis-1, 0) # make channel_axis the first axis
         x = x*100+100 # hard coded
@@ -296,8 +333,8 @@ class NeMODirectoryIterator(Iterator):
 
         white_list_formats = {'png', 'jpg', 'jpeg', 'bmp', 'ppm', 'tif'}
 
-        # first, count the number of samples and classes
-        self.samples = 0
+        # first, count the number of samples and classes as a list
+        self.samples = []
 
         # if not classes:
         # Always determine number classes by the subdirectories (will not count classes that don't show up)
@@ -318,42 +355,48 @@ class NeMODirectoryIterator(Iterator):
         pool = multiprocessing.pool.ThreadPool()
         function_partial = partial(_count_valid_files_in_directory, white_list_formats=white_list_formats, follow_links=follow_links)
         
+        dcount = 0
+        self.classes = []
         for d in self.directory:
-            self.samples = sum(pool.map(function_partial, (os.path.join(d, subdir) for subdir in classes))) # make sure number of samples same in both directories
-            print('%s: Found %d images belonging to %d classes, split into %d consolidated classes.' % (d, self.samples, self.num_class, self.num_consolclass))
+            self.samples.append(sum(pool.map(function_partial, (os.path.join(d, subdir) for subdir in classes)))) # make sure number of samples same in both directories
+            print('%s: Found %d images belonging to %d classes, split into %d consolidated classes.' % (d, self.samples[dcount], self.num_class, self.num_consolclass))
+            self.classes.append(np.zeros((self.samples[dcount],), dtype='int32')) # list of len(samples)... can be different lengths due to different directories
+            dcount += 1
 
         # Check FCN label directory if specified
+        dcount = 0
         if FCN_directory is not None:
             labelsamples = sum(pool.map(function_partial,
                 (os.path.join(FCN_directory, subdir) for subdir in classes)))
-            if labelsamples != self.samples:
-                raise ValueError("Error! %d training images found but only %d labelled images found." %(self.samples,labelsamples))
+            if labelsamples != self.samples[dcount]:
+                raise ValueError("Error! %d training images found but only %d labelled images found." %(self.samples[dcount],labelsamples))
 
         # second, build an index of the images in the different class subfolders
-        results = []
-        self.filenames = []
-        self.classes = np.zeros((len(self.directory),self.samples,), dtype='int32') # len(directory) x len(samples)
-        self.class_idx_startend = [] # for keeping track of the starting and ending idx of each class, in case they are of different lengths 
+        results = [[] for d in range(len(self.directory))]
+        self.filenames = [[] for d in range(len(self.directory))]
+#         self.classes = np.zeros((len(self.directory),self.samples,), dtype='int32') # len(directory) x len(samples)
+        self.class_idx_startend = [[] for d in range(len(self.directory))] # for keeping track of the starting and ending idx of each class, in case they are of different lengths 
+    
         dcount = 0
-        print(classes)
         for d in self.directory:
             tempresults = []
             for dirpath in (os.path.join(d, subdir) for subdir in classes):
                 tempresults.append(pool.apply_async(_list_valid_filenames_in_directory, (dirpath, white_list_formats, self.class_indices, follow_links)))
-            results.append(tempresults)
+            results[dcount].append(tempresults)
             
             i = 0
             tempfilenames = []
             for res in tempresults:
                 tempclasses, filenames = res.get()
-                self.classes[dcount,i:i + len(tempclasses)] = tempclasses
-                if dcount == 0: # assumes that all files have corresponding 1:1 between inputs
-                    self.class_idx_startend.append([i,i+len(tempclasses)])
+                self.classes[dcount][i:i + len(tempclasses)] = tempclasses
+#                 if dcount == 0: # assumes that all files have corresponding 1:1 between inputs
+                self.class_idx_startend[dcount].append([i,i+len(tempclasses)])
                 filenames.sort()
                 tempfilenames += filenames
                 i += len(tempclasses)
-            self.filenames.append(tempfilenames)
+            self.filenames[dcount] = tempfilenames
             dcount += 1
+        print("class_idx_startend: ", self.class_idx_startend)
             
         # Build an index of images in FCN label directory if specified
         if FCN_directory is not None:
@@ -385,23 +428,31 @@ class NeMODirectoryIterator(Iterator):
         # Ensure self.batch_index is 0.
         self.reset()
         # This assumes same number of files per class!
-        div = n/self.num_class
+        # self.num_class: Total number of sub-directories
+        
+#         div = n/self.num_class
+        if len(n) > 1:
+            n_1 = n[0]
+        else:
+            n_1 = n[0]
+    
         while 1:
-            index_array = []
+            index_array = [[] for d in range(len(self.directory))]
             np.asarray(index_array)
+
             if seed is not None:
                 np.random.seed(seed + self.total_batches_seen)
 
             leftover = batch_size % self.num_class #remainder in case num_class doesn't divide into batch_size
             random_c = np.random.choice(self.num_class,leftover,replace=False)
-            # Chooses same number of images per class, starting and ending with class_idx_startend in case folders contain different # of files
-            for c in range(self.num_class):
-                index_array = np.append(index_array, np.random.randint(int(self.class_idx_startend[c][0]),int(self.class_idx_startend[c][1]),size=int(batch_size//self.num_class)))
-            for c in random_c: #choose random folders to pick from
-                index_array = np.append(index_array, np.random.randint(int(self.class_idx_startend[c][0]),int(self.class_idx_startend[c][1]),size=1))
+            for d in range(len(self.directory)): # index array is different for every source/target directory
+                for c in range(self.num_class):
+                    index_array[d] = np.append(index_array[d], np.random.randint(int(self.class_idx_startend[d][c][0]),int(self.class_idx_startend[d][c][1]),size=int(batch_size//self.num_class)))
+                for c in random_c: #choose random folders to pick from
+                    index_array[d] = np.append(index_array[d], np.random.randint(int(self.class_idx_startend[d][c][0]),int(self.class_idx_startend[d][c][1]),size=1))
 
-            current_index = (self.batch_index * batch_size) % n # remainder
-            if n > current_index + batch_size:
+            current_index = (self.batch_index * batch_size) % n_1 # remainder... we randomize anyway so all of this is rather not necessary
+            if n_1 > current_index + batch_size:
                 current_batch_size = batch_size
                 self.batch_index += 1  # batch number within n images
             else:
@@ -409,7 +460,9 @@ class NeMODirectoryIterator(Iterator):
                 current_batch_size = batch_size
                 self.batch_index = 0 # has gone through all n images, reset batch_index to 0
             self.total_batches_seen += 1
-            index_array = index_array.astype(np.int64)
+            
+            for d in range(len(self.directory)):
+                index_array[d] = index_array[d].astype(np.int64)
             yield (index_array, current_index, current_batch_size)
 
     def next(self):
@@ -434,15 +487,16 @@ class NeMODirectoryIterator(Iterator):
         if self.color_mode == "8channel" or self.color_mode == "4channel" or self.color_mode == "4channel_delete":
             # iterate over directory?
             for dcount in range(0,len(self.directory)):
-                for i, j in enumerate(index_array):
+                for i, j in enumerate(index_array[dcount]): # index_array may be different for different directories
+#                     print("dcount, j:", dcount, j)
+#                     print("filenames: ", self.filenames[dcount])
                     fname = self.filenames[dcount][j]
-                    # print('image filename: ', fname, j)
                     img = coralutils.CoralData(os.path.join(self.directory[dcount], fname), load_type="raster").image
                     if self.color_mode == "4channel_delete": # assumes target AND source are starting off as 8 channel
                         img = np.delete(img, [0,3,5,7], 2) # harded coded for BGR + NIR
                     x = img_to_array(img, data_format=self.data_format)
                     if self.image_data_generator.augmentation:
-                        x = self.image_data_generator.augmentation_shift(x)
+                        x = self.image_data_generator.augmentation_shift_4channel(x)
                     x = self.image_data_generator.standardize(x) # standardize and rescaling is done here
                     if self.image_data_generator.channel_shift_range != 0:
                         x = self.image_data_generator.random_channel_shift(x)   
@@ -479,7 +533,8 @@ class NeMODirectoryIterator(Iterator):
                     batch_y = np.zeros((current_batch_size,) + self.label_shape, dtype=np.int8) # N x R x C x D
                 batch_weights = np.zeros((current_batch_size, self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float)
                 
-                for i, j in enumerate(index_array):
+                dcount=0
+                for i, j in enumerate(index_array[dcount]):
                     fname = self.FCN_filenames[j]
                     # print("FCN filename: ", fname, j)
                     
@@ -918,7 +973,7 @@ class DANN_NeMODirectoryIterator(Iterator):
         self.reset() # sets self.batch_index = 0 (only done during first call)
 #         print("batch_size: ", batch_size)
         if batch_size == True:
-            batch_size = 32 # hard coded
+            batch_size = 8 # hard coded
         self.target_batch_index = 0 # this batch index is specific to the target images
         # This assumes same number of files per class!
         div_source = n_source/self.num_class
@@ -1044,7 +1099,7 @@ class DANN_NeMODirectoryIterator(Iterator):
                             
 
             if self.label_directory[0] is not None:
-                batch_y = np.zeros((current_batch_size_source) + self.label_shape, dtype=np.int8) # N x R x C x D
+                batch_y = np.zeros((current_batch_size_source + current_batch_size_target, self.label_shape[0], self.label_shape[1], self.label_shape[2]), dtype=np.int8) # N x R x C x D
                 batch_weights = np.ones((current_batch_size_source + current_batch_size_target, self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float) # if every class has different weight
                 sample_weights_class = np.array(([1] * current_batch_size_source + [0] * current_batch_size_target))
                 sample_weights_domain = np.ones((current_batch_size_source + current_batch_size_target,))

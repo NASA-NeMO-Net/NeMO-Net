@@ -10,7 +10,7 @@ import keras.backend as K
 from keras.models import Model
 from keras.layers import Input, Flatten, Activation, Reshape, Dense, Cropping2D
 
-from NeMO_layers import CroppingLike2D, BilinearUpSampling2D, GradientReversal, Batch_Split
+from NeMO_layers import CroppingLike2D, BilinearUpSampling2D, GradientReversal, Batch_Split, Gram_Loss, Var_Loss, Content_Loss
 from keras.regularizers import l2
 from keras.layers.convolutional import Conv2D, AveragePooling2D
 from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Recursive_Hyperopt_Encoder
@@ -18,18 +18,6 @@ from NeMO_decoders import VGGDecoder, VGGUpsampler, VGG_DecoderBlock
 from NeMO_backend import get_model_memory_usage
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 from keras.layers import Lambda
-
-def gram_matrix(x): # Gram matrix of size [N_filter, rows x cols)], which contains the flattened features dotted with their transposes
-    features = K.batch_flatten(K.permute_dimensions(x, (2,0,1)))
-    gram = K.dot(features, K.transpose(features))
-    return gram
-
-def style_loss(style, combination):
-    S = gram_matrix(style)
-    C = gram_matrix(combination)
-    nrows, ncols, nchannels = style.shape
-    size = nrows*ncols
-    return K.sum(K.square(S - C)) / (4.0 * (nchannels ** 2) * (size ** 2))
 
 def content_loss(base, combination):
     return K.sum(K.square(combination - base))
@@ -89,7 +77,7 @@ def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, w
     return Model(inputs=inputs, output=encoder_output)
 
 def SharpMask_FCN(input_shape, classes, decoder_index, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, full_layers=0, conv_params=None, 
-    scales = 1, bridge_params=None, prev_params=None, next_params=None):
+    scales = 1, bridge_params=None, prev_params=None, next_params=None, reshape=True):
     inputs = Input(shape=input_shape)
     pyramid_layers = decoder_index
 
@@ -107,8 +95,11 @@ def SharpMask_FCN(input_shape, classes, decoder_index, weight_decay=0., trainabl
 
     final_1b1conv = Conv2D(classes, (1,1), padding="same", kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay), name='final_1b1conv')(outputs)
 
-    scores = Activation('softmax')(final_1b1conv)
-    scores = Reshape((input_shape[0]*input_shape[1], classes))(scores)  # for class weight purposes, (sample_weight_mode: 'temporal')
+    if reshape:
+        scores = Activation('softmax')(final_1b1conv)
+        scores = Reshape((input_shape[0]*input_shape[1], classes))(scores)  # for class weight purposes, (sample_weight_mode: 'temporal')
+    else:
+        scores = final_1b1conv
 
     # return model
     return Model(inputs=inputs, outputs=scores)
@@ -132,15 +123,50 @@ def TestModel_EncoderDecoder(input_shape, classes, decoder_index, weight_decay=0
     # return model
     return Model(inputs=inputs, outputs=outputs)
 
-def StyleTransfer(FeatureModel, FeatureLayers, style_weight):
-    content_weight = 1 - style_weight
-    layer_output = []
-    for layer in FeatureLayers:
-        layer_output.append(FeatureModel.get_layer(layer).output)
-    newFeatureModel = Model(FeatureModel.input, outputs=layer_output)
-    keras.utils.layer_utils.print_summary(newFeatureModel, line_length=150, positions=[.35, .55, .65, 1.])
+
+def StyleTransfer(feature_input_shape, product_input_shape, TransferModel, FeatureModel, FeatureLayers, ContentLayers, style_weight, variation_weight):
+    feature_input = Input(shape=feature_input_shape) # source
+    product_input = Input(shape=product_input_shape) # target
     
-    return newFeatureModel
+    product_output = TransferModel(product_input)
+    
+    content_weight = 1 - style_weight
+    
+    featurelayer_output = []
+    for layer in FeatureLayers:
+        featurelayer_output.append(FeatureModel.get_layer(layer).output)
+    newFeatureModel = Model(FeatureModel.input, outputs=featurelayer_output)
+    # Set FeatureModel as untrainable
+    for l in newFeatureModel.layers:
+        l.trainable=False
+    
+    # Not as efficient, but clean since it keeps style and content losses in separate models
+    contentlayer_output = []
+    for layer in ContentLayers:
+        contentlayer_output.append(FeatureModel.get_layer(layer).output)
+    newContentModel = Model(FeatureModel.input, outputs=contentlayer_output)
+    # Set ContentModel as untrainable
+    for l in newContentModel.layers:
+        l.trainable=False
+        
+    newFeatureModel_feature_content = newFeatureModel(feature_input)
+    newFeatureModel_prod_content = newFeatureModel(product_output) # expected output: list of tensors of shape (?,y,x,channels)
+    newContentModel_feature_content = newContentModel(product_input) # take original target and put it through the content model 
+    newContentModel_prod_content = newContentModel(product_output)
+    
+    loss = []
+#     loss.append(Var_Loss(variation_weight)(product_output))
+    # Style Loss (in the form of Gram Loss)
+    if type(newFeatureModel_feature_content) is list: # list of output features
+        for i in range(len(newFeatureModel_feature_content)): # go through every output feature in list
+            templist = [newFeatureModel_feature_content[i], newFeatureModel_prod_content[i]]
+            loss.append(Gram_Loss(style_weight/len(FeatureLayers))(templist))
+    
+    # Content Loss
+    loss.append(Content_Loss(content_weight)([newContentModel_feature_content, newContentModel_prod_content]))
+            
+    added_loss = keras.layers.Add()(loss)
+    return Model([feature_input, product_input], added_loss)
 
 def SRModel_FeatureWise(hr_input_shape, lr_input_shape, SRModel, FeatureModel, FeatureLayerName):
     hr_inputs = Input(shape=hr_input_shape)

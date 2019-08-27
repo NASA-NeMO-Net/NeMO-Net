@@ -34,7 +34,7 @@ from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 256
 batch_size = 8
-model_name = 'RefineMask_Jarrett256_RGB_NIR3'
+model_name = 'Test_StyleTransfer'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
@@ -43,7 +43,7 @@ with open(jsonpath) as json_file:
 labelkey = json_data["VedConsolidated_ClassDict"]
 num_classes = len(labelkey)
 
-with open("init_args - Jarrett.yml", 'r') as stream:
+with open("init_args - Style.yml", 'r') as stream:
     try:
         init_args = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -65,7 +65,7 @@ pixel_std = 1*np.ones(num_channels)
 # channel_shift_range = [0.01]*num_channels
 # rescale = np.asarray([[0.95,1.05]]*num_channels)
 
-checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, monitor='val_acc', mode='max', save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="./tmp/" + model_name + ".h5", verbose=1, monitor='val_loss', mode='min', save_best_only=True)
 lr_reducer = ReduceLROnPlateau(monitor='val_loss',
                                factor=np.sqrt(0.1),
                                cooldown=0,
@@ -92,27 +92,30 @@ datagen = NeMOImageGenerator(image_shape=[y, x, num_channels],
                                     augmentation = 1,
                                     channel_shift_range = 0,
                                     random_rotation=True,
-                                    pixel_std=pixel_std)
-train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
-    FCN_directory=train_loader.label_dir,
-    source_size=(x,y),
-    target_size=(x,y),
+                                    pixel_std=pixel_std,
+                                    image_or_label="image")
+train_generator = datagen.flow_from_NeMOdirectory(directory=[train_loader.image_dir, train_loader.label_dir],
+    FCN_directory=None,
+    source_size=[(x,y),(x,y)],
+    target_size=[1],
     color_mode='4channel_delete',
     passedclasses = labelkey,
-    class_mode = 'categorical',
+    class_mode = 'zeros',
     batch_size = batch_size,
 #    save_to_dir = './Generator_Outputs/',
-    shuffle=True)
+    shuffle=True,
+    image_or_label="unaltered")
 
-validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
-    FCN_directory=val_loader.label_dir,
-    source_size=(x,y),
-    target_size=(x,y),
+validation_generator = datagen.flow_from_NeMOdirectory(directory=[val_loader.image_dir, val_loader.label_dir],
+    FCN_directory=None,
+    source_size=[(x,y),(x,y)],
+    target_size=[1],
     color_mode='4channel_delete',
     passedclasses = labelkey,
-    class_mode = 'categorical',
+    class_mode = 'zeros',
     batch_size = batch_size,
-    shuffle=True)
+#    save_to_dir = './Generator_Outputs/',
+    image_or_label="unaltered")
 
 conv_layers = 5
 full_layers = 0
@@ -169,29 +172,29 @@ decoder_index = [0,1,2,3]
 # upsample = [False,True,True,True,True]
 scales= [1,1,1,1]
 
-RefineMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, decoder_index = decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
+RefineMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=4, decoder_index = decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
     conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params, scales=scales, 
-    bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
+    bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, reshape=False)
+keras.utils.layer_utils.print_summary(RefineMask, line_length=150, positions=[.25, .55, .85, 1.])
 
-TestModel = StyleTransfer(RefineMask, ['add_1', 'add_2'], 0.5)
+RefineMask_Jarrett256_RGB_NIR2 = load_model('./tmp/RefineMask_Jarrett256_RGB_NIR2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D, 'charbonnierLoss': charbonnierLoss}) 
 
-# SharpMask = load_model('./tmp/SharpMask_Jarrett256_v2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D})
-# RefineMask = load_model('./tmp/RefineMask_Jarrett256_RGB_NIR2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D, 'charbonnierLoss': charbonnierLoss})
+# TransferModel: will undergo learning to match content/style loss
+# FeatureModel: cannot be learned, imported from previous learned result
+TestModel = StyleTransfer(feature_input_shape=(y,x,num_channels), product_input_shape=(y,x,num_channels), TransferModel = RefineMask, FeatureModel=RefineMask_Jarrett256_RGB_NIR2, FeatureLayers=['add_1', 'add_2'], ContentLayers=['add_3'], style_weight=0.5, variation_weight=0.1)
+keras.utils.layer_utils.print_summary(TestModel, line_length=150, positions=[.25, .55, .85, 1.])
 
-# optimizer = keras.optimizers.Adam(1e-4)
+optimizer = keras.optimizers.Adam(1e-4)
+TestModel.compile(loss='mse', optimizer=optimizer)
 
-# # SharpMask.summary()
-# keras.utils.layer_utils.print_summary(RefineMask, line_length=150, positions=[.35, .55, .65, 1.])
-# RefineMask.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'], sample_weight_mode='temporal')
+# print("Memory required (GB): ", get_model_memory_usage(batch_size, TestModel))
 
-# print("Memory required (GB): ", get_model_memory_usage(batch_size, RefineMask))
-
-# RefineMask.fit_generator(train_generator,
-#     steps_per_epoch=50,
-#     epochs=10,
-#     validation_data=validation_generator,
-#     validation_steps=10,
-#     verbose=1)
-# #     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+TestModel.fit_generator(train_generator,
+    steps_per_epoch=100,
+    epochs=20,
+    validation_data=validation_generator,
+    validation_steps=20,
+    verbose=1,
+    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 
 

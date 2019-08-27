@@ -18,7 +18,7 @@ K.set_session(_SESSION)
 import sys
 sys.path.append("./utils/") # Adds higher directory to python modules path.
 import loadcoraldata_utils as coralutils
-from NeMO_models import AlexNetLike, SharpMask_FCN, 
+from NeMO_models import AlexNetLike, SharpMask_FCN
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 from NeMO_backend import get_model_memory_usage
 from NeMO_losses import charbonnierLoss
@@ -34,7 +34,7 @@ from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 256
 batch_size = 8
-model_name = 'RefineMask_Jarrett256_RGB_NIR3'
+model_name = 'RefineMask_Jarrett256_RGB_NIR_spectralshift'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
@@ -185,10 +185,10 @@ RefineMask.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics
 print("Memory required (GB): ", get_model_memory_usage(batch_size, RefineMask))
 
 RefineMask.fit_generator(train_generator,
-    steps_per_epoch=50,
-    epochs=10,
+    steps_per_epoch=100,
+    epochs=100,
     validation_data=validation_generator,
-    validation_steps=10,
-    verbose=1)
-#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+    validation_steps=20,
+    verbose=1,
+    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 

@@ -34,7 +34,7 @@ from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 256
 batch_size = 8
-model_name = 'RefineMask_DANN256'
+model_name = 'RefineMask_DANN256_v2'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
@@ -90,7 +90,7 @@ datagen = NeMOImageGenerator(image_shape=[y, x, num_channels],
                                     pixelwise_center=True,
                                     pixel_mean=pixel_mean,
                                     pixelwise_std_normalization=True,
-                                    augmentation = 1,
+                                    augmentation = 0,
                                     channel_shift_range = 0,
                                     random_rotation=True,
                                     pixel_std=pixel_std)
@@ -199,18 +199,19 @@ conv_params = {"filters": [32],
     "full_filters": [64,128,2], 
     "dropout": [0.5,0.5,0]}
 
-Domain_Predictor = AlexNetLike(input_shape=(8,8,1024), classes=2, weight_decay=3e-3, trainable_encoder=True, weights=None, conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
+Domain_Predictor = AlexNetLike(input_shape=(64,64,128), classes=2, weight_decay=3e-3, trainable_encoder=True, weights=None, conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
 keras.utils.layer_utils.print_summary(Domain_Predictor,line_length=150, positions=[.35, .55, .65, 1.])
 
 ## Combine Models
 
-DANN = DANN_Model(source_input_shape=(y,x,num_channels), source_model=RefineMask, domain_model=Domain_Predictor, FeatureLayerName="add_15")
+# DANN = DANN_Model(source_input_shape=(y,x,num_channels), source_model=RefineMask, domain_model=Domain_Predictor, FeatureLayerName="add_15")
+DANN = DANN_Model(source_input_shape=(y,x,num_channels), source_model=RefineMask, domain_model=Domain_Predictor, FeatureLayerName="add_2")
 keras.utils.layer_utils.print_summary(DANN, line_length=150, positions=[.35, .55, .65, 1.])
 
 optimizer = keras.optimizers.Adam(1e-4)
 
-# model 1: domain, model 3: classifier
-DANN.compile(optimizer=optimizer,loss={'reshape_1': 'categorical_crossentropy', 'vgg_fcblock3_BatchNorm': 'categorical_crossentropy'}, loss_weights={'reshape_1': 1.0, 'vgg_fcblock3_BatchNorm': 1.0}, metrics=['accuracy'])
+# reshape_1 1: domain, vgg_fcblock3_BatchNorm: classifier
+DANN.compile(optimizer=optimizer,loss={'reshape_1': 'categorical_crossentropy', 'vgg_fcblock3_Dense': 'categorical_crossentropy'}, loss_weights={'reshape_1': 1.0, 'vgg_fcblock3_Dense': 1.0}, metrics=['accuracy'])
                                        
 
 # SharpMask.summary()
