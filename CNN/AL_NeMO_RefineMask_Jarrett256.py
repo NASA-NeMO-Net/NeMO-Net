@@ -184,11 +184,11 @@ RefineMask.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics
 
 print("Memory required (GB): ", get_model_memory_usage(batch_size, RefineMask))
 
-RefineMask.fit_generator(train_generator,
-    steps_per_epoch=100,
-    epochs=100,
-    validation_data=validation_generator,
-    validation_steps=20,
-    verbose=1,
-    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+# RefineMask.fit_generator(train_generator,
+#     steps_per_epoch=100,
+#     epochs=100,
+#     validation_data=validation_generator,
+#     validation_steps=20,
+#     verbose=1,
+#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 

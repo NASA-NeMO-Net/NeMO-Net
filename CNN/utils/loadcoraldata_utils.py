@@ -729,7 +729,8 @@ class CoralData:
 							num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones((image_size,image_size))[offstart:offstart+predict_size,offstart:offstart+predict_size]
 						prob_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size,:] = \
 							prob_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size,:] + np.reshape(temp_prob_predict, (1,image_size,image_size,num_classes))[0][offstart:offstart+predict_size,offstart:offstart+predict_size,:]
-					print("Line: " + str(offset-crop_len) + " Col: " + str(cols-crop_len) + '/ ' + str(self.testimage.shape[1]-image_size+1) + ' completed')
+# 					print("Line: " + str(offset-crop_len) + " Col: " + str(cols-crop_len) + '/ ' + str(self.testimage.shape[1]-image_size+1) + ' completed')
+				print("Line: " + str(offset-crop_len) + ' completed')
 		else:
 			if num_lines is None:
 				num_lines = int(np.floor((self.testimage.shape[0] - image_size)/spacing[0])+1) # Predict on whole image
