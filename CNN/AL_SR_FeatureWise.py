@@ -31,12 +31,12 @@ from NeMO_losses import charbonnierLoss
 import NeMO_layers
 from keras.models import load_model
 
-Jarrett_4channel_model = load_model('./tmp/RefineMask_Jarrett256_RGB_NIR.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D, 'charbonnierLoss': charbonnierLoss})
+Jarrett_4channel_model = load_model('./tmp/RefineMask_Jarrett256_RGB_NIR2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D, 'charbonnierLoss': charbonnierLoss})
 
-image_size = 64
+image_size = 128
 batch_size = 12
-mag = 4
-model_name = 'SR_FeatureWise2'
+mag = 2
+model_name = 'SR_FeatureWise_Oct7'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
@@ -45,7 +45,7 @@ with open(jsonpath) as json_file:
 labelkey = json_data["Fiji_ClassDict"]
 num_classes = len(labelkey)
 
-with open("init_args - SRx4_Fiji.yml", 'r') as stream:
+with open("init_args - SRx2_Fiji.yml", 'r') as stream:
     try:
         init_args = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -119,6 +119,20 @@ validation_generator = datagen.flow_from_NeMOdirectory(directory=[val_loader.ima
 conv_layers = 3
 full_layers = 0
 
+# RCU = ("cbacb","")
+# # Upsampling with NN upsampling followed by 2d conv
+# conv_params = {"filters":[64,64,[64,64,4]],
+#     "conv_size": [(9,9),(3,3),[(3,3),(3,3),(9,9)]],
+#     "conv_strides": [(1,1), (1,1), (1,1)],
+#     "padding": ['same','same', 'same'],
+#     "dilation_rate": [(1,1), (1,1), (1,1)],
+#     "filters_up": [None,None,64],
+#     "upconv_size": [None,None,64],
+#     "upconv_strides": [None, None, (2,2)],
+#     "upconv_type": ["","","nn"],
+#     "layercombo": ["cba", [RCU,RCU,RCU,RCU], "ucbaucbac"],
+#     "layercombine": ["sum","sum","sum"]}
+
 RCU = ("cbacb","")
 # Upsampling with NN upsampling followed by 2d conv
 conv_params = {"filters":[64,64,[64,64,4]],
@@ -130,7 +144,7 @@ conv_params = {"filters":[64,64,[64,64,4]],
     "upconv_size": [None,None,64],
     "upconv_strides": [None, None, (2,2)],
     "upconv_type": ["","","nn"],
-    "layercombo": ["cba", [RCU,RCU,RCU,RCU], "ucbaucbac"],
+    "layercombo": ["cba", [RCU,RCU,RCU,RCU], "ucbacbac"],
     "layercombine": ["sum","sum","sum"]}
 
 
