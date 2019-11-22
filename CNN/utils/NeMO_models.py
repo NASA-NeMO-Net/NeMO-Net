@@ -67,14 +67,20 @@ def TestModel(input_shape, classes, decoder_index, weight_decay=0., trainable_en
     return Model(inputs=inputs, outputs=outputs)
 
 
-def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=0, full_layers=0, conv_params=None):
+def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=0, full_layers=0, conv_params=None, reshape=True):
     inputs = Input(shape=input_shape)
     # Note that classes is never used for Recursive_Hyperopt_Encoder!!! Manually enter it in at layer level!
     encoder = Recursive_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, 
         conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
     encoder_output = encoder.outputs[0]
+    final_1b1conv = Conv2D(classes, (1,1), padding="same", kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay), name='final_1b1conv')(encoder_output)
+    if reshape:
+        scores = Activation('softmax')(final_1b1conv)
+        scores = Reshape((input_shape[0]*input_shape[1], classes))(scores)  # for class weight purposes, (sample_weight_mode: 'temporal')
+    else:
+        scores = final_1b1conv
 
-    return Model(inputs=inputs, output=encoder_output)
+    return Model(inputs=inputs, output=scores)
 
 def SharpMask_FCN(input_shape, classes, decoder_index, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, full_layers=0, conv_params=None, 
     scales = 1, bridge_params=None, prev_params=None, next_params=None, reshape=True):

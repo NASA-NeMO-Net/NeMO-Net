@@ -32,8 +32,8 @@ from keras.callbacks import (
 from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 256
-batch_size = 16
-model_name = 'SharpMask_Jarrett256_v2_RGB_NIR'
+batch_size = 8
+model_name = 'SharpMask_Jarrett256_RGB_NIR_spectralshift'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
@@ -88,24 +88,25 @@ datagen = NeMOImageGenerator(image_shape=[y, x, num_channels],
                                     pixelwise_center=True,
                                     pixel_mean=pixel_mean,
                                     pixelwise_std_normalization=True,
-                                    channel_shift_range = 0.1,
+                                    augmentation=1,
+                                    channel_shift_range = 0,
                                     random_rotation=True,
                                     pixel_std=pixel_std)
 train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     FCN_directory=train_loader.label_dir,
-    source_size=(x,y),
+    source_size=(x,y),                                              
     target_size=(x,y),
-    color_mode='4channel',
+    color_mode='4channel_delete',
     passedclasses = labelkey,
     class_mode = 'categorical',
-    batch_size = batch_size,                               
+    batch_size = batch_size,
     shuffle=True)
 
 validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
     FCN_directory=val_loader.label_dir,
-    source_size=(x,y),
-    target_size=(x,y),
-    color_mode='4channel',
+    source_size=(x,y),                                                   
+    target_size=(x,y),                    
+    color_mode='4channel_delete',
     passedclasses = labelkey,
     class_mode = 'categorical',
     batch_size = batch_size,
@@ -131,14 +132,14 @@ conv_params = {"filters": [[64] , [([64,64,256],256)]*3, [128,128,512]*3, [256,2
     "full_filters": [1024,1024],
     "dropout": [0,0]}
 
-bridge_params = {"filters": [None, [128,128,64], [64,64,32], [32,32,16], [16,16,8]],
+bridge_params = {"filters": [None, [256,256,128], [128,128,64], [64,64,32], [32,32,16]],
     "conv_size": [None, (3,3),(3,3),(3,3), (3,3)],
     "filters_up": [None]*5,
     "upconv_size": [None]*5,
     "upconv_strides": [None]*5,
     "layercombo": ["", "cbacbac", "cbacbac", "cbacbac", "cbacbac"]}
 
-prev_params = {"filters": [None, [128,64], [64,32], [32,16], [16,8]],
+prev_params = {"filters": [None, [256,128], [128,64], [64,32], [132,16]],
     "conv_size": [None, (3,3),(3,3),(3,3), (3,3)],
     "filters_up": [None]*5,
     "upconv_size": [None]*5,
@@ -171,9 +172,9 @@ SharpMask.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=
 print("Memory required (GB): ", get_model_memory_usage(batch_size, SharpMask))
 
 SharpMask.fit_generator(train_generator,
-    steps_per_epoch=50,
+    steps_per_epoch=100,
     epochs=100,
     validation_data=validation_generator,
-    validation_steps=10,
+    validation_steps=20,
     verbose=1,
     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
