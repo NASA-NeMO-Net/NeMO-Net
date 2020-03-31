@@ -1,6 +1,7 @@
 # Images and output files #
 ###############
 *.tif
+*.TIF
 *.tiff
 *.png
 *.out
@@ -24,7 +25,6 @@
 # Keras saved files #
 ###################
 *.h5
-*.json
 *.hdf5
 *.npy
 *.json
@@ -34,6 +34,8 @@
 *.txt
 *.pdf
 *.xml
+*.yml
+*.rar
 ################
 C:/Users/msegalro/NeMO_NET/NeMO-NET/CNN/logs/
 C:/Users/msegalro/NeMO_NET/NeMO-NET/CNN/output/
