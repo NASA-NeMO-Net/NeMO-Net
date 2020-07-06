@@ -215,11 +215,12 @@ class NeMOImageGenerator(ImageDataGenerator):
                             save_prefix='',
                             save_format='png',
                             follow_links=False,
-                            image_or_label="label"):
+                            image_or_label="label",
+                            reshape=True):
         return NeMODirectoryIterator(
             directory, self, FCN_directory=FCN_directory, target_size=target_size, source_size=source_size, color_mode=color_mode, passedclasses=passedclasses, class_mode=class_mode,
             data_format=self.data_format, batch_size=batch_size, class_weights=class_weights, shuffle=shuffle, seed=seed,
-            save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format, follow_links=follow_links, image_or_label=image_or_label)
+            save_to_dir=save_to_dir, save_prefix=save_prefix, save_format=save_format, follow_links=follow_links, image_or_label=image_or_label, reshape=reshape)
     
     def DANN_flow_from_NeMOdirectory(self, source_directory, target_directory, label_directory=None,
                             source_size=(64,64), color_mode='rgb',
@@ -275,7 +276,7 @@ class NeMODirectoryIterator(Iterator):
 
     def __init__(self, directory, image_data_generator, FCN_directory=None, target_size=None, source_size=(64,64), color_mode='rgb',
                  passedclasses=None, class_mode='categorical', batch_size=32, class_weights=None, shuffle=True, seed=None,
-                 data_format=None, save_to_dir=None, save_prefix='', save_format='png', follow_links=False, image_or_label="label"):
+                 data_format=None, save_to_dir=None, save_prefix='', save_format='png', follow_links=False, image_or_label="label", reshape=True):
         if data_format is None:
             data_format = K.image_data_format() #channels_last
         if type(directory) == list:
@@ -322,7 +323,7 @@ class NeMODirectoryIterator(Iterator):
                 else:
                     self.image_shape.append((1,) + self.source_size[dcount])
                             
-        if class_mode not in {'categorical', 'binary', 'sparse', 'input', 'fixed_RGB', 'zeros', None}:
+        if class_mode not in {'categorical', 'categorical_not1hot', 'binary', 'sparse', 'input', 'fixed_RGB', 'zeros', None}:
             raise ValueError('Invalid class_mode:', class_mode, '; expected one of "categorical", "binary", "sparse", "input", "fixed_RGB", "zeros", or None.')
         self.class_mode = class_mode
         self.save_to_dir = save_to_dir
@@ -330,6 +331,7 @@ class NeMODirectoryIterator(Iterator):
         self.save_format = save_format
         self.class_weights = class_weights
         self.image_or_label = image_or_label
+        self.reshape = reshape
 
         white_list_formats = {'png', 'jpg', 'jpeg', 'bmp', 'ppm', 'tif'}
 
@@ -406,8 +408,11 @@ class NeMODirectoryIterator(Iterator):
             self.labelkey = [np.uint8(255/self.num_consolclass*i) for i in range(self.min_labelkey, self.min_labelkey+self.num_consolclass)] # Assuming labels are saved according to # of consolclass
             label_shape = list(self.image_shape[0]) # R x C x D
             if self.image_or_label == "label":
-                label_shape[self.image_data_generator.channel_axis - 1] = self.num_consolclass
-                self.label_shape = tuple(label_shape)
+                if self.class_mode == "categorical":
+                    label_shape[self.image_data_generator.channel_axis - 1] = self.num_consolclass
+                    self.label_shape = tuple(label_shape)
+                elif self.class_mode == "categorical_not1hot":
+                    self.label_shape = tuple(label_shape[:-1]) # R x C 
             else:
                 label_shape = self.target_size + (self.image_shape[0][-1],)
                 self.label_shape = tuple(label_shape)
@@ -530,7 +535,8 @@ class NeMODirectoryIterator(Iterator):
                 if self.image_or_label == "image":
                     batch_y = np.zeros((current_batch_size,) + self.label_shape, dtype=K.floatx()) # N x R x C x D
                 elif self.image_or_label == "label":
-                    batch_y = np.zeros((current_batch_size,) + self.label_shape, dtype=np.int8) # N x R x C x D
+                    # print(self.label_shape)
+                    batch_y = np.zeros((current_batch_size,) + self.label_shape, dtype=np.int8) # N x R x C x D, or N x R x C in case of not-categorical
                 batch_weights = np.zeros((current_batch_size, self.image_shape[0][0], self.image_shape[0][1]), dtype=np.float)
                 
                 dcount=0
@@ -554,7 +560,8 @@ class NeMODirectoryIterator(Iterator):
                                                                                   hash=index_array[i],
                                                                                   format=self.save_format)
                             cv2.imwrite(os.path.join(self.save_to_dir, fname), img)
-                        y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)
+                        if self.class_mode == 'categorical':
+                            y = to_categorical(y, self.num_consolclass).reshape(self.label_shape) # one hot representation
                         batch_y[i] = y
                     elif self.image_or_label == "image":
                         img = coralutils.CoralData(os.path.join(self.FCN_directory, fname), load_type="raster").image # if image and 8channel, then this must also be 8channel
@@ -686,7 +693,7 @@ class NeMODirectoryIterator(Iterator):
         quick_shape1 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2],z.shape[3])) # convert to B x (C*R) x N_channel
         quick_shape2 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2]))
 
-        if self.image_or_label == "image" or self.image_or_label == "unaltered":
+        if not self.reshape:
             return batch_x, batch_y
         else:
             if self.class_weights is None:

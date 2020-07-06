@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 import keras.backend as K
-from keras.callbacks import Callback
+from keras.callbacks import Callback, LearningRateScheduler
 
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
@@ -54,3 +54,12 @@ class WeightsSaver(Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         self.epoch += 1
+        
+def Learning_rate_adjuster(step_size, decay, verbose=1):
+    def schedule(epoch, lr):
+        if epoch > 0 and epoch % step_size == 0:
+            return lr * decay
+        else:
+            return lr
+
+    return LearningRateScheduler(schedule)

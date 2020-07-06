@@ -172,10 +172,10 @@ keras.utils.layer_utils.print_summary(TestArchitecture, line_length=150, positio
 TestArchitecture.compile(loss=charbonnierLoss, optimizer=optimizer)
 print("Memory required (GB): ", get_model_memory_usage(batch_size, TestArchitecture))
 
-TestArchitecture.fit_generator(train_generator,
-    steps_per_epoch=400,
-    epochs=100,
-    validation_data=validation_generator,
-    validation_steps=20,
-    verbose=1,
-    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+# TestArchitecture.fit_generator(train_generator,
+#     steps_per_epoch=400,
+#     epochs=100,
+#     validation_data=validation_generator,
+#     validation_steps=20,
+#     verbose=1,
+#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])

@@ -21,7 +21,7 @@ import loadcoraldata_utils as coralutils
 from NeMO_models import AlexNetLike, SharpMask_FCN
 from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 from NeMO_backend import get_model_memory_usage
-from NeMO_losses import charbonnierLoss
+from NeMO_losses import charbonnierLoss, keras_lovasz_softmax, categorical_focal_loss
 import NeMO_layers
 from keras.models import load_model
 from keras.callbacks import (
@@ -34,7 +34,7 @@ from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 
 image_size = 256
 batch_size = 8
-model_name = 'RefineMask_Jarrett256_RGB_NIR_spectralshift'
+model_name = 'RefineMask_Jarrett256_RGBNIR_spectralshift_lovaszloss'
 
 jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
@@ -102,7 +102,9 @@ train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     class_mode = 'categorical',
     batch_size = batch_size,
 #    save_to_dir = './Generator_Outputs/',
-    shuffle=True)
+    shuffle=True, 
+    image_or_label='label',
+    reshape=False) # default is label
 
 validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
     FCN_directory=val_loader.label_dir,
@@ -112,7 +114,9 @@ validation_generator = datagen.flow_from_NeMOdirectory(val_loader.image_dir,
     passedclasses = labelkey,
     class_mode = 'categorical',
     batch_size = batch_size,
-    shuffle=True)
+    shuffle=True,
+    image_or_label='label',
+    reshape=False)
 
 conv_layers = 5
 full_layers = 0
@@ -171,24 +175,27 @@ scales= [1,1,1,1]
 
 RefineMask = SharpMask_FCN(input_shape=(y,x,num_channels), classes=num_classes, decoder_index = decoder_index, weight_decay=3e-3, trainable_encoder=True, weights=None,
     conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params, scales=scales, 
-    bridge_params=bridge_params, prev_params=prev_params, next_params=next_params)
+    bridge_params=bridge_params, prev_params=prev_params, next_params=next_params, reshape=False) # default reshape = True
 
 # SharpMask = load_model('./tmp/SharpMask_Jarrett256_v2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D})
 # RefineMask = load_model('./tmp/RefineMask_Jarrett256_RGB_NIR2.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D, 'charbonnierLoss': charbonnierLoss})
+RefineMask = load_model('./tmp/RefineMask_Jarrett256_RGBNIR_spectralshift_lovaszloss.h5', custom_objects={'BilinearUpSampling2D':NeMO_layers.BilinearUpSampling2D, 'keras_lovasz_softmax': keras_lovasz_softmax})
 
 optimizer = keras.optimizers.Adam(1e-4)
 
 # SharpMask.summary()
 keras.utils.layer_utils.print_summary(RefineMask, line_length=150, positions=[.35, .55, .65, 1.])
-RefineMask.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'], sample_weight_mode='temporal')
+# RefineMask.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'], sample_weight_mode='temporal')
+# RefineMask.compile(optimizer=optimizer, loss=keras_lovasz_softmax, metrics=['accuracy'])
+RefineMask.compile(optimizer=optimizer, loss=categorical_focal_loss(gamma=2.0, alpha=0.25), metrics=['accuracy'])
 
 print("Memory required (GB): ", get_model_memory_usage(batch_size, RefineMask))
 
-# RefineMask.fit_generator(train_generator,
-#     steps_per_epoch=100,
-#     epochs=100,
-#     validation_data=validation_generator,
-#     validation_steps=20,
-#     verbose=1,
-#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+RefineMask.fit_generator(train_generator,
+    steps_per_epoch=100,
+    epochs=100,
+    validation_data=validation_generator,
+    validation_steps=20,
+    verbose=1,
+    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 

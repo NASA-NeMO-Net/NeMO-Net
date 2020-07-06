@@ -17,7 +17,7 @@ from NeMO_encoders import VGG16, VGG19, Alex_Encoder, Recursive_Hyperopt_Encoder
 from NeMO_decoders import VGGDecoder, VGGUpsampler, VGG_DecoderBlock
 from NeMO_backend import get_model_memory_usage
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
-from keras.layers import Lambda
+from keras.layers import Lambda, Dense, Flatten, LeakyReLU
 
 def content_loss(base, combination):
     return K.sum(K.square(combination - base))
@@ -67,13 +67,17 @@ def TestModel(input_shape, classes, decoder_index, weight_decay=0., trainable_en
     return Model(inputs=inputs, outputs=outputs)
 
 
-def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=0, full_layers=0, conv_params=None, reshape=True):
+def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=0, full_layers=0, conv_params=None, onebyoneconv= True, reshape=True):
     inputs = Input(shape=input_shape)
     # Note that classes is never used for Recursive_Hyperopt_Encoder!!! Manually enter it in at layer level!
     encoder = Recursive_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, 
         conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
     encoder_output = encoder.outputs[0]
-    final_1b1conv = Conv2D(classes, (1,1), padding="same", kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay), name='final_1b1conv')(encoder_output)
+    if onebyoneconv:
+        final_1b1conv = Conv2D(classes, (1,1), padding="same", kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay), name='final_1b1conv')(encoder_output)
+    else:
+        final_1b1conv = encoder_output
+        
     if reshape:
         scores = Activation('softmax')(final_1b1conv)
         scores = Reshape((input_shape[0]*input_shape[1], classes))(scores)  # for class weight purposes, (sample_weight_mode: 'temporal')
@@ -81,6 +85,22 @@ def AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, w
         scores = final_1b1conv
 
     return Model(inputs=inputs, output=scores)
+
+def Discriminator_AlexNetLike(input_shape, classes, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=0, full_layers=0, conv_params=None):
+    inputs = Input(shape=input_shape)
+    # Note that classes is never used for Recursive_Hyperopt_Encoder!!! Manually enter it in at layer level!
+    encoder = Recursive_Hyperopt_Encoder(inputs, classes=classes, weight_decay=weight_decay, weights=weights, trainable=trainable_encoder, 
+        conv_layers=conv_layers, full_layers=full_layers, conv_params=conv_params)
+    encoder_output = encoder.outputs[0]
+    
+    x = Flatten()(encoder_output)
+
+    x = Dense(1024)(x)
+    x = LeakyReLU(alpha=0.2)(x)
+    x = Dense(1, activation='sigmoid')(x)
+    
+    return Model(inputs=inputs, output=x, name='model_discriminator')
+    
 
 def SharpMask_FCN(input_shape, classes, decoder_index, weight_decay=0., trainable_encoder=True, weights=None, conv_layers=5, full_layers=0, conv_params=None, 
     scales = 1, bridge_params=None, prev_params=None, next_params=None, reshape=True):
@@ -105,7 +125,7 @@ def SharpMask_FCN(input_shape, classes, decoder_index, weight_decay=0., trainabl
         scores = Activation('softmax')(final_1b1conv)
         scores = Reshape((input_shape[0]*input_shape[1], classes))(scores)  # for class weight purposes, (sample_weight_mode: 'temporal')
     else:
-        scores = final_1b1conv
+        scores = Activation('softmax')(final_1b1conv)
 
     # return model
     return Model(inputs=inputs, outputs=scores)
@@ -199,6 +219,15 @@ def SRModel_FeatureWise(hr_input_shape, lr_input_shape, SRModel, FeatureModel, F
     
     return Model([lr_inputs, hr_inputs], loss)
 
+def SRGAN(input_shape, generator, discriminator):
+    discriminator.trainable = False
+
+    x_in = Input(shape=input_shape)
+    x_gen = generator(x_in)
+    x_dis = discriminator(x_gen)
+
+    return Model(x_in, [x_gen, x_dis])
+
 def DANN_Model(source_input_shape, source_model, domain_model, FeatureLayerName):
     source_inputs = Input(shape=source_input_shape)
     index = 0
@@ -259,44 +288,6 @@ def DANN_Model(source_input_shape, source_model, domain_model, FeatureLayerName)
     classifier_output = classifier_layer
     domain_output = dclassifier_layer
     
-#     feature_layer = source_model.get_layer(FeatureLayerName).output
-#     index = None
-#     for idx, layer in enumerate(source_model.layers):
-#         if layer.name == FeatureLayerName:
-#             index = idx
-#             break
-    
-#     classifier_input = Input(source_model.layers[index+1].input_shape[1:])
-#     classifier_layer = classifier_input
-#     layer_dict = {source_model.layers[index].name: classifier_input}
-#     for layer in source_model.layers[index+1:]:
-# #         print("layer: ", layer.name)
-#         predecessor_layers = layer.input
-#         if type(predecessor_layers) is list: # assume maximum of 2 input layers at most
-# #             print(layer.input[0].name)
-# #             print(layer.input[1].name)
-#             classifier_layer = layer([layer_dict[layer.input[0].name.split('/')[0]],layer_dict[layer.input[1].name.split('/')[0]]])
-#             layer_dict.update({layer.name:classifier_layer})
-#         else:
-#             predecessor_name = layer.input.name.split('/')[0]
-#             print(predecessor_name)
-#             classifier_layer = layer(layer_dict[predecessor_name])
-#             layer_dict.update({layer.name:classifier_layer})
-        
-#     classifier_model = Model(inputs=classifier_input, outputs=classifier_layer)
-#     keras.utils.layer_utils.print_summary(classifier_model, line_length=150, positions=[.35, .55, .65, 1.])
-# #     classifier_input = Input(model.layers[index+1].input_shape[1:])
-# #     classifer_model = Model(input=source_model.layers[index+1].input, output=source_model.layers[-1].output)
-
-#     feature_extractor = Model(source_model.input, feature_layer)
-#     feature_output = feature_extractor(source_inputs)
-#     Flip = GradientReversal(1.0)
-#     domain_output = Flip(feature_output)
-    
-#     domain_output = domain_model(domain_output)
-#     classifier_output = classifier_model(feature_output)
-    
-#     return Model(inputs=source_inputs, outputs=[classifier_output,domain_output])
     return Model(inputs=source_inputs, outputs=[classifier_output, domain_output])
 
 
