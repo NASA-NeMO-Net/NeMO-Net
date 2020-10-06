@@ -281,6 +281,7 @@ def load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
     conv_strides = load_specific_param(conv_layers, conv_params, "conv_strides", 'c', supercombo, default_conv_params)
     padding = load_specific_param(conv_layers, conv_params, "padding", 'c', supercombo, default_conv_params)
     dilation_rate = load_specific_param(conv_layers, conv_params, "dilation_rate", 'c', supercombo, default_conv_params)
+    scaling = load_specific_param(conv_layers, conv_params, "scaling", 's', supercombo, default_conv_params)
     pool_size = load_specific_param(conv_layers, conv_params, "pool_size", 'p', supercombo, default_conv_params)
     pool_strides = load_specific_param(conv_layers, conv_params, "pool_strides", 'p', supercombo, default_conv_params)
     pad_size = load_specific_param(conv_layers, conv_params, "pad_size", 'z', supercombo, default_conv_params)
@@ -298,7 +299,7 @@ def load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
         full_filters = 0
         dropout = 0
 
-    return filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, upconv_type, layercombo, layercombine, full_filters, dropout
+    return filters, conv_size, conv_strides, padding, dilation_rate, scaling, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, upconv_type, layercombo, layercombine, full_filters, dropout
 
 
 class Alex_Hyperopt_Encoder(Res_Encoder):
@@ -349,6 +350,7 @@ class Recursive_Hyperopt_Encoder(Res_Encoder):
             "conv_strides": [(1,1),(1,1),(1,1),(1,1),(1,1)],
             "padding": ['same','same','same','same','same'],
             "dilation_rate": [(1,1),(1,1),(1,1),(1,1),(1,1)],
+            "scaling": [1,1,1,1,1],
             "pool_size": [(2,2),(2,2),(2,2),(2,2),(2,2)],
             "pool_strides": [(2,2),(2,2),(1,1),(1,1),(1,1)],
             "pad_size": [(0,0),(0,0),(0,0),(0,0),(0,0)],
@@ -358,7 +360,7 @@ class Recursive_Hyperopt_Encoder(Res_Encoder):
             "layercombo": ["cacapb","cacapba","cacacapb","cacacapb","cacacapb"],
             "full_filters": [2048,2048],
             "dropout": [0.5,0.5]}
-        filters, conv_size, conv_strides, padding, dilation_rate, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, upconv_type, layercombo, layercombine, full_filters, dropout = \
+        filters, conv_size, conv_strides, padding, dilation_rate, scaling, pool_size, pool_strides, pad_size, filters_up, upconv_size, upconv_strides, upconv_type, layercombo, layercombine, full_filters, dropout = \
             load_conv_params(conv_layers, full_layers, default_conv_params, conv_params)
 
         # actual start of CNN
@@ -371,7 +373,7 @@ class Recursive_Hyperopt_Encoder(Res_Encoder):
 
             block_name = 'vgg_convblock{}'.format(i + 1)
             block = recursive_conv(filters[i], conv_size[i], conv_strides=conv_strides[i], padding=padding[i], pad_bool=False, pad_size=pad_size[i], pool_size=pool_size[i],
-                    pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], filters_up=filters_up[i], kernel_size_up=upconv_size[i], strides_up=upconv_strides[i], upconv_type=upconv_type[i],
+                    pool_strides=pool_strides[i], dilation_rate=dilation_rate[i], scaling = scaling[i], filters_up=filters_up[i], kernel_size_up=upconv_size[i], strides_up=upconv_strides[i], upconv_type=upconv_type[i],
                     layercombo=layercombo[i], layercombine=layercombine[i], combinecount=[-1], weight_decay=weight_decay, block_name=block_name)
             blocks.append(block)
 

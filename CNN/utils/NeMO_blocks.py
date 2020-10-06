@@ -18,7 +18,7 @@ from keras.layers.convolutional import (
 from keras.layers.merge import add
 from keras.layers.normalization import BatchNormalization
 from keras.regularizers import l2
-from NeMO_layers import CroppingLike2D, BilinearUpSampling2D
+from NeMO_layers import CroppingLike2D, BilinearUpSampling2D, PixelShuffler
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
 def h(inp,c_count):
@@ -53,7 +53,7 @@ def h_f(inp, c_count):
         return inp
 
 def recursive_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_bool=False, pad_size=(0,0),
-  pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), filters_up=None, kernel_size_up=None, strides_up=None, upconv_type="bilinear", dropout=0, 
+  pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), scaling=None, filters_up=None, kernel_size_up=None, strides_up=None, upconv_type="bilinear", dropout=0, 
   layercombo='capb', layercombine='sum', combinecount=[-1], weight_decay=0., block_name='convblock'):
     def f(input):
       x = input
@@ -64,7 +64,7 @@ def recursive_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pa
         end_x = []
         for i in range(len(layercombo)):
           x = recursive_conv(h_f(filters,i), h(kernel_size,i), h(conv_strides,i), h(padding,i), h(pad_bool,i), h(pad_size,i), h(pool_size,i),
-            h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h_f(upconv_type,i), h(dropout,i), 
+            h(pool_strides,i), h(dilation_rate,i), h(scaling,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h_f(upconv_type,i), h(dropout,i), 
             layercombo[i], layercombine, combinecount, weight_decay, block_name='{}_par{}'.format(block_name, i+1))(startx)
           # tempcombinecount += 1
           end_x.append(x)
@@ -91,11 +91,11 @@ def recursive_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pa
       elif type(layercombo) is list:
         for i in range(len(layercombo)):
           x = recursive_conv(h_f(filters,i), h(kernel_size,i), h(conv_strides,i), h(padding,i), h(pad_bool,i), h(pad_size,i), h(pool_size,i),
-            h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h_f(upconv_type,i), h(dropout,i), 
+            h(pool_strides,i), h(dilation_rate,i), h(scaling,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h_f(upconv_type,i), h(dropout,i), 
             layercombo[i], layercombine, combinecount, weight_decay, block_name='{}_str{}'.format(block_name, i+1))(x)
           # tempcombinecount += 1
       else:
-        x = alex_conv(filters, kernel_size, conv_strides, padding, pad_bool, pad_size, pool_size, pool_strides, dilation_rate, filters_up, kernel_size_up, strides_up, upconv_type, dropout, 
+        x = alex_conv(filters, kernel_size, conv_strides, padding, pad_bool, pad_size, pool_size, pool_strides, dilation_rate, scaling, filters_up, kernel_size_up, strides_up, upconv_type, dropout, 
           layercombo, weight_decay, block_name)(x)
       return x
     return f
@@ -114,7 +114,7 @@ def recursive_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pa
 # weight_decay: kernel regularizer l2 weight decay [float]
 # block_name: Name of block [string]
 def alex_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_bool=False, pad_size=(0,0), 
-  pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), filters_up=None, kernel_size_up=None, strides_up=None, upconv_type='bilinear', dropout=0, 
+  pool_size=(2,2), pool_strides=(2,2), dilation_rate=(1,1), scaling = None, filters_up=None, kernel_size_up=None, strides_up=None, upconv_type='bilinear', dropout=0, 
   layercombo='capb', weight_decay=0., block_name='alexblock'):
     def f(input):
       x = input
@@ -132,7 +132,7 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_boo
       b_count=0
       d_count=0
       z_count=0
-      s_count=0
+      s_count=0 # used to shortcut, now is scaling
       u_count=0
       f = lambda input,c_count: input[c_count] if type(input) is list else input
       start_x = x
@@ -174,8 +174,9 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_boo
           x = Dropout(f(dropout,d_count), name='{}_Dropout{}'.format(block_name, d_count+1))(x)
           d_count +=1
         if layer_char == "s":
-          x = res_shortcut(start_x, x, weight_decay, block_name='{}_Shortcut{}'.format(block_name,s_count+1))
-          start_x = x
+          def scalefunc(xx, ss=1):
+            return xx * ss
+          x = Lambda(scalefunc, arguments={'ss': f(scaling, s_count)}, name='{}_scale{}'.format(block_name, s_count+1))(x)
           s_count +=1
         if layer_char == "u":
           print("block: ", block_name, "filters_up:", f(filters_up,u_count), "conv_size_up:", f(kernel_size_up,u_count), "strides_up:", f(strides_up,u_count), "type:", f(upconv_type,u_count))
@@ -193,6 +194,8 @@ def alex_conv(filters, kernel_size, conv_strides=(1,1), padding='valid', pad_boo
               xsize[2] = int(xsize[2]*f(strides_up,u_count)[1])
               xsize = tuple(xsize)
               x = BilinearUpSampling2D(target_shape=xsize, method='nn', name='{}_NNUp{}'.format(block_name, u_count+1))(x)
+          elif f(upconv_type,u_count) == "pixel_shuffle":
+              x = PixelShuffler()(x) # defaults to (2,2)
           elif f(upconv_type,u_count) == "2dtranspose":
               print("size: ", K.int_shape(x))
               x = Conv2DTranspose(f(filters_up,u_count), f(kernel_size_up,u_count), strides=f(strides_up,u_count), padding='same', kernel_initializer='he_normal', 
@@ -243,7 +246,7 @@ def recursive_conv_wparams(filters, kernel_size, conv_strides=(1,1), padding='va
       elif type(layercombo) is list:
         for i in range(len(layercombo)):
           x = recursive_conv(h_f(filters,i), h(kernel_size,i), h(conv_strides,i), h(padding,i), h(pad_bool,i), h(pad_size,i), h(pool_size,i),
-            h(pool_strides,i), h(dilation_rate,i), h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h_f(upconv_type,i), h(dropout,i), 
+            h(pool_strides,i), h(dilation_rate,i), 1, h(filters_up,i), h(kernel_size_up,i), h(strides_up,i), h_f(upconv_type,i), h(dropout,i), 
             layercombo[i], layercombine, combinecount, weight_decay, block_name='{}_str{}'.format(block_name, i+1))(x)
           # tempcombinecount += 1
       else:
