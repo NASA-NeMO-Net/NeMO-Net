@@ -484,14 +484,19 @@ class NeMODirectoryIterator(Iterator):
         if self.image_data_generator.random_rotation:
             batch_flip = np.zeros(current_batch_size)
             batch_rot90 = np.zeros(current_batch_size)
-        if self.color_mode == "8channel" or self.color_mode == "4channel" or self.color_mode == "4channel_delete":
+        if self.color_mode == "8channel" or self.color_mode == "4channel" or self.color_mode == "4channel_delete" or self.color_mode == "rgb":
             # iterate over directory?
             for dcount in range(0,len(self.directory)):
                 for i, j in enumerate(index_array[dcount]): # index_array may be different for different directories
 #                     print("dcount, j:", dcount, j)
 #                     print("filenames: ", self.filenames[dcount])
                     fname = self.filenames[dcount][j]
-                    img = coralutils.CoralData(os.path.join(self.directory[dcount], fname), load_type="raster").image
+
+                    if self.color_mode == "rgb":
+                        img = coralutils.CoralData(os.path.join(self.directory[dcount], fname), load_type="cv2").image[:,:,::-1] # turn BGR into RGB
+                    else:
+                        img = coralutils.CoralData(os.path.join(self.directory[dcount], fname), load_type="raster").image
+
                     if self.color_mode == "4channel_delete": # assumes target AND source are starting off as 8 channel
                         img = np.delete(img, [0,3,5,7], 2) # harded coded for BGR + NIR
                     x = img_to_array(img, data_format=self.data_format)
@@ -510,14 +515,17 @@ class NeMODirectoryIterator(Iterator):
                     if self.save_to_dir: # save to directory code
                         img = (x*self.image_data_generator.pixel_std)+self.image_data_generator.pixel_mean
                         fname = '{prefix}_{direct}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_trainimg', direct=dcount,
-                                                                              index=current_index + i,
-                                                                              hash=index_array[i],
-                                                                              format='tif')
-                        driver = gdal.GetDriverByName('GTiff')
-                        dataset = driver.Create(os.path.join(self.save_to_dir, fname), img.shape[0], img.shape[1], img.shape[2], gdal.GDT_Float32)
-                        for chan in range(img.shape[2]):
-                            dataset.GetRasterBand(chan+1).WriteArray((img[:,:,chan]))
-                            dataset.FlushCache()
+                                                      index=current_index + i,
+                                                      hash=index_array[dcount][i],
+                                                      format='tif')
+                        if self.color_mode == "rgb":
+                            cv2.imwrite(os.path.join(self.save_to_dir,fname), np.asarray(img,dtype=np.uint8)[:,:,::-1])
+                        else:
+                            driver = gdal.GetDriverByName('GTiff')
+                            dataset = driver.Create(os.path.join(self.save_to_dir, fname), img.shape[0], img.shape[1], img.shape[2], gdal.GDT_Float32)
+                            for chan in range(img.shape[2]):
+                                dataset.GetRasterBand(chan+1).WriteArray((img[:,:,chan]))
+                                dataset.FlushCache()
 
                 # build batch of labels
             if self.class_mode == 'input':
@@ -551,7 +559,7 @@ class NeMODirectoryIterator(Iterator):
                             img = y
                             fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix+'_labelimg',
                                                                                   index=current_index + i,
-                                                                                  hash=index_array[i],
+                                                                                  hash=index_array[dcount][i],
                                                                                   format=self.save_format)
                             cv2.imwrite(os.path.join(self.save_to_dir, fname), img)
                         y = to_categorical(y, self.num_consolclass).reshape(self.label_shape)

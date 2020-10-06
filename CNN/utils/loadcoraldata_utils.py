@@ -9,8 +9,9 @@ from PIL import Image as pil_image
 from keras.preprocessing.image import img_to_array
 from sklearn.metrics import confusion_matrix
 from scipy.ndimage.interpolation import zoom
-from scipy.misc import imresize
-from pandas_ml import ConfusionMatrix
+# from scipy.misc import imresize
+from skimage.transform import resize as imresize
+# from pandas_ml import ConfusionMatrix
 import keras.backend as K
 import itertools
 import matplotlib.pyplot as plt
@@ -425,6 +426,20 @@ class CoralData:
 		for chan in range(self.image.shape[2]):
 			lores_image_channel = imresize(self.image[:,:,chan], downscale, mode='F')
 			dataset.GetRasterBand(chan+1).WriteArray(lores_image_channel)
+			dataset.FlushCache()
+		dataset = None
+
+	@staticmethod
+	def export_raster(image_array, filepath):
+		driver = gdal.GetDriverByName('GTiff')
+
+		xsize = image_array.shape[1]
+		ysize = image_array.shape[0]
+		channels = image_array.shape[2]
+		dataset = driver.Create(filepath, xsize, ysize, channels, gdal.GDT_Float32)
+
+		for chan in range(channels):
+			dataset.GetRasterBand(chan+1).WriteArray(image_array[:,:,chan])
 			dataset.FlushCache()
 		dataset = None
 

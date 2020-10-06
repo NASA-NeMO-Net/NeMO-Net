@@ -17,6 +17,7 @@
 *.sbx
 *.CPG
 *.ovr
+*.ply
 # TensorFlow  save files #
 ###############
 *.meta
@@ -40,3 +41,6 @@
 C:/Users/msegalro/NeMO_NET/NeMO-NET/CNN/logs/
 C:/Users/msegalro/NeMO_NET/NeMO-NET/CNN/output/
 C:/Users/msegalro/NeMO_NET/NeMO-NET/CNN/plots/
+Images/AppData/*
+Images/AppData_May/*
+Images/NOAA Machine Learning Uploads/*
