@@ -1,5 +1,6 @@
-"""Pascal VOC Segmenttion Generator."""
 from __future__ import unicode_literals
+from typing import Tuple
+
 import os
 import cv2
 import numpy as np
@@ -23,7 +24,7 @@ from keras.preprocessing.image import (
     _count_valid_files_in_directory,
     _list_valid_filenames_in_directory)
 
-from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
+# from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 from PIL import Image as pil_image
 
 class NeMOImageGenerator(ImageDataGenerator):
@@ -1236,123 +1237,44 @@ class DANN_NeMODirectoryIterator(Iterator):
 class ImageSetLoader(object):
     """Helper class to load image data into numpy arrays."""
 
-    def __init__(self, image_set, image_dir, label_dir, target_size=(100, 100),
-                 image_format='jpg', color_mode='rgb', label_format='png',
-                 data_format=None,
-                 save_to_dir=None, save_prefix='', save_format='jpg'):
-        """Init."""
-        if data_format is None:
-            data_format = K.image_data_format()
-        self.data_format = data_format
-        self.target_size = tuple(target_size)
+    def __init__(self, 
+        image_dir: str, 
+        label_dir: str, 
+        image_size: Tuple[int, int] = (100, 100),
+        image_format: str = 'tif', 
+        color_mode: str = '8channel', 
+        label_format: str ='png'):
 
-        if not os.path.exists(image_set):
-            raise IOError('Image set {} does not exist. Please provide a'
-                          'valid file.'.format(image_set))
-
-#         try:
-#             self.filenames = np.loadtxt(image_set, dtype=bytes)
-#             self.filenames = [fn.decode('utf-8') for fn in self.filenames]
-#         except:
-#             pass
+        self.image_size = tuple(image_size)
 
         if not os.path.exists(image_dir):
-            raise IOError('Directory {} does not exist. Please provide a '
-                          'valid directory.'.format(image_dir))
+            raise IOError('Directory {} does not exist. Please provide a valid directory.'.format(image_dir))
         self.image_dir = image_dir
+
         if label_dir and not os.path.exists(label_dir):
-            raise IOError('Directory {} does not exist. Please provide a '
-                          'valid directory.'.format(label_dir))
+            raise IOError('Directory {} does not exist. Please provide a valid directory.'.format(label_dir))
         self.label_dir = label_dir
 
         white_list_formats = {'png', 'jpg', 'jpeg', 'bmp','tif'}
         self.image_format = image_format
         if self.image_format not in white_list_formats:
-            raise ValueError('Invalid image format:', image_format,
-                             '; expected "png", "jpg", "jpeg" or "bmp"')
+            raise ValueError('Invalid image format:', image_format, '; expected "png", "jpg", "jpeg" or "bmp"')
         self.label_format = label_format
         if self.label_format not in white_list_formats:
-            raise ValueError('Invalid image format:', label_format,
-                             '; expected "png", "jpg", "jpeg" or "bmp"')
+            raise ValueError('Invalid image format:', label_format, '; expected "png", "jpg", "jpeg" or "bmp"')
 
         if color_mode not in {'rgb', 'grayscale', '8channel', '4channel'}:
-            raise ValueError('Invalid color mode:', color_mode,
-                             '; expected "rgb" or "grayscale".')
+            raise ValueError('Invalid color mode:', color_mode, '; expected "rgb" or "grayscale".')
         self.color_mode = color_mode
+
+        self.data_format = 'channels_last'
         if self.color_mode == 'rgb':
-            if self.data_format == 'channels_last':
-                self.image_shape = self.target_size + (3,)
-            else:
-                self.image_shape = (3,) + self.target_size
+            self.image_shape = self.image_size + (3,)
         elif self.color_mode == '8channel':
-            if self.data_format == 'channels_last':
-                self.image_shape = self.target_size + (8,)
-            else:
-                self.image_shape = (8,) + self.target_size
+            self.image_shape = self.image_size + (8,)
+        elif self.color_mode == '4channel':
+            self.image_shape = self.image_size + (4,)
         else:
-            if self.data_format == 'channels_last':
-                self.image_shape = self.target_size + (1,)
-            else:
-                self.image_shape = (1,) + self.target_size
+            self.image_shape = self.image_size + (1,)
 
         self.grayscale = self.color_mode == 'grayscale'
-
-        self.save_to_dir = save_to_dir
-        self.save_prefix = save_prefix
-        self.save_format = save_format
-
-    def load_img(self, fn):
-        """Image load method.
-
-        # Arguments
-            fn: filename of the image (without extension suffix)
-        # Returns
-            arr: numpy array of shape self.image_shape
-        """
-        img_path = os.path.join(self.image_dir,
-                                '{}.{}'.format(fn,
-                                               self.image_format))
-        if not os.path.exists(img_path):
-            raise IOError('Image {} does not exist.'.format(img_path))
-        img = load_img(img_path, self.grayscale, self.target_size)
-        x = img_to_array(img, data_format=self.data_format)
-
-        return x
-
-    def load_seg(self, fn, labelkey=None):
-        """Segmentation load method.
-
-        # Arguments
-            fn: filename of the image (without extension suffix)
-        # Returns
-            arr: numpy array of shape self.target_size
-        """
-        label_path = os.path.join(self.label_dir,
-                                  '{}.{}'.format(fn, self.label_format))
-        img = pil_image.open(label_path)
-        if self.target_size:
-            wh_tuple = (self.target_size[1], self.target_size[0])
-        if img.size != wh_tuple:
-            img = img.resize(wh_tuple)
-        y = img_to_array(img, self.data_format)
- #       y[y == 255] = 0
-
-        if labelkey is not None:
-            item_counter = 0
-            for item in labelkey:
-                y[y == item ] = item_counter 
-                item_counter+=1
-        return y
-
-    def save(self, x, y, index):
-        """Image save method."""
-        img = array_to_img(x, self.data_format, scale=True)
-        mask = array_to_img(y, self.data_format, scale=True)
-        img.paste(mask, (0, 0), mask)
-
-        fname = 'img_{prefix}_{index}_{hash}.{format}'.format(
-            prefix=self.save_prefix,
-            index=index,
-            hash=np.random.randint(1e4),
-            format=self.save_format)
-        img.save(os.path.join(self.save_to_dir, fname))

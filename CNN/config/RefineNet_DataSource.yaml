@@ -1,0 +1,19 @@
+image_set_loader:
+  train:
+    image_dir: ../Images/RefineNet_TrainingImages
+    label_dir: ../Images/RefineNet_LabelImages
+    image_size:
+      - 256
+      - 256
+    image_format: 'tif'
+    color_mode: '8channel'
+    label_format: 'png'
+  val:
+    image_dir: ../Images/RefineNet_ValidationImages
+    label_dir: ../Images/RefineNet_ValidationLabels
+    image_size:
+      - 256
+      - 256
+    image_format: 'tif'
+    color_mode: '8channel'
+    label_format: 'png'

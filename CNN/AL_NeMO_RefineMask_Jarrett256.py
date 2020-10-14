@@ -36,7 +36,7 @@ image_size = 256
 batch_size = 8
 model_name = 'RefineMask_Jarrett256_RGBNIR_spectralshift_lovaszloss'
 
-jsonpath = './utils/CoralClasses.json'
+jsonpath = './config/CoralClasses.json'
 with open(jsonpath) as json_file:
     json_data = json.load(json_file)
 
@@ -101,7 +101,7 @@ train_generator = datagen.flow_from_NeMOdirectory(train_loader.image_dir,
     passedclasses = labelkey,
     class_mode = 'categorical',
     batch_size = batch_size,
-#    save_to_dir = './Generator_Outputs/',
+    save_to_dir = './Generator_Outputs/',
     shuffle=True, 
     image_or_label='label',
     reshape=False) # default is label
@@ -192,10 +192,9 @@ RefineMask.compile(optimizer=optimizer, loss=categorical_focal_loss(gamma=2.0, a
 print("Memory required (GB): ", get_model_memory_usage(batch_size, RefineMask))
 
 RefineMask.fit_generator(train_generator,
-    steps_per_epoch=100,
-    epochs=100,
+    steps_per_epoch=1,
+    epochs=1,
     validation_data=validation_generator,
     validation_steps=20,
-    verbose=1,
-    callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
+    verbose=1)
 
