@@ -8,7 +8,7 @@ from osgeo import gdal, ogr, osr
 
 from NeMO_Augmentation import NeMOAugmentationModule, PolynomialAugmentation
 from NeMO_Utils import apply_channel_corrections, normalize
-import loadcoraldata_utils as coralutils
+from NeMO_CoralData import CoralData
 
 from keras import backend as K
 from keras.utils.np_utils import to_categorical
@@ -236,9 +236,9 @@ class NeMODirectoryIterator(Iterator):
             fname = self.filenames[j]
 
             if self.color_mode == "rgb":
-                img = coralutils.CoralData(os.path.join(self.directory, fname), load_type="cv2").image[:,:,::-1] # turn BGR into RGB
+                img = CoralData(os.path.join(self.directory, fname), load_type="cv2").image[:,:,::-1] # turn BGR into RGB
             else:
-                img = coralutils.CoralData(os.path.join(self.directory, fname), load_type="raster").image
+                img = CoralData(os.path.join(self.directory, fname), load_type="raster").image
 
             if self.color_mode == "8channel_to_4channel": # assumes target AND source are starting off as 8 channel
                 img = np.delete(img, [0,3,5,7], 2) # harded coded to delete channels except for BGR + NIR
@@ -259,26 +259,7 @@ class NeMODirectoryIterator(Iterator):
             batch_x[i] = x # save edited image
 
             if self.save_to_dir: # save to directory code
-                img_save = self.image_data_generator.generator_normalize(x, 
-                    self.image_data_generator.pixel_mean, 
-                    self.image_data_generator.pixel_std, 
-                    reverse_normalize = True)
-                fname = '{prefix}_{index}_{hash}.{format}'.format(prefix = self.save_prefix+'_trainimg',
-                                              index = current_index + i,
-                                              hash = index_array[i],
-                                              format='tif')
-                if self.color_mode == "rgb":
-                    cv2.imwrite(os.path.join(self.save_to_dir, fname), np.asarray(img_save, dtype=np.uint8)[:,:,::-1])
-                else:
-                    driver = gdal.GetDriverByName('GTiff')
-                    dataset = driver.Create(os.path.join(self.save_to_dir, fname), 
-                        img_save.shape[0], 
-                        img_save.shape[1], 
-                        img_save.shape[2],
-                        gdal.GDT_Float32)
-                    for chan in range(img_save.shape[2]):
-                        dataset.GetRasterBand(chan + 1).WriteArray((img_save[:,:,chan]))
-                        dataset.FlushCache()
+                self._save_to_dir(x, current_index, index_array, i, "trainimg", "image", "tif")
 
         # initialize labels
         if self.class_mode == "image":
@@ -308,44 +289,25 @@ class NeMODirectoryIterator(Iterator):
                     batch_weights[i] = weights
 
                 # save to dir before y is transformed to categorical tensor
-                if self.save_to_dir:            
-                    labelimg_save = y
-                    labelimg_fname = '{prefix}_{index}_{hash}.{format}'.format(prefix = self.save_prefix+'_labelimg',
-                                                                          index = current_index + i,
-                                                                          hash = index_array[i],
-                                                                          format = self.save_format)
-                    cv2.imwrite(os.path.join(self.save_to_dir, labelimg_fname), labelimg_save + self.min_labelkey)
-                
+                if self.save_to_dir:
+                    self._save_to_dir(y, current_index, index_array, i, "labelimg", "categorical", self.save_format)            
                 y = to_categorical(y, self.num_classes).reshape(self.label_shape) # one hot representation
-                batch_y[i] = y
 
             elif self.class_mode == "image":
-                img = coralutils.CoralData(os.path.join(self.label_directory, label_fname), load_type="raster").image # if image and 8channel, then this must also be 8channel
+                img = CoralData(os.path.join(self.label_directory, label_fname), load_type="raster").image # if image and 8channel, then this must also be 8channel
                 y = img_to_array(img, data_format=self.data_format)
+
+                y = self.image_data_generator.generator_normalize(y,
+                    self.image_data_generator.pixel_mean, 
+                    self.image_data_generator.pixel_std,
+                    reverse_normalize = False)
 
                 if self.image_data_generator.random_rotation:           # flip and rotate according to previous batch_x images
                     y = self.image_data_generator.augmentation_module.flip_rotation(y, batch_flip[i], batch_rot90[i])
                 if self.save_to_dir:            # save to dir before y is transformed to categorical tensor
-                    labelimg_save = y
-                    labelimg_fname = '{prefix}_{index}_{hash}.{format}'.format(prefix = self.save_prefix+'_labelimg',
-                                                                          index = current_index + i,
-                                                                          hash = index_array[i],
-                                                                          format = 'tif')
-                    FCNdriver = gdal.GetDriverByName('GTiff')
-                    FCNdataset = FCNdriver.Create(os.path.join(self.save_to_dir, labelimg_fname), 
-                        labelimg_save.shape[0], 
-                        labelimg_save.shape[1], 
-                        labelimg_save.shape[2], 
-                        gdal.GDT_Float32)
-                    for chan in range(labelimg_save.shape[2]):
-                        FCNdataset.GetRasterBand(chan+1).WriteArray((labelimg_save[:,:,chan]))
-                        FCNdataset.FlushCache()
-
-                y = self.image_data_generator.generator_normalize(y, 
-                    self.image_data_generator.pixel_mean, 
-                    self.image_data_generator.pixel_std, 
-                    reverse_normalize = True)        
-                batch_y[i] = y
+                    self._save_to_dir(y, current_index, index_array, i, "labelimg", "image", "tif")
+      
+            batch_y[i] = y
             
         quick_shape1 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2],z.shape[3])) # convert to B x (C*R) x N_channel
         quick_shape2 = lambda z: np.reshape(z, (z.shape[0],z.shape[1]*z.shape[2]))
@@ -383,3 +345,52 @@ class NeMODirectoryIterator(Iterator):
         for k, v in self.labelkey.items():
             y[y == v] = self.classes_dict[k] - self.min_labelkey
         return y
+
+    def _save_to_dir(self, 
+        input_array: np.ndarray,
+        current_index: int,
+        index_array: np.ndarray,
+        i: int,
+        img_type: str = "trainimg", 
+        save_type: str = "categorical",
+        save_format: str = 'tif') -> None:
+        """ Saves generator image to directory
+
+            input_array: array/image to save
+            current_index: current_index
+            index_array: index_array
+            i: index of index_array
+            img_type: "trainimg" or "labelimg"
+            save_type: "image" or "categorical"
+            save_format: "tif" or "png" (usually)
+        """
+
+        img_save = input_array
+        img_fname = '{prefix}_{index}_{hash}.{format}'.format(prefix = self.save_prefix + '_' + img_type,
+            index = current_index + i,
+            hash = index_array[i],
+            format = save_format)
+        if save_type == "image":
+            img_save = self.image_data_generator.generator_normalize(img_save, 
+                self.image_data_generator.pixel_mean, 
+                self.image_data_generator.pixel_std, 
+                reverse_normalize = True)
+
+            if self.color_mode == "rgb":
+                cv2.imwrite(os.path.join(self.save_to_dir, img_fname), np.asarray(img_save, dtype=np.uint8)[:,:,::-1])
+            else:
+                driver = gdal.GetDriverByName('GTiff')
+                dataset = driver.Create(os.path.join(self.save_to_dir, img_fname), 
+                    img_save.shape[0], 
+                    img_save.shape[1], 
+                    img_save.shape[2], 
+                    gdal.GDT_Float32)
+                for chan in range(img_save.shape[2]):
+                    dataset.GetRasterBand(chan+1).WriteArray((img_save[:,:,chan]))
+                    dataset.FlushCache()
+        elif save_type == "categorical":
+            cv2.imwrite(os.path.join(self.save_to_dir, img_fname), img_save + self.min_labelkey)
+        else:
+            raise ValueError("Generator save type not recognized!")
+
+

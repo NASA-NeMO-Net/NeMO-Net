@@ -36,7 +36,7 @@ image_size = 256
 batch_size = 8
 model_name = 'RefineMask_Jarrett256_RGBNIR_spectralshift_lovaszloss'
 
-jsonpath = './config/CoralClasses.json'
+jsonpath = './utils/CoralClasses.json'
 with open(jsonpath) as json_file:
     json_data = json.load(json_file)
 
