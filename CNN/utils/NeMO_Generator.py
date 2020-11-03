@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from typing import Tuple, Callable, List, Union
 
 import numpy as np
+import os
 
 from NeMO_DirectoryIterator import NeMODirectoryIterator
 from NeMO_Augmentation import PolynomialAugmentation
@@ -84,3 +85,48 @@ class NeMOImageGenerator(ImageDataGenerator):
         """
         array = normalize(input_array, pixel_mean, pixel_std, reverse_normalize)
         return super(NeMOImageGenerator, self).standardize(array) # If there are any other operations that needs to be performed
+
+class ImageSetLoader(object):
+    """Helper class to load image data into numpy arrays."""
+
+    def __init__(self, 
+        image_dir: str, 
+        label_dir: str, 
+        image_size: Tuple[int, int] = (256, 256),
+        image_format: str = 'tif', 
+        color_mode: str = '8channel', 
+        label_format: str ='png'):
+
+        self.image_size = tuple(image_size)
+
+        if not os.path.exists(image_dir):
+            raise IOError('Directory {} does not exist. Please provide a valid directory.'.format(image_dir))
+        self.image_dir = image_dir
+
+        if label_dir and not os.path.exists(label_dir):
+            raise IOError('Directory {} does not exist. Please provide a valid directory.'.format(label_dir))
+        self.label_dir = label_dir
+
+        white_list_formats = {'png', 'jpg', 'jpeg', 'bmp','tif'}
+        self.image_format = image_format
+        if self.image_format not in white_list_formats:
+            raise ValueError('Invalid image format:', image_format, '; expected "png", "jpg", "jpeg" or "bmp"')
+        self.label_format = label_format
+        if self.label_format not in white_list_formats:
+            raise ValueError('Invalid image format:', label_format, '; expected "png", "jpg", "jpeg" or "bmp"')
+
+        if color_mode not in {'rgb', 'grayscale', '8channel', '4channel'}:
+            raise ValueError('Invalid color mode:', color_mode, '; expected "rgb" or "grayscale".')
+        self.color_mode = color_mode
+
+        self.data_format = 'channels_last'
+        if self.color_mode == 'rgb':
+            self.image_shape = self.image_size + (3,)
+        elif self.color_mode == '8channel':
+            self.image_shape = self.image_size + (8,)
+        elif self.color_mode == '4channel':
+            self.image_shape = self.image_size + (4,)
+        else:
+            self.image_shape = self.image_size + (1,)
+
+        self.grayscale = self.color_mode == 'grayscale'

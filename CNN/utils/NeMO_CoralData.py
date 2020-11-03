@@ -14,7 +14,10 @@ from PIL import Image as pil_image
 
 from NeMO_Utils import apply_channel_corrections, normalize
 
+import keras
 from keras.preprocessing.image import img_to_array
+from keras.utils.np_utils import to_categorical
+from keras.models import load_model
 import keras.backend as K
 
 class CoralData:
@@ -30,6 +33,7 @@ class CoralData:
 			and class labels are not required)
 		load_type: "cv2" for RGB data, or "raster" for satellite multi-channel data
 		tfwpath: .tfw file for geotransform data (raster data)
+		shpfile_classname: The str id for identifying classes within a shapefile (if loading label data from shapefile)
 	"""
 
 	def __init__(self, 
@@ -38,7 +42,8 @@ class CoralData:
 		bathypath: str = None, 
 		labelkey: Dict[str, int] = None, 
 		load_type: str = "cv2", 
-		tfwpath: str = None):
+		tfwpath: str = None,
+		shpfile_classname: str = 'Class_name'):
 
 		self.labelimage_consolidated = None
 		self.labelimage = None
@@ -53,12 +58,6 @@ class CoralData:
 		self.image, self.geotransform = self._load_image(imagepath, load_type)
 
 		if load_type == "raster":
-			try:
-				self.projection = img.GetProjection()
-			except Exception:
-				self.projection = None
-				pass
-
 			if tfwpath is not None:
 				tfw_info = np.asarray([float(line.rstrip('\n')) for line in open(tfwpath)]).astype(np.float32)
 				# top left x, w-e pixel resolution, 0, top left y, 0, n-s pixel resolution (negative)
@@ -78,14 +77,14 @@ class CoralData:
 				source_ds = ogr.GetDriverByName("Memory").CopyDataSource(orig_data_source, "")
 				source_layer = source_ds.GetLayer(0)
 				source_srs = source_layer.GetSpatialRef()
+				num_features = source_layer.GetFeatureCount()
 
-				field_vals = list(set([feature.GetFieldAsString('Class_name') for feature in source_layer]))
+				field_vals = list(set([source_layer[i].GetFieldAsString(shpfile_classname) for i in range(num_features)]))
 				field_vals.sort(key=lambda x: x.lower())
 				if 'NoData' not in field_vals: 		# NoData field automatically added to .shp files (this is an artifact from PerosBanhos.shp, which is required)
 					self.class_labels = ['NoData'] + field_vals 	# all unique labels
 					self.class_dict['NoData'] = 0
-
-				x_min, x_max, y_min, y_max = source_layer.GetExtent()
+				print("The following classes were found in the shapefile (NoData is post-added):", self.class_labels)
 
 				field_def = ogr.FieldDefn("Class_id", ogr.OFTReal)
 				source_layer.CreateField(field_def)
@@ -93,11 +92,12 @@ class CoralData:
 				field_index = source_layer_def.GetFieldIndex("Class_id")
 
 				for feature in source_layer:
-					val = self.class_labels.index(feature.GetFieldAsString('Class_name'))
+					val = labelkey[feature.GetFieldAsString(shpfile_classname)]
 					feature.SetField(field_index, val)
 					source_layer.SetFeature(feature)
-					self.class_dict[feature.GetFieldAsString('Class_name')] = val
+					self.class_dict[feature.GetFieldAsString(shpfile_classname)] = val
 
+				x_min, x_max, y_min, y_max = source_layer.GetExtent()
 				x_res = int((x_max - x_min) / pixel_size)
 				y_res = int((y_max - y_min) / pixel_size)
 				target_ds = gdal.GetDriverByName('GTiff').Create('temp.tif', x_res, y_res, gdal.GDT_Int32)
@@ -111,47 +111,43 @@ class CoralData:
 
 				tempband = target_ds.GetRasterBand(1)
 				self.labelimage = tempband.ReadAsArray()
+				self.labelimage = self.labelimage.astype(np.uint8)
+				# print(self.labelimage)
 
 				self.num_classes = len(self.class_labels)
-				self.labelimage = self.labelimage.astype(np.uint8)
 				target_ds = None
 
 				# fix .tif vs .shp dimensional mismatch
-				image_xstart = np.max([0, int((x_min - self.geotransform[0])/pixel_size)])
-				truth_xstart = np.max([0, int((self.geotransform[0] - x_min)/pixel_size)])
-				image_ystart = np.max([0, int((self.geotransform[3] - y_max)/pixel_size)])
-				truth_ystart = np.max([0, int((y_max - self.geotransform[3])/pixel_size)])
-
-				total_cols = int((np.min([xsize*pixel_size + self.geotransform[0], x_max]) - np.max([self.geotransform[0], x_min]))/pixel_size)
-				total_rows = int((np.min([self.geotransform[3], y_max]) - np.max([-ysize*pixel_size + self.geotransform[3], y_min]))/pixel_size)
-
-				self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
-				self.labelimage = self.labelimage[truth_ystart:truth_ystart+total_rows, truth_xstart:truth_xstart+total_cols]
+				self.image, self.labelimage = self._fix_image_vs_labels(self.image, 
+					self.labelimage, 
+					[x_min, x_max], 
+					[y_min, y_max], 
+					self.geotransform, 
+					self.geotransform)
 			
 			if ((labelpath.endswith('.tif') or labelpath.endswith('.TIF')) or labelpath.endswith('.png')) and load_type is "raster":
 				self.labelimage = np.asarray(cv2.imread(labelpath, cv2.IMREAD_UNCHANGED), dtype=np.uint8)
 
 				if self.labelimage is None:
-					gdal_truthimg = gdal.Open(labelpath)
-					self.labelimage = gdal_truthimg.GetRasterBand(1).ReadAsArray()
-					gdal_truthimg_gt = gdal_truthimg.GetGeoTransform()
-					if gdal_truthimg_gt[0] == 0 and gdal_truthimg_gt[3] == 0:
+					gdal_labelimg = gdal.Open(labelpath)
+					self.labelimage = gdal_labelimg.GetRasterBand(1).ReadAsArray()
+					gdal_labelimg_gt = gdal_labelimg.GetGeoTransform()
+					if gdal_labelimg_gt[0] == 0 and gdal_labelimg_gt[3] == 0:
 						print("labelimage geotransform is not set! Reverting to default image's geotransform...")
-						x_min, x_max, y_min, y_max = self.geotransform[0], self.geotransform[0]+self.labelimage.shape[1]*self.geotransform[1], self.geotransform[3]+self.labelimage.shape[0]*self.geotransform[5], self.geotransform[3]
+						x_min, x_max, y_min, y_max = self.geotransform[0], self.geotransform[0]+self.labelimage.shape[1]*self.geotransform[1], \
+							self.geotransform[3]+self.labelimage.shape[0]*self.geotransform[5], self.geotransform[3]
 					else:
-						x_min, x_max, y_min, y_max = gdal_truthimg_gt[0], gdal_truthimg_gt[0]+self.labelimage.shape[1]*gdal_truthimg_gt[1], gdal_truthimg_gt[3]+self.labelimage.shape[0]*gdal_truthimg_gt[5], gdal_truthimg_gt[3]
-					image_xstart = np.max([0, int((x_min - self.geotransform[0])//pixel_size)])
-					truth_xstart = np.max([0, int((self.geotransform[0] - x_min)//pixel_size)])
-					image_ystart = np.max([0, int((self.geotransform[3] - y_max)//pixel_size)])
-					truth_ystart = np.max([0, int((y_max - self.geotransform[3])//pixel_size)])
+						x_min, x_max, y_min, y_max = gdal_labelimg_gt[0], gdal_labelimg_gt[0]+self.labelimage.shape[1]*gdal_labelimg_gt[1], \
+							gdal_labelimg_gt[3]+self.labelimage.shape[0]*gdal_labelimg_gt[5], gdal_labelimg_gt[3]
 
-					total_cols = int((np.min([xsize*pixel_size + self.geotransform[0], x_max]) - np.max([self.geotransform[0], x_min]))//pixel_size)
-					total_rows = int((np.min([self.geotransform[3], y_max]) - np.max([-ysize*pixel_size + self.geotransform[3], y_min]))//pixel_size)
+					self.image, self.labelimage = self._fix_image_vs_labels(self.image, 
+						self.labelimage, 
+						[x_min, x_max], 
+						[y_min, ymax], 
+						self.geotransform, 
+						gdal_labelimg_gt)
 
-					self.image = self.image[image_ystart:image_ystart+total_rows, image_xstart:image_xstart+total_cols, :]
-					self.labelimage = self.labelimage[truth_ystart:truth_ystart+int(total_rows*pixel_size//gdal_truthimg_gt[1]), truth_xstart:truth_xstart+int(total_cols*pixel_size//gdal_truthimg_gt[1])]
-
-				gdal_truthimg = None
+				gdal_labelimg = None
 		if bathypath is not None:
 			self.bathyimage = cv2.imread(bathypath, cv2.IMREAD_UNCHANGED)
 			self.bathyimage[self.bathyimage == np.min(self.bathyimage)] = -1
@@ -184,6 +180,42 @@ class CoralData:
 		self.consolidated_num_classes = len(self.consolidated_class_dict)
 		self.consolclass_count = dict((k, (self.labelimage_consolidated == newclassdict[k]).sum()) for k in newclassdict)
 
+	def _fix_image_vs_labels(self,
+		image_array: np.ndarray,
+		label_array: np.ndarray,
+		xbounds_label: List[float],
+		ybounds_label: List[float],
+		image_gt: List[float],
+		label_gt: List[float]) -> Tuple[np.ndarray, np.ndarray]:
+		''' Fixes both image and label arrays so that they are the same size, and correspond to each other pixel-wise
+
+			image_array: multi-channel image
+			label_array: label array
+			xbounds_label: [min, max] of x coordinates of label, usually taken from geotransform of label image
+			ybounds_label: [min, max] of y coordinates of label, usually taken from geotransform of label image
+			image_gt: geotransform of image
+			label_gt: geotransform of label 
+		'''
+		x_min, x_max = xbounds_label[0], xbounds_label[1]
+		y_min, y_max = ybounds_label[0], ybounds_label[1]
+		xsize = image_array.shape[1]
+		ysize = image_array.shape[0]
+		pixel_size = image_gt[1] # resolution of image
+
+		image_xstart = np.max([0, int((x_min - image_gt[0])//pixel_size)])
+		label_xstart = np.max([0, int((image_gt[0] - x_min)//pixel_size)])
+		image_ystart = np.max([0, int((image_gt[3] - y_max)//pixel_size)])
+		label_ystart = np.max([0, int((y_max - image_gt[3])//pixel_size)])
+
+		total_cols = int((np.min([xsize*pixel_size + image_gt[0], x_max]) - np.max([image_gt[0], x_min]))//pixel_size)
+		total_rows = int((np.min([image_gt[3], y_max]) - np.max([-ysize*pixel_size + image_gt[3], y_min]))//pixel_size)
+
+		image = image_array[image_ystart:image_ystart + total_rows, image_xstart:image_xstart + total_cols, :]
+		labelimage = label_array[label_ystart:label_ystart + int(total_rows*pixel_size//label_gt[1]), \
+			label_xstart:label_xstart + int(total_cols*pixel_size//label_gt[1])]
+
+		return image, labelimage
+
 	def _load_image(self, 
 		imgpath: str,
 		loadtype: str = "raster") -> Tuple[np.ndarray, Tuple]:
@@ -205,6 +237,12 @@ class CoralData:
 				band += 1
 				imgband = img_gdal.GetRasterBand(band)
 				image[:,:,band-1] = imgband.ReadAsArray()
+
+			try:
+				self.projection = img_gdal.GetProjection()
+			except Exception:
+				self.projection = None
+				pass
 		else:
 			image = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
 			
@@ -453,343 +491,87 @@ class CoralData:
 		print("{} of {} total classes found and saved".format(classcounter, len(export_class_dict)))
 		f.close()
 
-# #### Load entire line(s) of patches from testimage
-# # Input:
-# #	image_size: size of image patch
-# # 	crop_len: sides to crop (if predicting upon middle pixel)
-# # 	offset: offset from top of image
-# # 	yoffset: offset from left of image 
-# # 	cols: number of columns to output
-# # 	lines: Number of lines of patches to output (None defaults to all possible)
-# # 	toremove: Remove last channel or not
-# # Output:
-# # 	whole_dataset: Patch(es) of test image
-# 	def _load_whole_data(self, image_size, crop_len, offset=0, yoffset = 0, cols = 1, lines=None, toremove=None):
-# 		if image_size%2 == 0:
-# 			if lines is None: 	# this is never used currently
-# 				lines = self.testimage.shape[0] - 2*crop_len +1
+	def predict_on_whole_image(self, 
+		model: keras.engine.training.Model, 
+		image_array: np.ndarray,
+		num_classes: int,
+		image_mean: float = 0.0, 
+		image_std: float = 1.0, 
+		patch_size: int = 256,
+		num_lines: int = None, 
+		spacing: Tuple[int, int] = (256, 256), 
+		predict_size: int = 256) -> Tuple[np.ndarray, np.ndarray]:
+		''' Predicts upon image_array using model, patch-based with overlap
 
-# 			if offset+lines+crop_len > self.testimage.shape[0]+1: # this is never used currently
-# 				print("Too many lines specified, reverting to maximum possible")
-# 				lines = self.testimage.shape[0] - offset - crop_len
+			model: Keras model to predict with
+			image_array: Image to predict on
+			num_classes: number of total classes to predict on ???
+			image_mean: mean value to normalize by before prediction
+			image_std: std value to normalize by before prediction 
+			patch size: Size of patch that the model outputs (usually 256)
+			num_lines: number of rows of patches to predict. If None, then this will be automatically calculated.
+			spacing: Spacing between each patch to predict [row, col]
+			predict_size: size of prediction area square (centered). This will disregard predictions of areas that are close to the boundaries.
+				 Must be smaller than patch_size.
 
-# 			whole_datasets = []
-# 			for i in range(offset, lines+offset):
-# 				#for j in range(crop_len, self.testimage.shape[1] - crop_len):
-# 				for j in range(yoffset, yoffset+cols):
-# 					whole_datasets.append(self.testimage[i-crop_len:i+crop_len, j-crop_len:j+crop_len,:])
-# 		else:
-# 			if lines is None:
-# 				lines = self.testimage.shape[0] - 2*crop_len
+			Output:
+			final_predict: Predicted class array based upon most common predictions
+			prob_predict: Probably of each class per pixel, as calculated by softmax
+		'''
 
-# 			if offset+lines+crop_len > self.testimage.shape[0]:
-# 				print("Too many lines specified, reverting to maximum possible")
-# 				lines = self.testimage.shape[0] - offset - crop_len
+		crop_len = int(np.floor(patch_size/2)) # lengths from sides to not take into account in the calculation of num_lines (center of patch)
+		offstart = crop_len - int(np.floor(predict_size/2)) # if we only predict on center of an image, then need to know how much to offset
+		ysize, xsize = image_array.shape[0], image_array.shape[1]
+		# example: for an image_array of size (256,256), if patch_size = 256, predict_size = 128
+		# that means that only image_array[64:192, 64:192] will be predicted on (offstart = 64, crop_len = 128)
 
-# 			whole_datasets = []
-# 			for i in range(offset, lines+offset):
-# 				for j in range(yoffset, yoffset+cols):
-# 					whole_datasets.append(self.testimage[i-crop_len:i+crop_len+1, j-crop_len:j+crop_len+1,:])
-
-# 		whole_datasets = np.asarray(whole_datasets)
-
-# 		if toremove is not None:
-# 			whole_datasets = np.delete(whole_datasets, toremove, -1)
-# 		whole_dataset = self._rescale(whole_datasets)
-# 		return whole_dataset
-
-# #### Load entire line(s) of patches from testimage
-# # Input:
-# #	model: Keras model to predict on
-# # 	image_size: size of each image
-# # 	num_lines: number of lines to predict
-# # 	spacing: Spacing between each image (row,col)
-# # 	predict_size: size of prediction area square (starting from center); FCN will use predict_size = image_size
-# # 	lastchannelremove: Remove last channel or not
-# # 	predict_mid: Only predict the middle of the image (e.g. 256x256 -> only predict on middle 128x128
-# # Output:
-# # 	whole_predict: Predicted class array
-# #   num_predict: Number of times per prediction in array
-# # 	prob_predict: Probability of each class per pixel, as calculated by softmax
-# # 	truth_predict: Original truth image (cropped)
-# # 	accuracy: Overall accuracy of entire prediction
-# 	def predict_on_whole_image(self, model, image_size, num_classes, num_lines = None, spacing = (1,1), predict_size = 1, lastchannelremove = True):
-# 		crop_len = int(np.floor(image_size/2)) # lengths from sides to not take into account in the calculation of num_lines
-# 		offstart = crop_len-int(np.floor(predict_size/2))
+		image_mean = apply_channel_corrections(image_mean, image_array.shape[2], 0.0, "image_mean")
+		image_std = apply_channel_corrections(image_std, image_array.shape[2], 1.0, "image_std")
             
-# 		if image_size%spacing[0] != 0 or image_size%spacing[1] != 0:
-# 			print("Error: Spacing does not divide into image size!")
-# 			raise ValueError
+        # make sure spacing divides into image sizes, so that all pixels will be considered during training
+		if (ysize % spacing[0] != 0) or (xsize % spacing[1]) != 0:
+			print("Error: Spacing does not divide into image size!")
+			raise ValueError
             
-# 		if spacing[0] > predict_size or spacing[1] > predict_size:
-# 			print("Spacing must be smaller than predict_size!")
-# 			raise ValueError
+		if spacing[0] > predict_size or spacing[1] > predict_size:
+			print("Spacing must be smaller than or equal to predict_size!")
+			raise ValueError
 
-# 		if image_size%2 == 0:
-# 			if num_lines is None:
-# 				num_lines = int(np.floor((self.testimage.shape[0] - image_size + spacing[0])/spacing[0])) # Predict on whole image
+		if num_lines is None:
+			num_lines = int((ysize - patch_size)//spacing[0] + 1) # Calculate number of lines of patches to predict for whole image
+		num_cols = int((xsize - patch_size)//spacing[0] + 1)
 
-# 			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
-# 			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
-# 			prob_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size, num_classes))
+		# prepare arrays with appropriate sizes
+		# Note that we can manually control how many rows we predict, but we will always try to predict max amount of columns
+		whole_predict = np.zeros((spacing[0]*(num_lines-1) + predict_size, spacing[1]*(num_cols-1) + predict_size, num_classes))
+		num_predict = np.zeros((spacing[0]*(num_lines-1) + predict_size, spacing[1]*(num_cols-1) + predict_size))
+		prob_predict = np.zeros((spacing[0]*(num_lines-1) + predict_size, spacing[1]*(num_cols-1) + predict_size, num_classes))
 
-# 			truth_predict = self.labelimage[offstart:offstart+whole_predict.shape[0], offstart:offstart+whole_predict.shape[1]]
+		for yoffset in range(crop_len, crop_len + spacing[0]*num_lines, spacing[0]):
+			for xoffset in range(crop_len, crop_len + spacing[1]*num_cols, spacing[1]):
+				input_array = image_array[yoffset - crop_len: yoffset + crop_len, xoffset - crop_len: xoffset + crop_len, :]
+				input_array = normalize(input_array, image_mean, image_std, False)
+				input_array = np.expand_dims(input_array, axis=0)
 
-# 			for offset in range(crop_len, crop_len+spacing[0]*num_lines, spacing[0]):
-# 				for cols in range(crop_len, self.testimage.shape[1]-crop_len+1, spacing[1]):
-# 					if lastchannelremove:
-# 						temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1, toremove=3)
-# 					else:
-# 						temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1)
-# 					# print(temp_dataset.shape)
-# 					temp_prob_predict = model.predict_on_batch(temp_dataset)
-# 					# print(temp_prob_predict.shape)
-# 					temp_predict = self._classifyback(temp_prob_predict)
-					
-# 					for predict_mat in temp_predict: 	# this is incorrect if temp_predict has more than 1 prediction (e.g. cols>1, lines>1)
-# 						whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = \
-# 							whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.reshape(predict_mat, (image_size,image_size))[offstart:offstart+predict_size,offstart:offstart+predict_size]
-# 						num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = \
-# 							num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones((image_size,image_size))[offstart:offstart+predict_size,offstart:offstart+predict_size]
-# 						prob_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size,:] = \
-# 							prob_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size,:] + np.reshape(temp_prob_predict, (1,image_size,image_size,num_classes))[0][offstart:offstart+predict_size,offstart:offstart+predict_size,:]
-# # 					print("Line: " + str(offset-crop_len) + " Col: " + str(cols-crop_len) + '/ ' + str(self.testimage.shape[1]-image_size+1) + ' completed')
-# 				print("Line: " + str(offset-crop_len) + ' completed')
-# 		else:
-# 			if num_lines is None:
-# 				num_lines = int(np.floor((self.testimage.shape[0] - image_size)/spacing[0])+1) # Predict on whole image
+				temp_prob_predict = model.predict_on_batch(input_array)[0]
+				temp_predict = self._classifyback(temp_prob_predict)
+				temp_predict = to_categorical(temp_predict, num_classes).reshape((patch_size, patch_size, num_classes)) # one hot representation
 
-# 			whole_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
-# 			num_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size))
-# 			prob_predict = np.zeros((spacing[0]*(num_lines-1)+predict_size, self.testimage.shape[1]-image_size+predict_size, num_classes))
+				whole_predict[yoffset - crop_len: yoffset - crop_len + predict_size, xoffset - crop_len: xoffset - crop_len + predict_size, :] += \
+					temp_predict[offstart: offstart + predict_size, offstart: offstart + predict_size, :]
 
-# 			truth_predict = self.labelimage[offstart:offstart+whole_predict.shape[0], offstart:offstart+whole_predict.shape[1]]
+				num_predict[yoffset - crop_len: yoffset - crop_len + predict_size, xoffset - crop_len: xoffset - crop_len + predict_size] += \
+					np.ones((predict_size, predict_size))
 
-# 			for offset in range(crop_len, crop_len+spacing[0]*num_lines, spacing[0]):
-# 				for cols in range(crop_len, self.testimage.shape[1]-crop_len, spacing[1]):
-# 					if lastchannelremove:
-# 						temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1, toremove=3)
-# 					else:
-# 						temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1)
-# 					temp_predict = model.predict_on_batch(temp_dataset)
-# 					temp_predict = self._classifyback(temp_predict)
-					
-# 					for predict_mat in temp_predict: 	# this is incorrect if temp_predict has more than 1 prediction (e.g. cols>1, lines>1)
-# 						whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = whole_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + predict_mat
-# 						num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] = num_predict[offset-crop_len:offset-crop_len+predict_size, cols-crop_len:cols-crop_len+predict_size] + np.ones(predict_mat.shape)
-# # 					print("Line: " + str(offset-crop_len) + " Col: " + str(cols-crop_len) + '/ ' + str(self.testimage.shape[1]-2*crop_len) + ' completed', end=' ')
-# 				print("Line: " + str(offset-crop_len) + ' completed', end='/r')
+				prob_predict[yoffset - crop_len: yoffset - crop_len + predict_size, xoffset - crop_len: xoffset - crop_len + predict_size,:] += \
+					np.reshape(temp_prob_predict, (patch_size, patch_size, num_classes))[offstart: offstart + predict_size, offstart: offstart + predict_size, :]
+			print("Row: " + str(yoffset - crop_len) + ' completed')
 
-# 		# Remaining code is for the special case in which spacing does not get to the last col/row
+		final_predict = self._classifyback(whole_predict)
 
-# 			# Classify last column of row
-# 			# tempcol = whole_predict.shape[1]-image_size
-# 			# temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = tempcol, cols=1, lines=1, toremove = 3)
-# 			# temp_predict = model.predict_on_batch(temp_dataset)
-# 			# temp_predict = self._classifyback(temp_predict)
-# 			# whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] = whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] + predict_mat
-# 			# num_predict[offset:offset+image_size, tempcol:tempcol+image_size] = num_predict[offset:offset+image_size, tempcol:tempcol+image_size] + np.ones(predict_mat.shape)
-		
-# 		# Predict on last rows
-# 		# if num_lines*spacing[0]+image_size == int(np.floor((self.testimage.shape[0]-image_size)/spacing[0])):
-# 		# 	offset = self.testimage.shape[0]-image_size
-# 		# 	for cols in range(0, whole_predict.shape[1]-image_size+1, spacing[1]):
-# 		# 		if lastchannelremove:
-# 		# 			temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1, toremove=3)
-# 		# 		else:
-# 		# 			temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = cols, cols=1, lines=1)
-# 		# 		temp_predict = model.predict_on_batch(temp_dataset)
-# 		# 		temp_predict = self._classifyback(temp_predict)
-				
-# 		# 		for predict_mat in temp_predict:
-# 		# 			whole_predict[offset:offset+image_size, cols:cols+image_size] = whole_predict[offset:offset+image_size, cols:cols+image_size] + predict_mat
-# 		# 			num_predict[offset:offset+image_size, cols:cols+image_size] = num_predict[offset:offset+image_size, cols:cols+image_size] + np.ones(predict_mat.shape)
-# 		# 		print("Line: " + str(offset) + " Col: " + str(cols) + '/ ' + str(whole_predict.shape[1]-image_size+1) + ' completed', end='\r')
+		prob_predict = prob_predict/np.dstack([num_predict.astype(np.float)]*num_classes)
 
-# 		# 	# Classify last column of row
-# 		# 	tempcol = whole_predict.shape[1]-image_size
-# 		# 	temp_dataset = self._load_whole_data(image_size, crop_len, offset=offset, yoffset = tempcol, cols=1, lines=1, toremove = 3)
-# 		# 	temp_predict = model.predict_on_batch(temp_dataset)
-# 		# 	temp_predict = self._classifyback(temp_predict)
-# 		# 	whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] = whole_predict[offset:offset+image_size, tempcol:tempcol+image_size] + predict_mat
-# 		# 	num_predict[offset:offset+image_size, tempcol:tempcol+image_size] = num_predict[offset:offset+image_size, tempcol:tempcol+image_size] + np.ones(predict_mat.shape)
-		
-# 		# whole_predict = np.round(whole_predict.astype(np.float)/num_predict.astype(np.float)).astype(np.uint8)
-# 		# class_dict_min = np.min([self.class_dict[k] for k in self.class_dict])
-# 		whole_predict = np.round(whole_predict.astype(np.float)/num_predict.astype(np.float))
-# 		prob_predict = prob_predict/np.dstack([num_predict.astype(np.float)]*num_classes)
-# 		accuracy = 100*np.asarray(whole_predict == truth_predict).astype(np.float32).sum()/(whole_predict.shape[0]*whole_predict.shape[1]) # this is not correct when truth_predict does not start from 0
-
-# 		return whole_predict, num_predict, prob_predict, truth_predict, accuracy
-
-# # Input:
-# 	#   cm: confusion matrix from sklearn: confusion_matrix(y_true, y_pred)
-# 	#   classes: a list of class labels
-# 	#   normalize: whether the cm is shown as number of percentage (normalized)
-# 	#   file2sav: unique filename identifier in case of multiple cm
-# 	# Output:
-# 	#   .png plot of cm
-# def plot_confusion_matrix(cm, classes, normalize=False,
-# 					title='Confusion matrix',
-# 					cmap=plt.cm.Blues, plot_colorbar = False, file2sav = "cm"):
-# 	#"""
-# 	#This function prints and plots the confusion matrix.
-# 	#Normalization can be applied by setting `normalize=True`.
-# 	#cm can be a unique file identifier if multiple options exist
-# 	#"""
-# 	if normalize:
-# 		cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-# 		print("Normalized confusion matrix")
-# 		tit = "normalized"
-# 	else:
-# 		print('Confusion matrix, without normalization')
-# 		tit = "non_normalized"
-# 	# print(cm)
-
-# 	cm_plot = './plots/Confusion_Matrix_' + tit + file2sav + ".png"
-# 	plt.figure()
-# 	plt.imshow(cm, interpolation='nearest', cmap=cmap)
-# 	plt.title(title + " " + tit)
-# 	if plot_colorbar:
-# 		plt.colorbar(fraction=0.046, pad=0.04)
-# 	tick_marks = np.arange(len(classes))
-# 	plt.xticks(tick_marks, classes, rotation=90,fontsize=16)
-# 	plt.yticks(tick_marks, classes, fontsize=16)
-
-# 	fmt = '.2f' if normalize else 'd'
-# 	if normalize:
-# 		thresh = 0.5
-# 	else:
-# 		thresh = cm.max() / 2.
-# 	for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-# 		plt.text(j, i, format(cm[i, j], fmt),
-# 			horizontalalignment="center", fontsize=16, 
-# 			color="white" if cm[i, j] > thresh else "black")
-# 		#plt.text(j, i, r'{0:.2f}'.format(cm[i,j]), 
-# 	#		horizontalalignment="center", fontsize=16, 
-# 	#		color="white" if cm[i, j] > thresh else "black")
-
-# 	#plt.tight_layout()
-# 	plt.ylabel('True label', fontsize=16)
-# 	plt.xlabel('Predicted label', fontsize=16)
-# 	fig = plt.gcf()
-# 	fig.set_size_inches(20, 20, forward=True)
-# 	plt.show()
-# 	# plt.savefig(cm_plot)
-# 	# plt.close()
-
-
-# def confusion_matrix_stats(cm, classes, file2sav = "cm_stats"):
-# 	#"""
-# 	#This function calculates stats related to the confusion matrix cm
-# 	#cm - confusion matrix as numpy array, can be generated or loaded (cm = np.load('./output/cm_whole_image_hyperas1.npy'))
-# 	#classes - a list of class labels
-# 	#file2save - filename (without csv extension)
-# 	#"""
-# 	TP = np.trace(cm)
-# 	sum_pred = cm.sum(axis=0) # summing over predicted values (each columns going over all rows)
-# 	sum_true = cm.sum(axis=1) # summing over true values (each row going over all columns)
-
-# 	total_pred = sum_pred.sum()
-# 	total_true = sum_true.sum()
-
-# 	overall_accuracy = (float(TP) / float(total_true))*100.
-# 	print("overall_accuracy: " + str(np.round(overall_accuracy, decimals=2)) + "%")
-
-# 	diag = cm.diagonal()
-# 	prod_acc = np.true_divide((diag), (sum_true))
-# 	user_acc = np.true_divide((diag), (sum_pred))
-	
-# 	d = {'class_label': label_list, 'prod_acc': prod_acc, 'user_acc': user_acc, 'overall_acc': overall_accuracy/100.}
-# 	df = pd.DataFrame(data=d)
-	
-# 	# df.to_csv('./output/' +file2save + '.csv')
-
-# # fill in last remaining color on a truthmap
-# # truthmap_fn: path to truthmap
-# # cmap: colormap of colors that already exist in the truthmap
-# # lastcolor: last color to fill in, in BGR
-# def fill_in_truthmap_lastcolor(truthmap_fn, cmap, lastcolor):
-# 	truthmap = cv2.imread(truthmap_fn) 	# Read in as BGR
-# 	cmap_8bit = np.asarray([np.asarray(cmap(i)[-2::-1])*255 for i in range(len(cmap.colors))], dtype = np.uint8)	 #in BGR
-
-# 	replacemap = np.ones((truthmap.shape[0], truthmap.shape[1]), dtype=np.bool)
-# 	for color in cmap_8bit:
-# 		idx = np.where(np.all(truthmap==color, axis=-1))
-# 		replacemap[idx] = False
-# 	truthmap[replacemap] = lastcolor
-# 	return truthmap
-
-# # fill in empty pixels based upon surrounding pixel colors
-# # truthmap_fn: path to truthmap (classified from people)
-# # surroundingarea: square grid size arround classification pixel (pick an odd number!)
-# def fill_in_truthmap(truthmap_fn, surroundingarea, nofillcolor=None):
-# 	if nofillcolor is None:
-# 		white = np.asarray([255,255,255])
-# 	else:
-# 		white = nofillcolor
-# 	if surroundingarea % 2 == 0:
-# 		raise ValueError('Please choose an odd number for fill_in_truthmap surroundingarea')
-# 	truthmap = cv2.imread(truthmap_fn)
-# 	y,x = np.where(np.all(truthmap == white, axis=-1))
-# 	for j,i in zip(y,x):
-# 		crop_len = int((surroundingarea-1)/2)
-# 		found_replace = False
-# 		while found_replace is False:
-# 			tempy_min = max(j-crop_len,0)
-# 			tempy_max = min(j+crop_len+1,truthmap.shape[0])
-# 			tempx_min = max(i-crop_len,0)
-# 			tempx_max = min(i+crop_len+1, truthmap.shape[1])
-# 			truthmap_patch = truthmap[tempy_min:tempy_max,tempx_min:tempx_max,:]
-# 			unq, unq_count = np.unique(truthmap_patch.reshape(-1, truthmap_patch.shape[2]), return_counts=True, axis=0)
-# 			idx = np.where(np.all(unq == white, axis=-1))
-
-# 			if len(idx[0]) > 0: 		# Get rid of white counts
-# 				unq = np.delete(unq, idx, axis=0)
-# 				unq_count = np.delete(unq_count, idx, axis=0)
-
-# 			if len(unq) > 0:			# Make sure there is still at least 1 unique left
-# 				found_replace = True
-# 			else:						# If no uniques left, increment area by 1
-# 				crop_len += 1
-# 		maxidx = np.argmax(unq_count)
-# 		truthmap[j,i] = unq[maxidx]
-# 	return truthmap
-
-# # Loads patch from mosaiced .tif file
-# # imagepath: file where raster file is located
-# # specific_fn: specific patch filename of the NxN patch being loaded
-# # trainfile: file where all info is stored for all NxN patches
-# # image_size: Size of image (just 1 number since it is a square)
-# # offset: (y,x) offset of patch to load in tuple
-# def load_specific_patch(imagepath, specific_fn, trainfile, image_size, offset=0):
-# 	f = open(trainfile,"r")
-# 	col = []
-# 	row = []
-# 	rastername = []
-# 	patch_name = []
-# 	for line in f:
-# 		infosplit = line.split(" ")
-# 		col.append(int(infosplit[-1]))
-# 		row.append(int(infosplit[-2]))
-# 		rastername.append(infosplit[-3])
-# 		patch_path = ' '.join(infosplit[0:-3])
-# 		head, tail = os.path.split(patch_path)
-# 		patch_name.append(tail)
-
-# 	idx = patch_name.index(specific_fn)
-# 	raster = CoralData(imagepath+'/'+rastername[idx], load_type="raster")
-# 	patch = raster.image[row[idx]+offset:row[idx]+offset+image_size, col[idx]+offset:col[idx]+offset+image_size, :]
-# 	projection = raster.projection
-# 	# geotransform is organized as [top left x, w-e pixel resolution, 0, top left y, 0, n-s pixel resolution (negative)]
-# 	# print(raster.geotransform)
-# 	geotransform = [g for g in raster.geotransform]
-# 	# geotransform = [(g[0]+offset*g[1], g[1], g[2], g[3]+offset*g[5], g[4], g[5]) for g in raster.geotransform]
-# 	# geotransform = raster.geotransform
-# 	geotransform[0] = geotransform[0] + offset*geotransform[1]
-# 	geotransform[3] = geotransform[3] + offset*geotransform[5]
-
-# 	return patch, projection, geotransform
+		return final_predict, prob_predict
 
 # # Turns RGB cmap into dictionary-defined truthmap
 # # Note: Dictionary might go from 1 to num_classes, and hence the grayscale truthmap will go from num_classes:255/num_classes:255
