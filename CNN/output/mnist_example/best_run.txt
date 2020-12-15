@@ -1,1 +1,0 @@
-{"Activation": "sigmoid", "Dense": 512, "Dropout": 0.6357875518823483, "Dropout_1": 0.4700001460504394, "batch_size": 64, "choiceval": "rmsprop", "conditional": "four", "decay": 0.056281912425076484, "decay_1": 0.0001, "decay_2": 0.001, "lr": 0.0288669649277187, "lr_1": 0.0001, "lr_2": 0.1}

@@ -1,9 +1,0 @@
-Run,1
-optimizer,sgd
-learning_rate,1e-05
-decay,0.001
-train_accuracy,0.098249999996
-train_loss,2.54556273931
-val_accuracy,0.0934
-val_loss,2.36777178459
-test_accuracy,0.0934

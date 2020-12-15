@@ -1,9 +1,0 @@
-Run,2
-optimizer,rmsprop
-learning_rate,1e-05
-decay,0.0001
-train_accuracy,0.74
-train_loss,1.24309340839
-val_accuracy,0.8286
-val_loss,0.997867987823
-test_accuracy,0.8286
