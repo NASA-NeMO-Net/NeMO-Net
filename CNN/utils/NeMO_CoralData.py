@@ -262,15 +262,6 @@ class CoralData:
 		y = geotransform[5]*row + geotransform[4]*column + geotransform[3]
 		return x, y
 
-	def _classifyback(self, 
-		predictions: np.ndarray) -> np.ndarray: 
-		''' Classify from categorical array to label
-			# Input:
-			# 	predictions: Array of vectorized categorical predictions, nrow x ncol x n_categories
-			# Output:
-			# 	Array of label predictions, nrow x ncol
-		'''
-		return np.argmax(predictions,-1)
 
 	def export_consolidated_labelmap(self,
 		filename: str) -> None:
@@ -490,88 +481,6 @@ class CoralData:
 				classcounter += 1
 		print("{} of {} total classes found and saved".format(classcounter, len(export_class_dict)))
 		f.close()
-
-	def predict_on_whole_image(self, 
-		model: keras.engine.training.Model, 
-		image_array: np.ndarray,
-		num_classes: int,
-		image_mean: float = 0.0, 
-		image_std: float = 1.0, 
-		patch_size: int = 256,
-		num_lines: int = None, 
-		spacing: Tuple[int, int] = (256, 256), 
-		predict_size: int = 256) -> Tuple[np.ndarray, np.ndarray]:
-		''' Predicts upon image_array using model, patch-based with overlap
-
-			model: Keras model to predict with
-			image_array: Image to predict on
-			num_classes: number of total classes to predict on ???
-			image_mean: mean value to normalize by before prediction
-			image_std: std value to normalize by before prediction 
-			patch size: Size of patch that the model outputs (usually 256)
-			num_lines: number of rows of patches to predict. If None, then this will be automatically calculated.
-			spacing: Spacing between each patch to predict [row, col]
-			predict_size: size of prediction area square (centered). This will disregard predictions of areas that are close to the boundaries.
-				 Must be smaller than patch_size.
-
-			Output:
-			final_predict: Predicted class array based upon most common predictions
-			prob_predict: Probably of each class per pixel, as calculated by softmax
-		'''
-
-		crop_len = int(np.floor(patch_size/2)) # lengths from sides to not take into account in the calculation of num_lines (center of patch)
-		offstart = crop_len - int(np.floor(predict_size/2)) # if we only predict on center of an image, then need to know how much to offset
-		ysize, xsize = image_array.shape[0], image_array.shape[1]
-		# example: for an image_array of size (256,256), if patch_size = 256, predict_size = 128
-		# that means that only image_array[64:192, 64:192] will be predicted on (offstart = 64, crop_len = 128)
-
-		image_mean = apply_channel_corrections(image_mean, image_array.shape[2], 0.0, "image_mean")
-		image_std = apply_channel_corrections(image_std, image_array.shape[2], 1.0, "image_std")
-            
-        # make sure spacing divides into image sizes, so that all pixels will be considered during training
-		if (ysize % spacing[0] != 0) or (xsize % spacing[1]) != 0:
-			print("Error: Spacing does not divide into image size!")
-			raise ValueError
-            
-		if spacing[0] > predict_size or spacing[1] > predict_size:
-			print("Spacing must be smaller than or equal to predict_size!")
-			raise ValueError
-
-		if num_lines is None:
-			num_lines = int((ysize - patch_size)//spacing[0] + 1) # Calculate number of lines of patches to predict for whole image
-		num_cols = int((xsize - patch_size)//spacing[0] + 1)
-
-		# prepare arrays with appropriate sizes
-		# Note that we can manually control how many rows we predict, but we will always try to predict max amount of columns
-		whole_predict = np.zeros((spacing[0]*(num_lines-1) + predict_size, spacing[1]*(num_cols-1) + predict_size, num_classes))
-		num_predict = np.zeros((spacing[0]*(num_lines-1) + predict_size, spacing[1]*(num_cols-1) + predict_size))
-		prob_predict = np.zeros((spacing[0]*(num_lines-1) + predict_size, spacing[1]*(num_cols-1) + predict_size, num_classes))
-
-		for yoffset in range(crop_len, crop_len + spacing[0]*num_lines, spacing[0]):
-			for xoffset in range(crop_len, crop_len + spacing[1]*num_cols, spacing[1]):
-				input_array = image_array[yoffset - crop_len: yoffset + crop_len, xoffset - crop_len: xoffset + crop_len, :]
-				input_array = normalize(input_array, image_mean, image_std, False)
-				input_array = np.expand_dims(input_array, axis=0)
-
-				temp_prob_predict = model.predict_on_batch(input_array)[0]
-				temp_predict = self._classifyback(temp_prob_predict)
-				temp_predict = to_categorical(temp_predict, num_classes).reshape((patch_size, patch_size, num_classes)) # one hot representation
-
-				whole_predict[yoffset - crop_len: yoffset - crop_len + predict_size, xoffset - crop_len: xoffset - crop_len + predict_size, :] += \
-					temp_predict[offstart: offstart + predict_size, offstart: offstart + predict_size, :]
-
-				num_predict[yoffset - crop_len: yoffset - crop_len + predict_size, xoffset - crop_len: xoffset - crop_len + predict_size] += \
-					np.ones((predict_size, predict_size))
-
-				prob_predict[yoffset - crop_len: yoffset - crop_len + predict_size, xoffset - crop_len: xoffset - crop_len + predict_size,:] += \
-					np.reshape(temp_prob_predict, (patch_size, patch_size, num_classes))[offstart: offstart + predict_size, offstart: offstart + predict_size, :]
-			print("Row: " + str(yoffset - crop_len) + ' completed')
-
-		final_predict = self._classifyback(whole_predict)
-
-		prob_predict = prob_predict/np.dstack([num_predict.astype(np.float)]*num_classes)
-
-		return final_predict, prob_predict
 
 # # Turns RGB cmap into dictionary-defined truthmap
 # # Note: Dictionary might go from 1 to num_classes, and hence the grayscale truthmap will go from num_classes:255/num_classes:255

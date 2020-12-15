@@ -4,10 +4,20 @@ import sys
 import datetime
 import numpy as np
 import json
-import keras.backend as K
-import tensorflow as tf
 
 from matplotlib import pyplot as plt
+
+import tensorflow as tf
+import keras.backend as K
+from keras.optimizers import Adam
+from keras.utils.layer_utils import print_summary
+from keras.callbacks import (
+	ReduceLROnPlateau,
+	CSVLogger,
+	EarlyStopping,
+	ModelCheckpoint,
+	TerminateOnNaN)
+
 
 # Set up GPU
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -24,18 +34,13 @@ from NeMO_CoralData import CoralData
 # from NeMO_generator import NeMOImageGenerator, ImageSetLoader
 # from NeMO_backend import get_model_memory_usage
 # from NeMO_losses import charbonnierLoss, keras_lovasz_softmax, categorical_focal_loss
-# import NeMO_layers
-# from keras.models import Model, Sequential, load_model
-# from keras.callbacks import (
-#     ReduceLROnPlateau,
-#     CSVLogger,
-#     EarlyStopping,
-#     ModelCheckpoint,
-#     TerminateOnNaN)
+
 # from NeMO_callbacks import CheckNumericsOps, WeightsSaver
 from NeMO_Generator import NeMOImageGenerator, ImageSetLoader
 from NeMO_DirectoryIterator import NeMODirectoryIterator
+from NeMO_Architecture import NeMO_FCN_Architecture
 from NeMO_Models import NeMO_FCN
+from NeMO_Backend import get_model_memory_usage
 
 def run_training() -> None:
 	CoralClasses_config = './config/CoralClasses.json'
@@ -56,75 +61,68 @@ def run_training() -> None:
 	y = train_loader.image_size[1]
 	x = train_loader.image_size[0]
 	num_channels = 4
+	batch_size = 8
 
-	conv_layers = 5
-	full_layers = 0
+	NeMO_ImageGenerator = NeMOImageGenerator(image_shape=[y, x, num_channels],
+		pixel_mean = None,
+		pixel_std = None,
+		channel_shift_range = 0,
+		spectral_augmentation = True,
+		random_rotation = True)
 
-	# First 4 megablocks of the resnet-50 architecture
+	DirectoryIterator_train = NeMO_ImageGenerator.flow_from_NeMOdirectory(directory = train_loader.image_dir,
+		label_directory = train_loader.label_dir,
+		classes = labelkey,
+		class_weights = None,
+		image_size = (y,x), 
+		color_mode = '8channel_to_4channel',
+		batch_size = batch_size,
+		shuffle = True,
+		seed = None,
+		save_to_dir = None,
+		save_prefix = "test",
+		save_format = "png",
+		reshape = True)
 
-	conv_params = {"filters": [[64] , [([64,64,128],128)]*3, [([128,128,256],256)]*4, [([256,256,512],512)]*6, [([512,512,1024],1024)]*3],
-		"conv_size": [[(7,7)] , [([(1,1),(3,3),(1,1)], (1,1))]*3, [([(1,1),(3,3),(1,1)], (1,1))]*4, [([(1,1),(3,3),(1,1)], (1,1))]*6, [([(1,1),(3,3),(1,1)], (1,1))]*3],
-		"conv_strides": [(2,2), [([(1,1),(1,1),(1,1)], (1,1))] + [(1,1)]*2 , [([(2,2),(1,1),(1,1)], (2,2))] + [(1,1)]*3 , [([(2,2),(1,1),(1,1)], (2,2))] + [(1,1)]*5, [([(2,2),(1,1),(1,1)], (2,2))] + [(1,1)]*2],
-		"padding": ['same', 'same', 'same', 'same', 'same'],
-		"dilation_rate": [(1,1), (1,1), (1,1), (1,1), (1,1)],
-		"pool_size": [(3,3), (1,1), (1,1), (1,1), (1,1)],
-		"pool_strides": [(2,2), (1,1), (1,1), (1,1), (1,1)],
-		"pad_size": [(0,0), (0,0), (0,0), (0,0), (0,0)],
-		"filters_up": [None]*conv_layers,
-		"upconv_size": [None]*conv_layers,
-		"upconv_strides": [None]*conv_layers,
-		"layercombo": ["cbap", [("cbacbac","c")]+[("bacbacbac","")]*2, [("bacbacbac","c")]+[("bacbacbac","")]*3, [("bacbacbac","c")]+[("bacbacbac","")]*5, [("bacbacbac","c")]+[("bacbacbac","")]*2], 
-		"layercombine": ["","sum","sum","sum","sum"],           
-		"full_filters": [1024,1024], 
-		"dropout": [0,0]}
+	DirectoryIterator_valid = NeMO_ImageGenerator.flow_from_NeMOdirectory(directory = val_loader.image_dir,
+		label_directory = val_loader.label_dir,
+		classes = labelkey,
+		class_weights = None,
+		image_size = (y,x), 
+		color_mode = '8channel_to_4channel',
+		batch_size = batch_size,
+		shuffle = True,
+		seed = None,
+		save_to_dir = None,
+		save_prefix = "test",
+		save_format = "png",
+		reshape = True)
 
-	RCU = ("bacbac","")
-	CRPx2 = ([("pbc",""),"pbc"],"")
 
-	bridge_params = {"filters": [[1024,1024,128], [512,512,64], [256,256,32], [128,128,16]],
-		"conv_size": [(3,3), (3,3), (3,3), (3,3)],
-		"filters_up": [None]*4,
-		"upconv_size": [None]*4,
-		"upconv_strides": [None]*4,
-		"layercombo": [[RCU,RCU,"bc"], [RCU,RCU,"bc"], [RCU,RCU,"bc"], [RCU,RCU,"bc"]],
-		"layercombine": ["sum","sum","sum","sum"]}
+	FCN_architecture = NeMO_FCN_Architecture(conv_blocks = 5, dense_blocks = 0, decoder_index = [0,1,2,3], scales = [1,1,1,1])
+	FCN_architecture.refinemask_defaultparams()
 
-	prev_params = {"filters": [None, [128,128,64], [64,64,32], [32,32,16]],
-		"conv_size": [None, (3,3),(3,3),(3,3)],
-		"filters_up": [None,None,None,None],
-		"upconv_size": [None,None,None,None],
-		"upconv_strides": [None,(2,2),(2,2),(2,2)],
-		"upconv_type": [None,"bilinear","bilinear","bilinear"],
-		"layercombo": ["", [RCU,RCU,"bcu"], [RCU,RCU,"bcu"], [RCU,RCU,"bcu"]],
-		"layercombine": [None,"sum","sum","sum"]} 
+	RefineMask = NeMO_FCN(input_shape = (y,x,num_channels), 
+		classes = num_classes, 
+		architecture = FCN_architecture,
+		weight_decay = 3e-3, 
+		trainable_encoder = True,
+		reshape = True) # default reshape = True
 
-	next_params = {"filters": [["",128,128], ["",64,64], ["",32,32], ["",16,16,16,None,16,None]],
-		"conv_size": [(3,3), (3,3), (3,3), (3,3)],
-		"pool_size": [(5,5), (5,5), (5,5), (5,5)],
-		"filters_up": [None,None,None,None],
-		"upconv_size": [None,None,None,None],
-		"upconv_strides": [None,None,None,(2,2)],
-		"upconv_type": [None,None,None,"bilinear"],
-		"layercombo": [["a",CRPx2,RCU], ["a",CRPx2,RCU], ["a",CRPx2,RCU], ["a",CRPx2,RCU,RCU,"u",RCU,"u"]],
-		"layercombine": ["sum","sum","sum","sum"]} 
+	optimizer = Adam(1e-4)
+	print_summary(RefineMask, line_length=150, positions=[.35, .55, .65, 1.])
 
-	decoder_index = [0,1,2,3]
-	# upsample = [False,True,True,True,True]
-	scales= [1,1,1,1]
+	RefineMask.compile(optimizer=optimizer, loss = 'categorical_crossentropy', metrics=['accuracy'])
 
-	RefineMask = NeMO_FCN(input_shape=(y,x,num_channels), 
-		classes=num_classes, 
-		decoder_index = decoder_index, 
-		weight_decay=3e-3, 
-		trainable_encoder=True,
-		conv_blocks=conv_layers, 
-		dense_blocks=full_layers, 
-		conv_params=conv_params, 
-		scales=scales, 
-		bridge_params=bridge_params, 
-		prev_params=prev_params, 
-		next_params=next_params, 
-		reshape=False) # default reshape = True
+	print("Memory required (GB): ", get_model_memory_usage(batch_size, RefineMask))
+
+	RefineMask.fit_generator(DirectoryIterator_train,
+	    steps_per_epoch=10,
+	    epochs=1,
+	    validation_data=DirectoryIterator_valid,
+	    validation_steps=10,
+	    verbose=1)
+	#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 
 	
 	# imgpath = '/home/shared/NeMO-Net Data/processed_Fiji_files/mosaiced_003.TIF'
@@ -170,31 +168,6 @@ def run_training() -> None:
 	# 	num_lines = None, 
 	# 	spacing = (128, 128), 
 	# 	predict_size = 128)
-
-
-	# NeMO_ImageGenerator = NeMOImageGenerator(image_shape=[y, x, num_channels],
- #                                    pixel_mean = None,
- #                                    pixel_std = None,
- #                                    channel_shift_range = 0,
- #                                    spectral_augmentation = True,
- #                                    random_rotation = True)
-
-
-	# DirectoryIterator = NeMO_ImageGenerator.flow_from_NeMOdirectory(directory = train_loader.image_dir,
-	# 	label_directory = train_loader.label_dir,
-	# 	classes = labelkey,
-	# 	class_weights = None,
-	# 	image_size = (y,x), 
-	# 	color_mode = '8channel_to_4channel',
-	# 	batch_size = 1,
-	# 	shuffle = True,
-	# 	seed = None,
-	# 	save_to_dir = None,
-	# 	save_prefix = "test",
-	# 	save_format = "png",
-	# 	reshape = True)
-
-	# batch_x, batch_y = DirectoryIterator.next()
 
 if __name__ == "__main__":
 	run_training()

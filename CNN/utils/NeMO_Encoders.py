@@ -15,7 +15,7 @@ from NeMO_Blocks import (
     recursive_conv,
     dense_block
 )
-from NeMO_backend import load_weights
+from NeMO_Backend import load_weights
 
 
 class Res_Encoder(Model):

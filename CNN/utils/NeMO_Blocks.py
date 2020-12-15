@@ -26,7 +26,7 @@ from keras.layers.merge import add
 from keras.layers.normalization import BatchNormalization
 from keras.regularizers import l2
 
-from NeMO_layers import CroppingLike2D, BilinearUpSampling2D, PixelShuffler
+from NeMO_Layers import CroppingLike2D, BilinearUpSampling2D, PixelShuffler
 
 def h(inp: Union[Tuple, List, Tuple[int,int]], c_count: int):
     ''' Helper function to separate tuple parameter (e.g. conv_stride) from list (feedforward) or tuple (parallel)

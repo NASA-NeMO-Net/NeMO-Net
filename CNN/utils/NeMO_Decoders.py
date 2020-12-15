@@ -10,7 +10,7 @@ from keras.layers import (
 from keras.layers.convolutional import (
     Conv2D
 )
-from NeMO_layers import CroppingLike2D
+from NeMO_Layers import CroppingLike2D
 from NeMO_Encoders import load_specific_param, flatten_list, recursive_concatcombo
 from NeMO_Blocks import NeMO_Deconvblock
 
@@ -56,6 +56,7 @@ def load_deconv_params(deconv_blocks: int,
     # Assumes conv_strides = 1
     # Assumes padding = same
     # Assumes dilation_rate = 1
+    # Assumes dropout = 0
     pool_size = load_specific_param(deconv_blocks, deconv_params, "pool_size", "p", supercombo, block_str="deconvolutional")
     # Assumes pool_strides = 1
     # Assumes no padding layers (no pad_size)
