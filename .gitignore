@@ -32,7 +32,6 @@
 # Other files #
 ################
 *.zip
-*.txt
 *.pdf
 *.xml
 *.yml

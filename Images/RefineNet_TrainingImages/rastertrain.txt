@@ -1,0 +1,2490 @@
+./Coral/Coral_00000000.tif mosaiced_001.TIF 2110 4321
+./Coral/Coral_00000001.tif mosaiced_001.TIF 1077 4213
+./Coral/Coral_00000002.tif mosaiced_001.TIF 1112 1203
+./Coral/Coral_00000003.tif mosaiced_001.TIF 1007 4154
+./Coral/Coral_00000004.tif mosaiced_001.TIF 586 2693
+./Coral/Coral_00000005.tif mosaiced_001.TIF 536 2112
+./Coral/Coral_00000006.tif mosaiced_001.TIF 3694 1809
+./Coral/Coral_00000007.tif mosaiced_001.TIF 1638 4476
+./Coral/Coral_00000008.tif mosaiced_001.TIF 3376 878
+./Coral/Coral_00000009.tif mosaiced_001.TIF 2277 4359
+./Sediment/Sediment_00000000.tif mosaiced_001.TIF 3587 2304
+./Sediment/Sediment_00000001.tif mosaiced_001.TIF 3324 879
+./Sediment/Sediment_00000002.tif mosaiced_001.TIF 639 3603
+./Sediment/Sediment_00000003.tif mosaiced_001.TIF 3628 2314
+./Sediment/Sediment_00000004.tif mosaiced_001.TIF 624 2205
+./Sediment/Sediment_00000005.tif mosaiced_001.TIF 1391 4304
+./Sediment/Sediment_00000006.tif mosaiced_001.TIF 3223 795
+./Sediment/Sediment_00000007.tif mosaiced_001.TIF 1711 4413
+./Sediment/Sediment_00000008.tif mosaiced_001.TIF 821 3745
+./Sediment/Sediment_00000009.tif mosaiced_001.TIF 3101 4353
+./Beach/Beach_00000000.tif mosaiced_001.TIF 1089 1515
+./Beach/Beach_00000001.tif mosaiced_001.TIF 3493 3912
+./Beach/Beach_00000002.tif mosaiced_001.TIF 926 1769
+./Beach/Beach_00000003.tif mosaiced_001.TIF 1696 4241
+./Beach/Beach_00000004.tif mosaiced_001.TIF 996 3609
+./Beach/Beach_00000005.tif mosaiced_001.TIF 3504 3898
+./Beach/Beach_00000006.tif mosaiced_001.TIF 3456 1172
+./Beach/Beach_00000007.tif mosaiced_001.TIF 3512 3890
+./Beach/Beach_00000008.tif mosaiced_001.TIF 1859 4272
+./Beach/Beach_00000009.tif mosaiced_001.TIF 3498 2312
+./Seagrass/Seagrass_00000000.tif mosaiced_001.TIF 3718 3574
+./Seagrass/Seagrass_00000001.tif mosaiced_001.TIF 918 3678
+./Seagrass/Seagrass_00000002.tif mosaiced_001.TIF 727 2191
+./Seagrass/Seagrass_00000003.tif mosaiced_001.TIF 857 1771
+./Seagrass/Seagrass_00000004.tif mosaiced_001.TIF 990 3733
+./Seagrass/Seagrass_00000005.tif mosaiced_001.TIF 3503 1976
+./Seagrass/Seagrass_00000006.tif mosaiced_001.TIF 879 3658
+./Seagrass/Seagrass_00000007.tif mosaiced_001.TIF 3605 3720
+./Seagrass/Seagrass_00000008.tif mosaiced_001.TIF 3525 1962
+./Seagrass/Seagrass_00000009.tif mosaiced_001.TIF 3201 4172
+./Terrestrial vegetation/Terrestrial vegetation_00000000.tif mosaiced_001.TIF 1017 3302
+./Terrestrial vegetation/Terrestrial vegetation_00000001.tif mosaiced_001.TIF 2012 1164
+./Terrestrial vegetation/Terrestrial vegetation_00000002.tif mosaiced_001.TIF 1856 2107
+./Terrestrial vegetation/Terrestrial vegetation_00000003.tif mosaiced_001.TIF 1863 3672
+./Terrestrial vegetation/Terrestrial vegetation_00000004.tif mosaiced_001.TIF 1934 4225
+./Terrestrial vegetation/Terrestrial vegetation_00000005.tif mosaiced_001.TIF 1537 2580
+./Terrestrial vegetation/Terrestrial vegetation_00000006.tif mosaiced_001.TIF 2502 1033
+./Terrestrial vegetation/Terrestrial vegetation_00000007.tif mosaiced_001.TIF 1185 2691
+./Terrestrial vegetation/Terrestrial vegetation_00000008.tif mosaiced_001.TIF 1681 2114
+./Terrestrial vegetation/Terrestrial vegetation_00000009.tif mosaiced_001.TIF 2243 1756
+./Deep water/Deep water_00000000.tif mosaiced_001.TIF 465 253
+./Deep water/Deep water_00000001.tif mosaiced_001.TIF 3562 312
+./Deep water/Deep water_00000002.tif mosaiced_001.TIF 185 2204
+./Deep water/Deep water_00000003.tif mosaiced_001.TIF 4409 4145
+./Deep water/Deep water_00000004.tif mosaiced_001.TIF 3761 163
+./Deep water/Deep water_00000005.tif mosaiced_001.TIF 647 4370
+./Deep water/Deep water_00000006.tif mosaiced_001.TIF 3867 2049
+./Deep water/Deep water_00000007.tif mosaiced_001.TIF 4327 2520
+./Deep water/Deep water_00000008.tif mosaiced_001.TIF 660 1261
+./Deep water/Deep water_00000009.tif mosaiced_001.TIF 3964 4186
+./Other or Unknown/Other or Unknown_00000000.tif mosaiced_001.TIF 2129 863
+./Other or Unknown/Other or Unknown_00000001.tif mosaiced_001.TIF 4148 4592
+./Other or Unknown/Other or Unknown_00000002.tif mosaiced_001.TIF 2729 806
+./Other or Unknown/Other or Unknown_00000003.tif mosaiced_001.TIF 1200 362
+./Other or Unknown/Other or Unknown_00000004.tif mosaiced_001.TIF 258 852
+./Other or Unknown/Other or Unknown_00000005.tif mosaiced_001.TIF 3438 72
+./Other or Unknown/Other or Unknown_00000006.tif mosaiced_001.TIF 287 2937
+./Other or Unknown/Other or Unknown_00000007.tif mosaiced_001.TIF 593 3653
+./Other or Unknown/Other or Unknown_00000008.tif mosaiced_001.TIF 2513 1583
+./Other or Unknown/Other or Unknown_00000009.tif mosaiced_001.TIF 1706 1866
+./Coral/Coral_00000010.tif mosaiced_002.TIF 3313 766
+./Coral/Coral_00000011.tif mosaiced_002.TIF 3707 1057
+./Coral/Coral_00000012.tif mosaiced_002.TIF 2608 656
+./Coral/Coral_00000013.tif mosaiced_002.TIF 2332 758
+./Coral/Coral_00000014.tif mosaiced_002.TIF 870 1596
+./Coral/Coral_00000015.tif mosaiced_002.TIF 1133 4041
+./Coral/Coral_00000016.tif mosaiced_002.TIF 630 3422
+./Coral/Coral_00000017.tif mosaiced_002.TIF 653 3583
+./Coral/Coral_00000018.tif mosaiced_002.TIF 4109 2957
+./Coral/Coral_00000019.tif mosaiced_002.TIF 772 3659
+./Sediment/Sediment_00000010.tif mosaiced_002.TIF 2789 4502
+./Sediment/Sediment_00000011.tif mosaiced_002.TIF 2429 830
+./Sediment/Sediment_00000012.tif mosaiced_002.TIF 656 3136
+./Sediment/Sediment_00000013.tif mosaiced_002.TIF 3714 1359
+./Sediment/Sediment_00000014.tif mosaiced_002.TIF 3719 3637
+./Sediment/Sediment_00000015.tif mosaiced_002.TIF 727 3345
+./Sediment/Sediment_00000016.tif mosaiced_002.TIF 3391 1021
+./Sediment/Sediment_00000017.tif mosaiced_002.TIF 2487 795
+./Sediment/Sediment_00000018.tif mosaiced_002.TIF 3060 4319
+./Sediment/Sediment_00000019.tif mosaiced_002.TIF 2826 4462
+./Beach/Beach_00000010.tif mosaiced_002.TIF 1166 3855
+./Beach/Beach_00000011.tif mosaiced_002.TIF 3511 1341
+./Beach/Beach_00000012.tif mosaiced_002.TIF 3588 3725
+./Beach/Beach_00000013.tif mosaiced_002.TIF 3582 3734
+./Beach/Beach_00000014.tif mosaiced_002.TIF 3466 2202
+./Beach/Beach_00000015.tif mosaiced_002.TIF 3565 2412
+./Beach/Beach_00000016.tif mosaiced_002.TIF 1716 4246
+./Beach/Beach_00000017.tif mosaiced_002.TIF 2995 801
+./Beach/Beach_00000018.tif mosaiced_002.TIF 2633 902
+./Beach/Beach_00000019.tif mosaiced_002.TIF 3777 2753
+./Seagrass/Seagrass_00000010.tif mosaiced_002.TIF 3494 2268
+./Seagrass/Seagrass_00000011.tif mosaiced_002.TIF 3225 4143
+./Seagrass/Seagrass_00000012.tif mosaiced_002.TIF 1295 1110
+./Seagrass/Seagrass_00000013.tif mosaiced_002.TIF 745 3073
+./Seagrass/Seagrass_00000014.tif mosaiced_002.TIF 3515 1860
+./Seagrass/Seagrass_00000015.tif mosaiced_002.TIF 944 3536
+./Seagrass/Seagrass_00000016.tif mosaiced_002.TIF 3816 3444
+./Seagrass/Seagrass_00000017.tif mosaiced_002.TIF 765 2659
+./Seagrass/Seagrass_00000018.tif mosaiced_002.TIF 705 2109
+./Seagrass/Seagrass_00000019.tif mosaiced_002.TIF 3420 4026
+./Terrestrial vegetation/Terrestrial vegetation_00000010.tif mosaiced_002.TIF 2935 2314
+./Terrestrial vegetation/Terrestrial vegetation_00000011.tif mosaiced_002.TIF 927 1891
+./Terrestrial vegetation/Terrestrial vegetation_00000012.tif mosaiced_002.TIF 2674 1972
+./Terrestrial vegetation/Terrestrial vegetation_00000013.tif mosaiced_002.TIF 3191 3559
+./Terrestrial vegetation/Terrestrial vegetation_00000014.tif mosaiced_002.TIF 2211 2246
+./Terrestrial vegetation/Terrestrial vegetation_00000015.tif mosaiced_002.TIF 1144 2801
+./Terrestrial vegetation/Terrestrial vegetation_00000016.tif mosaiced_002.TIF 1669 2905
+./Terrestrial vegetation/Terrestrial vegetation_00000017.tif mosaiced_002.TIF 1701 1859
+./Terrestrial vegetation/Terrestrial vegetation_00000018.tif mosaiced_002.TIF 3054 2756
+./Terrestrial vegetation/Terrestrial vegetation_00000019.tif mosaiced_002.TIF 2051 1043
+./Deep water/Deep water_00000010.tif mosaiced_002.TIF 4412 783
+./Deep water/Deep water_00000011.tif mosaiced_002.TIF 4083 4191
+./Deep water/Deep water_00000012.tif mosaiced_002.TIF 4464 3992
+./Deep water/Deep water_00000013.tif mosaiced_002.TIF 504 2653
+./Deep water/Deep water_00000014.tif mosaiced_002.TIF 3973 2148
+./Deep water/Deep water_00000015.tif mosaiced_002.TIF 3984 1663
+./Deep water/Deep water_00000016.tif mosaiced_002.TIF 4250 411
+./Deep water/Deep water_00000017.tif mosaiced_002.TIF 4246 2474
+./Deep water/Deep water_00000018.tif mosaiced_002.TIF 84 4057
+./Deep water/Deep water_00000019.tif mosaiced_002.TIF 243 2728
+./Other or Unknown/Other or Unknown_00000010.tif mosaiced_002.TIF 2741 3361
+./Other or Unknown/Other or Unknown_00000011.tif mosaiced_002.TIF 282 1589
+./Other or Unknown/Other or Unknown_00000012.tif mosaiced_002.TIF 1774 4674
+./Other or Unknown/Other or Unknown_00000013.tif mosaiced_002.TIF 1217 4543
+./Other or Unknown/Other or Unknown_00000014.tif mosaiced_002.TIF 1362 4109
+./Other or Unknown/Other or Unknown_00000015.tif mosaiced_002.TIF 3434 2557
+./Other or Unknown/Other or Unknown_00000016.tif mosaiced_002.TIF 1527 1551
+./Other or Unknown/Other or Unknown_00000017.tif mosaiced_002.TIF 1526 4932
+./Other or Unknown/Other or Unknown_00000018.tif mosaiced_002.TIF 807 603
+./Other or Unknown/Other or Unknown_00000019.tif mosaiced_002.TIF 989 3565
+./Coral/Coral_00000020.tif mosaiced_003.TIF 542 3313
+./Coral/Coral_00000021.tif mosaiced_003.TIF 771 1524
+./Coral/Coral_00000022.tif mosaiced_003.TIF 558 3181
+./Coral/Coral_00000023.tif mosaiced_003.TIF 1757 923
+./Coral/Coral_00000024.tif mosaiced_003.TIF 1848 4381
+./Coral/Coral_00000025.tif mosaiced_003.TIF 3050 625
+./Coral/Coral_00000026.tif mosaiced_003.TIF 2432 4505
+./Coral/Coral_00000027.tif mosaiced_003.TIF 3979 3488
+./Coral/Coral_00000028.tif mosaiced_003.TIF 786 3277
+./Coral/Coral_00000029.tif mosaiced_003.TIF 2996 573
+./Sediment/Sediment_00000020.tif mosaiced_003.TIF 2701 810
+./Sediment/Sediment_00000021.tif mosaiced_003.TIF 2502 737
+./Sediment/Sediment_00000022.tif mosaiced_003.TIF 649 2215
+./Sediment/Sediment_00000023.tif mosaiced_003.TIF 2850 795
+./Sediment/Sediment_00000024.tif mosaiced_003.TIF 3255 727
+./Sediment/Sediment_00000025.tif mosaiced_003.TIF 2512 803
+./Sediment/Sediment_00000026.tif mosaiced_003.TIF 1372 4257
+./Sediment/Sediment_00000027.tif mosaiced_003.TIF 744 3303
+./Sediment/Sediment_00000028.tif mosaiced_003.TIF 770 3399
+./Sediment/Sediment_00000029.tif mosaiced_003.TIF 2833 806
+./Beach/Beach_00000020.tif mosaiced_003.TIF 744 2305
+./Beach/Beach_00000021.tif mosaiced_003.TIF 794 2729
+./Beach/Beach_00000022.tif mosaiced_003.TIF 963 3553
+./Beach/Beach_00000023.tif mosaiced_003.TIF 3649 2531
+./Beach/Beach_00000024.tif mosaiced_003.TIF 755 2293
+./Beach/Beach_00000025.tif mosaiced_003.TIF 3594 3714
+./Beach/Beach_00000026.tif mosaiced_003.TIF 1775 4251
+./Beach/Beach_00000027.tif mosaiced_003.TIF 3692 1515
+./Beach/Beach_00000028.tif mosaiced_003.TIF 1604 4223
+./Beach/Beach_00000029.tif mosaiced_003.TIF 771 2200
+./Seagrass/Seagrass_00000020.tif mosaiced_003.TIF 3649 1501
+./Seagrass/Seagrass_00000021.tif mosaiced_003.TIF 1208 1127
+./Seagrass/Seagrass_00000022.tif mosaiced_003.TIF 3794 3441
+./Seagrass/Seagrass_00000023.tif mosaiced_003.TIF 713 3006
+./Seagrass/Seagrass_00000024.tif mosaiced_003.TIF 3508 1255
+./Seagrass/Seagrass_00000025.tif mosaiced_003.TIF 1509 4295
+./Seagrass/Seagrass_00000026.tif mosaiced_003.TIF 776 3057
+./Seagrass/Seagrass_00000027.tif mosaiced_003.TIF 807 3436
+./Seagrass/Seagrass_00000028.tif mosaiced_003.TIF 1032 3793
+./Seagrass/Seagrass_00000029.tif mosaiced_003.TIF 1369 4182
+./Terrestrial vegetation/Terrestrial vegetation_00000020.tif mosaiced_003.TIF 810 2656
+./Terrestrial vegetation/Terrestrial vegetation_00000021.tif mosaiced_003.TIF 2166 1375
+./Terrestrial vegetation/Terrestrial vegetation_00000022.tif mosaiced_003.TIF 1068 2807
+./Terrestrial vegetation/Terrestrial vegetation_00000023.tif mosaiced_003.TIF 1493 4010
+./Terrestrial vegetation/Terrestrial vegetation_00000024.tif mosaiced_003.TIF 3737 2726
+./Terrestrial vegetation/Terrestrial vegetation_00000025.tif mosaiced_003.TIF 2172 1722
+./Terrestrial vegetation/Terrestrial vegetation_00000026.tif mosaiced_003.TIF 2115 3680
+./Terrestrial vegetation/Terrestrial vegetation_00000027.tif mosaiced_003.TIF 3635 2782
+./Terrestrial vegetation/Terrestrial vegetation_00000028.tif mosaiced_003.TIF 2991 933
+./Terrestrial vegetation/Terrestrial vegetation_00000029.tif mosaiced_003.TIF 1151 2435
+./Deep water/Deep water_00000020.tif mosaiced_003.TIF 1308 141
+./Deep water/Deep water_00000021.tif mosaiced_003.TIF 957 5043
+./Deep water/Deep water_00000022.tif mosaiced_003.TIF 3793 349
+./Deep water/Deep water_00000023.tif mosaiced_003.TIF 4237 2725
+./Deep water/Deep water_00000024.tif mosaiced_003.TIF 3576 4284
+./Deep water/Deep water_00000025.tif mosaiced_003.TIF 2433 4699
+./Deep water/Deep water_00000026.tif mosaiced_003.TIF 2016 471
+./Deep water/Deep water_00000027.tif mosaiced_003.TIF 1884 175
+./Deep water/Deep water_00000028.tif mosaiced_003.TIF 696 456
+./Deep water/Deep water_00000029.tif mosaiced_003.TIF 2243 557
+./Other or Unknown/Other or Unknown_00000020.tif mosaiced_003.TIF 4167 2726
+./Other or Unknown/Other or Unknown_00000021.tif mosaiced_003.TIF 2815 2068
+./Other or Unknown/Other or Unknown_00000022.tif mosaiced_003.TIF 183 1070
+./Other or Unknown/Other or Unknown_00000023.tif mosaiced_003.TIF 3244 3435
+./Other or Unknown/Other or Unknown_00000024.tif mosaiced_003.TIF 387 4107
+./Other or Unknown/Other or Unknown_00000025.tif mosaiced_003.TIF 4248 3060
+./Other or Unknown/Other or Unknown_00000026.tif mosaiced_003.TIF 3344 3853
+./Other or Unknown/Other or Unknown_00000027.tif mosaiced_003.TIF 4337 3422
+./Other or Unknown/Other or Unknown_00000028.tif mosaiced_003.TIF 4029 3268
+./Other or Unknown/Other or Unknown_00000029.tif mosaiced_003.TIF 3835 2268
+./Coral/Coral_00000030.tif mosaiced_004.TIF 4832 1655
+./Coral/Coral_00000031.tif mosaiced_004.TIF 4141 2706
+./Coral/Coral_00000032.tif mosaiced_004.TIF 4897 1859
+./Coral/Coral_00000033.tif mosaiced_004.TIF 968 1443
+./Coral/Coral_00000034.tif mosaiced_004.TIF 3204 2959
+./Coral/Coral_00000035.tif mosaiced_004.TIF 1218 1462
+./Coral/Coral_00000036.tif mosaiced_004.TIF 2458 898
+./Coral/Coral_00000037.tif mosaiced_004.TIF 3943 132
+./Coral/Coral_00000038.tif mosaiced_004.TIF 1230 1692
+./Coral/Coral_00000039.tif mosaiced_004.TIF 973 1500
+./Sediment/Sediment_00000030.tif mosaiced_004.TIF 655 93
+./Sediment/Sediment_00000031.tif mosaiced_004.TIF 2165 1882
+./Sediment/Sediment_00000032.tif mosaiced_004.TIF 1379 269
+./Sediment/Sediment_00000033.tif mosaiced_004.TIF 2362 2823
+./Sediment/Sediment_00000034.tif mosaiced_004.TIF 1938 2217
+./Sediment/Sediment_00000035.tif mosaiced_004.TIF 2294 2285
+./Sediment/Sediment_00000036.tif mosaiced_004.TIF 3383 2609
+./Sediment/Sediment_00000037.tif mosaiced_004.TIF 3824 691
+./Sediment/Sediment_00000038.tif mosaiced_004.TIF 2755 197
+./Sediment/Sediment_00000039.tif mosaiced_004.TIF 3317 2678
+./Beach/Beach_00000030.tif mosaiced_004.TIF 4094 2457
+./Beach/Beach_00000031.tif mosaiced_004.TIF 3145 820
+./Beach/Beach_00000032.tif mosaiced_004.TIF 4122 865
+./Beach/Beach_00000033.tif mosaiced_004.TIF 3900 806
+./Beach/Beach_00000034.tif mosaiced_004.TIF 4470 930
+./Beach/Beach_00000035.tif mosaiced_004.TIF 4500 2024
+./Beach/Beach_00000036.tif mosaiced_004.TIF 3606 1498
+./Beach/Beach_00000037.tif mosaiced_004.TIF 3577 305
+./Beach/Beach_00000038.tif mosaiced_004.TIF 3744 1681
+./Beach/Beach_00000039.tif mosaiced_004.TIF 4378 2184
+./Seagrass/Seagrass_00000030.tif mosaiced_004.TIF 3587 480
+./Seagrass/Seagrass_00000031.tif mosaiced_004.TIF 3653 361
+./Seagrass/Seagrass_00000032.tif mosaiced_004.TIF 3639 314
+./Seagrass/Seagrass_00000033.tif mosaiced_004.TIF 1211 109
+./Seagrass/Seagrass_00000034.tif mosaiced_004.TIF 3626 480
+./Seagrass/Seagrass_00000035.tif mosaiced_004.TIF 3507 1006
+./Seagrass/Seagrass_00000036.tif mosaiced_004.TIF 3578 466
+./Seagrass/Seagrass_00000037.tif mosaiced_004.TIF 3635 252
+./Seagrass/Seagrass_00000038.tif mosaiced_004.TIF 3493 990
+./Seagrass/Seagrass_00000039.tif mosaiced_004.TIF 3679 454
+./Terrestrial vegetation/Terrestrial vegetation_00000030.tif mosaiced_004.TIF 3232 124
+./Terrestrial vegetation/Terrestrial vegetation_00000031.tif mosaiced_004.TIF 4327 1528
+./Terrestrial vegetation/Terrestrial vegetation_00000032.tif mosaiced_004.TIF 4330 2049
+./Terrestrial vegetation/Terrestrial vegetation_00000033.tif mosaiced_004.TIF 3375 1528
+./Terrestrial vegetation/Terrestrial vegetation_00000034.tif mosaiced_004.TIF 4234 1052
+./Terrestrial vegetation/Terrestrial vegetation_00000035.tif mosaiced_004.TIF 4712 1337
+./Terrestrial vegetation/Terrestrial vegetation_00000036.tif mosaiced_004.TIF 4474 1001
+./Terrestrial vegetation/Terrestrial vegetation_00000037.tif mosaiced_004.TIF 4061 1917
+./Terrestrial vegetation/Terrestrial vegetation_00000038.tif mosaiced_004.TIF 3916 1205
+./Terrestrial vegetation/Terrestrial vegetation_00000039.tif mosaiced_004.TIF 3866 2548
+./Deep water/Deep water_00000030.tif mosaiced_004.TIF 77 2519
+./Deep water/Deep water_00000031.tif mosaiced_004.TIF 4851 2921
+./Deep water/Deep water_00000032.tif mosaiced_004.TIF 1123 2195
+./Deep water/Deep water_00000033.tif mosaiced_004.TIF 517 3609
+./Deep water/Deep water_00000034.tif mosaiced_004.TIF 5239 3741
+./Deep water/Deep water_00000035.tif mosaiced_004.TIF 5206 215
+./Deep water/Deep water_00000036.tif mosaiced_004.TIF 4355 3472
+./Deep water/Deep water_00000037.tif mosaiced_004.TIF 1635 3236
+./Deep water/Deep water_00000038.tif mosaiced_004.TIF 4394 3348
+./Deep water/Deep water_00000039.tif mosaiced_004.TIF 4428 3436
+./Other or Unknown/Other or Unknown_00000030.tif mosaiced_004.TIF 883 847
+./Other or Unknown/Other or Unknown_00000031.tif mosaiced_004.TIF 4441 2084
+./Other or Unknown/Other or Unknown_00000032.tif mosaiced_004.TIF 3114 936
+./Other or Unknown/Other or Unknown_00000033.tif mosaiced_004.TIF 3387 1871
+./Other or Unknown/Other or Unknown_00000034.tif mosaiced_004.TIF 1321 166
+./Other or Unknown/Other or Unknown_00000035.tif mosaiced_004.TIF 3211 1278
+./Other or Unknown/Other or Unknown_00000036.tif mosaiced_004.TIF 3507 81
+./Other or Unknown/Other or Unknown_00000037.tif mosaiced_004.TIF 2548 916
+./Other or Unknown/Other or Unknown_00000038.tif mosaiced_004.TIF 1163 899
+./Other or Unknown/Other or Unknown_00000039.tif mosaiced_004.TIF 3542 189
+./Coral/Coral_00000040.tif mosaiced_005.TIF 2245 4238
+./Coral/Coral_00000041.tif mosaiced_005.TIF 4210 960
+./Coral/Coral_00000042.tif mosaiced_005.TIF 580 2478
+./Coral/Coral_00000043.tif mosaiced_005.TIF 2168 614
+./Coral/Coral_00000044.tif mosaiced_005.TIF 1284 3651
+./Coral/Coral_00000045.tif mosaiced_005.TIF 2010 4114
+./Coral/Coral_00000046.tif mosaiced_005.TIF 4045 2498
+./Coral/Coral_00000047.tif mosaiced_005.TIF 3366 2906
+./Coral/Coral_00000048.tif mosaiced_005.TIF 4535 4420
+./Coral/Coral_00000049.tif mosaiced_005.TIF 2817 565
+./Sediment/Sediment_00000040.tif mosaiced_005.TIF 1934 3892
+./Sediment/Sediment_00000041.tif mosaiced_005.TIF 2651 2166
+./Sediment/Sediment_00000042.tif mosaiced_005.TIF 2133 3335
+./Sediment/Sediment_00000043.tif mosaiced_005.TIF 2719 4763
+./Sediment/Sediment_00000044.tif mosaiced_005.TIF 1790 3466
+./Sediment/Sediment_00000045.tif mosaiced_005.TIF 2520 3110
+./Sediment/Sediment_00000046.tif mosaiced_005.TIF 2458 4220
+./Sediment/Sediment_00000047.tif mosaiced_005.TIF 3822 3533
+./Sediment/Sediment_00000048.tif mosaiced_005.TIF 3228 4360
+./Sediment/Sediment_00000049.tif mosaiced_005.TIF 1478 2543
+./Beach/Beach_00000040.tif mosaiced_005.TIF 3885 3576
+./Beach/Beach_00000041.tif mosaiced_005.TIF 3708 1561
+./Beach/Beach_00000042.tif mosaiced_005.TIF 4067 4387
+./Beach/Beach_00000043.tif mosaiced_005.TIF 3350 647
+./Beach/Beach_00000044.tif mosaiced_005.TIF 4400 4030
+./Beach/Beach_00000045.tif mosaiced_005.TIF 3181 3817
+./Beach/Beach_00000046.tif mosaiced_005.TIF 3903 4450
+./Beach/Beach_00000047.tif mosaiced_005.TIF 3673 1646
+./Beach/Beach_00000048.tif mosaiced_005.TIF 3921 4440
+./Beach/Beach_00000049.tif mosaiced_005.TIF 3806 838
+./Seagrass/Seagrass_00000040.tif mosaiced_005.TIF 1507 1601
+./Seagrass/Seagrass_00000041.tif mosaiced_005.TIF 2482 1235
+./Seagrass/Seagrass_00000042.tif mosaiced_005.TIF 2566 1207
+./Seagrass/Seagrass_00000043.tif mosaiced_005.TIF 3638 2225
+./Seagrass/Seagrass_00000044.tif mosaiced_005.TIF 2457 1184
+./Seagrass/Seagrass_00000045.tif mosaiced_005.TIF 2293 679
+./Seagrass/Seagrass_00000046.tif mosaiced_005.TIF 1734 1451
+./Seagrass/Seagrass_00000047.tif mosaiced_005.TIF 3605 2245
+./Seagrass/Seagrass_00000048.tif mosaiced_005.TIF 2429 1234
+./Seagrass/Seagrass_00000049.tif mosaiced_005.TIF 2496 1151
+./Terrestrial vegetation/Terrestrial vegetation_00000040.tif mosaiced_005.TIF 3191 1336
+./Terrestrial vegetation/Terrestrial vegetation_00000041.tif mosaiced_005.TIF 1586 1386
+./Terrestrial vegetation/Terrestrial vegetation_00000042.tif mosaiced_005.TIF 4168 2821
+./Terrestrial vegetation/Terrestrial vegetation_00000043.tif mosaiced_005.TIF 4144 2976
+./Terrestrial vegetation/Terrestrial vegetation_00000044.tif mosaiced_005.TIF 4276 2868
+./Terrestrial vegetation/Terrestrial vegetation_00000045.tif mosaiced_005.TIF 2925 662
+./Terrestrial vegetation/Terrestrial vegetation_00000046.tif mosaiced_005.TIF 2850 902
+./Terrestrial vegetation/Terrestrial vegetation_00000047.tif mosaiced_005.TIF 3611 734
+./Terrestrial vegetation/Terrestrial vegetation_00000048.tif mosaiced_005.TIF 3253 2663
+./Terrestrial vegetation/Terrestrial vegetation_00000049.tif mosaiced_005.TIF 2256 989
+./Deep water/Deep water_00000040.tif mosaiced_005.TIF 4035 212
+./Deep water/Deep water_00000041.tif mosaiced_005.TIF 4524 1946
+./Deep water/Deep water_00000042.tif mosaiced_005.TIF 536 2691
+./Deep water/Deep water_00000043.tif mosaiced_005.TIF 4864 1202
+./Deep water/Deep water_00000044.tif mosaiced_005.TIF 1125 544
+./Deep water/Deep water_00000045.tif mosaiced_005.TIF 250 22
+./Deep water/Deep water_00000046.tif mosaiced_005.TIF 4687 1347
+./Deep water/Deep water_00000047.tif mosaiced_005.TIF 352 4788
+./Deep water/Deep water_00000048.tif mosaiced_005.TIF 4376 1945
+./Deep water/Deep water_00000049.tif mosaiced_005.TIF 3728 5573
+./Other or Unknown/Other or Unknown_00000040.tif mosaiced_005.TIF 1203 979
+./Other or Unknown/Other or Unknown_00000041.tif mosaiced_005.TIF 4167 2525
+./Other or Unknown/Other or Unknown_00000042.tif mosaiced_005.TIF 3722 3269
+./Other or Unknown/Other or Unknown_00000043.tif mosaiced_005.TIF 5269 3240
+./Other or Unknown/Other or Unknown_00000044.tif mosaiced_005.TIF 4083 3675
+./Other or Unknown/Other or Unknown_00000045.tif mosaiced_005.TIF 3513 4032
+./Other or Unknown/Other or Unknown_00000046.tif mosaiced_005.TIF 3746 4976
+./Other or Unknown/Other or Unknown_00000047.tif mosaiced_005.TIF 5087 4184
+./Other or Unknown/Other or Unknown_00000048.tif mosaiced_005.TIF 4462 2971
+./Other or Unknown/Other or Unknown_00000049.tif mosaiced_005.TIF 3715 4208
+./Coral/Coral_00000050.tif mosaiced_006.TIF 4937 2933
+./Coral/Coral_00000051.tif mosaiced_006.TIF 4402 2456
+./Coral/Coral_00000052.tif mosaiced_006.TIF 5002 3083
+./Coral/Coral_00000053.tif mosaiced_006.TIF 3264 5022
+./Coral/Coral_00000054.tif mosaiced_006.TIF 4575 2591
+./Coral/Coral_00000055.tif mosaiced_006.TIF 3769 1608
+./Coral/Coral_00000056.tif mosaiced_006.TIF 3126 4931
+./Coral/Coral_00000057.tif mosaiced_006.TIF 3138 4742
+./Coral/Coral_00000058.tif mosaiced_006.TIF 1813 4254
+./Coral/Coral_00000059.tif mosaiced_006.TIF 1196 3693
+./Sediment/Sediment_00000050.tif mosaiced_006.TIF 3433 2910
+./Sediment/Sediment_00000051.tif mosaiced_006.TIF 3146 3408
+./Sediment/Sediment_00000052.tif mosaiced_006.TIF 2008 4008
+./Sediment/Sediment_00000053.tif mosaiced_006.TIF 1135 1169
+./Sediment/Sediment_00000054.tif mosaiced_006.TIF 2489 4235
+./Sediment/Sediment_00000055.tif mosaiced_006.TIF 1977 3673
+./Sediment/Sediment_00000056.tif mosaiced_006.TIF 1936 2987
+./Sediment/Sediment_00000057.tif mosaiced_006.TIF 2127 2319
+./Sediment/Sediment_00000058.tif mosaiced_006.TIF 2751 3124
+./Sediment/Sediment_00000059.tif mosaiced_006.TIF 2225 2126
+./Beach/Beach_00000050.tif mosaiced_006.TIF 3665 3594
+./Beach/Beach_00000051.tif mosaiced_006.TIF 4707 3592
+./Beach/Beach_00000052.tif mosaiced_006.TIF 3663 3589
+./Beach/Beach_00000053.tif mosaiced_006.TIF 1863 3856
+./Beach/Beach_00000054.tif mosaiced_006.TIF 3511 3347
+./Beach/Beach_00000055.tif mosaiced_006.TIF 3451 4474
+./Beach/Beach_00000056.tif mosaiced_006.TIF 3564 4444
+./Beach/Beach_00000057.tif mosaiced_006.TIF 3082 3928
+./Beach/Beach_00000058.tif mosaiced_006.TIF 4564 3800
+./Beach/Beach_00000059.tif mosaiced_006.TIF 4295 4118
+./Seagrass/Seagrass_00000050.tif mosaiced_006.TIF 2284 1289
+./Seagrass/Seagrass_00000051.tif mosaiced_006.TIF 3423 2861
+./Seagrass/Seagrass_00000052.tif mosaiced_006.TIF 1594 1513
+./Seagrass/Seagrass_00000053.tif mosaiced_006.TIF 3617 2146
+./Seagrass/Seagrass_00000054.tif mosaiced_006.TIF 1488 1573
+./Seagrass/Seagrass_00000055.tif mosaiced_006.TIF 2220 1341
+./Seagrass/Seagrass_00000056.tif mosaiced_006.TIF 3163 1569
+./Seagrass/Seagrass_00000057.tif mosaiced_006.TIF 2173 1373
+./Seagrass/Seagrass_00000058.tif mosaiced_006.TIF 3646 2248
+./Seagrass/Seagrass_00000059.tif mosaiced_006.TIF 1504 1592
+./Terrestrial vegetation/Terrestrial vegetation_00000050.tif mosaiced_006.TIF 3196 2328
+./Terrestrial vegetation/Terrestrial vegetation_00000051.tif mosaiced_006.TIF 4237 2814
+./Terrestrial vegetation/Terrestrial vegetation_00000052.tif mosaiced_006.TIF 2949 1879
+./Terrestrial vegetation/Terrestrial vegetation_00000053.tif mosaiced_006.TIF 3471 1607
+./Terrestrial vegetation/Terrestrial vegetation_00000054.tif mosaiced_006.TIF 4306 3646
+./Terrestrial vegetation/Terrestrial vegetation_00000055.tif mosaiced_006.TIF 3074 2337
+./Terrestrial vegetation/Terrestrial vegetation_00000056.tif mosaiced_006.TIF 1591 3320
+./Terrestrial vegetation/Terrestrial vegetation_00000057.tif mosaiced_006.TIF 4390 3737
+./Terrestrial vegetation/Terrestrial vegetation_00000058.tif mosaiced_006.TIF 4377 2797
+./Terrestrial vegetation/Terrestrial vegetation_00000059.tif mosaiced_006.TIF 1372 1601
+./Deep water/Deep water_00000050.tif mosaiced_006.TIF 770 4232
+./Deep water/Deep water_00000051.tif mosaiced_006.TIF 5061 3752
+./Deep water/Deep water_00000052.tif mosaiced_006.TIF 1204 4474
+./Deep water/Deep water_00000053.tif mosaiced_006.TIF 1038 4661
+./Deep water/Deep water_00000054.tif mosaiced_006.TIF 2000 5442
+./Deep water/Deep water_00000055.tif mosaiced_006.TIF 1615 4438
+./Deep water/Deep water_00000056.tif mosaiced_006.TIF 5112 54
+./Deep water/Deep water_00000057.tif mosaiced_006.TIF 40 832
+./Deep water/Deep water_00000058.tif mosaiced_006.TIF 689 5451
+./Deep water/Deep water_00000059.tif mosaiced_006.TIF 431 4022
+./Other or Unknown/Other or Unknown_00000050.tif mosaiced_006.TIF 5018 3790
+./Other or Unknown/Other or Unknown_00000051.tif mosaiced_006.TIF 1193 351
+./Other or Unknown/Other or Unknown_00000052.tif mosaiced_006.TIF 1582 150
+./Other or Unknown/Other or Unknown_00000053.tif mosaiced_006.TIF 1540 467
+./Other or Unknown/Other or Unknown_00000054.tif mosaiced_006.TIF 1805 1633
+./Other or Unknown/Other or Unknown_00000055.tif mosaiced_006.TIF 2783 2630
+./Other or Unknown/Other or Unknown_00000056.tif mosaiced_006.TIF 2836 1269
+./Other or Unknown/Other or Unknown_00000057.tif mosaiced_006.TIF 2404 2153
+./Other or Unknown/Other or Unknown_00000058.tif mosaiced_006.TIF 4992 3839
+./Other or Unknown/Other or Unknown_00000059.tif mosaiced_006.TIF 3259 2054
+./Coral/Coral_00000060.tif mosaiced_010.TIF 1337 3088
+./Coral/Coral_00000061.tif mosaiced_010.TIF 293 1793
+./Coral/Coral_00000062.tif mosaiced_010.TIF 1152 753
+./Coral/Coral_00000063.tif mosaiced_010.TIF 1675 3356
+./Coral/Coral_00000064.tif mosaiced_010.TIF 4196 1323
+./Coral/Coral_00000065.tif mosaiced_010.TIF 4936 2218
+./Coral/Coral_00000066.tif mosaiced_010.TIF 4218 2688
+./Coral/Coral_00000067.tif mosaiced_010.TIF 3921 3174
+./Coral/Coral_00000068.tif mosaiced_010.TIF 2998 3381
+./Coral/Coral_00000069.tif mosaiced_010.TIF 706 1262
+./Sediment/Sediment_00000060.tif mosaiced_010.TIF 647 2587
+./Sediment/Sediment_00000061.tif mosaiced_010.TIF 1622 3132
+./Sediment/Sediment_00000062.tif mosaiced_010.TIF 1990 3168
+./Sediment/Sediment_00000063.tif mosaiced_010.TIF 4060 1216
+./Sediment/Sediment_00000064.tif mosaiced_010.TIF 2281 3188
+./Sediment/Sediment_00000065.tif mosaiced_010.TIF 3161 714
+./Sediment/Sediment_00000066.tif mosaiced_010.TIF 3282 3195
+./Sediment/Sediment_00000067.tif mosaiced_010.TIF 634 2505
+./Sediment/Sediment_00000068.tif mosaiced_010.TIF 443 1680
+./Sediment/Sediment_00000069.tif mosaiced_010.TIF 439 1632
+./Beach/Beach_00000060.tif mosaiced_010.TIF 1254 2846
+./Beach/Beach_00000061.tif mosaiced_010.TIF 1194 2826
+./Beach/Beach_00000062.tif mosaiced_010.TIF 3847 1179
+./Beach/Beach_00000063.tif mosaiced_010.TIF 579 2444
+./Beach/Beach_00000064.tif mosaiced_010.TIF 4460 1754
+./Beach/Beach_00000065.tif mosaiced_010.TIF 4624 1882
+./Beach/Beach_00000066.tif mosaiced_010.TIF 1189 905
+./Beach/Beach_00000067.tif mosaiced_010.TIF 4187 1390
+./Beach/Beach_00000068.tif mosaiced_010.TIF 1624 653
+./Beach/Beach_00000069.tif mosaiced_010.TIF 2779 600
+./Seagrass/Seagrass_00000060.tif mosaiced_010.TIF 3956 2793
+./Seagrass/Seagrass_00000061.tif mosaiced_010.TIF 1639 2921
+./Seagrass/Seagrass_00000062.tif mosaiced_010.TIF 1373 785
+./Seagrass/Seagrass_00000063.tif mosaiced_010.TIF 1496 2882
+./Seagrass/Seagrass_00000064.tif mosaiced_010.TIF 1630 2930
+./Seagrass/Seagrass_00000065.tif mosaiced_010.TIF 1150 2835
+./Seagrass/Seagrass_00000066.tif mosaiced_010.TIF 4054 2745
+./Seagrass/Seagrass_00000067.tif mosaiced_010.TIF 4067 2738
+./Seagrass/Seagrass_00000068.tif mosaiced_010.TIF 4186 2621
+./Seagrass/Seagrass_00000069.tif mosaiced_010.TIF 1614 2933
+./Terrestrial vegetation/Terrestrial vegetation_00000060.tif mosaiced_010.TIF 3433 2329
+./Terrestrial vegetation/Terrestrial vegetation_00000061.tif mosaiced_010.TIF 2102 1920
+./Terrestrial vegetation/Terrestrial vegetation_00000062.tif mosaiced_010.TIF 3674 2429
+./Terrestrial vegetation/Terrestrial vegetation_00000063.tif mosaiced_010.TIF 1390 2276
+./Terrestrial vegetation/Terrestrial vegetation_00000064.tif mosaiced_010.TIF 2786 2333
+./Terrestrial vegetation/Terrestrial vegetation_00000065.tif mosaiced_010.TIF 2035 2834
+./Terrestrial vegetation/Terrestrial vegetation_00000066.tif mosaiced_010.TIF 2577 2323
+./Terrestrial vegetation/Terrestrial vegetation_00000067.tif mosaiced_010.TIF 1842 842
+./Terrestrial vegetation/Terrestrial vegetation_00000068.tif mosaiced_010.TIF 2817 1796
+./Terrestrial vegetation/Terrestrial vegetation_00000069.tif mosaiced_010.TIF 1337 2794
+./Deep water/Deep water_00000060.tif mosaiced_010.TIF 627 438
+./Deep water/Deep water_00000061.tif mosaiced_010.TIF 1501 266
+./Deep water/Deep water_00000062.tif mosaiced_010.TIF 4493 3552
+./Deep water/Deep water_00000063.tif mosaiced_010.TIF 4616 3214
+./Deep water/Deep water_00000064.tif mosaiced_010.TIF 2666 237
+./Deep water/Deep water_00000065.tif mosaiced_010.TIF 4989 2580
+./Deep water/Deep water_00000066.tif mosaiced_010.TIF 2616 3731
+./Deep water/Deep water_00000067.tif mosaiced_010.TIF 4176 488
+./Deep water/Deep water_00000068.tif mosaiced_010.TIF 4443 3742
+./Deep water/Deep water_00000069.tif mosaiced_010.TIF 4473 3436
+./Other or Unknown/Other or Unknown_00000060.tif mosaiced_010.TIF 2437 2226
+./Other or Unknown/Other or Unknown_00000061.tif mosaiced_010.TIF 3942 1912
+./Other or Unknown/Other or Unknown_00000062.tif mosaiced_010.TIF 230 1609
+./Other or Unknown/Other or Unknown_00000063.tif mosaiced_010.TIF 1332 1368
+./Other or Unknown/Other or Unknown_00000064.tif mosaiced_010.TIF 1503 2360
+./Other or Unknown/Other or Unknown_00000065.tif mosaiced_010.TIF 2018 1132
+./Other or Unknown/Other or Unknown_00000066.tif mosaiced_010.TIF 2089 3136
+./Other or Unknown/Other or Unknown_00000067.tif mosaiced_010.TIF 645 1560
+./Other or Unknown/Other or Unknown_00000068.tif mosaiced_010.TIF 1316 2671
+./Other or Unknown/Other or Unknown_00000069.tif mosaiced_010.TIF 581 1074
+./Coral/Coral_00000070.tif mosaiced_011.TIF 1063 2272
+./Coral/Coral_00000071.tif mosaiced_011.TIF 1116 187
+./Coral/Coral_00000072.tif mosaiced_011.TIF 5039 1276
+./Coral/Coral_00000073.tif mosaiced_011.TIF 2495 2393
+./Coral/Coral_00000074.tif mosaiced_011.TIF 2724 2464
+./Coral/Coral_00000075.tif mosaiced_011.TIF 4117 387
+./Coral/Coral_00000076.tif mosaiced_011.TIF 4261 516
+./Coral/Coral_00000077.tif mosaiced_011.TIF 3989 2143
+./Coral/Coral_00000078.tif mosaiced_011.TIF 3494 2379
+./Coral/Coral_00000079.tif mosaiced_011.TIF 468 1183
+./Sediment/Sediment_00000070.tif mosaiced_011.TIF 3702 178
+./Sediment/Sediment_00000071.tif mosaiced_011.TIF 544 835
+./Sediment/Sediment_00000072.tif mosaiced_011.TIF 484 753
+./Sediment/Sediment_00000073.tif mosaiced_011.TIF 1196 2174
+./Sediment/Sediment_00000074.tif mosaiced_011.TIF 621 1726
+./Sediment/Sediment_00000075.tif mosaiced_011.TIF 403 915
+./Sediment/Sediment_00000076.tif mosaiced_011.TIF 807 667
+./Sediment/Sediment_00000077.tif mosaiced_011.TIF 1157 2078
+./Sediment/Sediment_00000078.tif mosaiced_011.TIF 556 743
+./Sediment/Sediment_00000079.tif mosaiced_011.TIF 635 1687
+./Beach/Beach_00000070.tif mosaiced_011.TIF 3651 2248
+./Beach/Beach_00000071.tif mosaiced_011.TIF 4559 1273
+./Beach/Beach_00000072.tif mosaiced_011.TIF 3646 196
+./Beach/Beach_00000073.tif mosaiced_011.TIF 3831 2072
+./Beach/Beach_00000074.tif mosaiced_011.TIF 677 1698
+./Beach/Beach_00000075.tif mosaiced_011.TIF 505 1601
+./Beach/Beach_00000076.tif mosaiced_011.TIF 3321 53
+./Beach/Beach_00000077.tif mosaiced_011.TIF 3982 1964
+./Beach/Beach_00000078.tif mosaiced_011.TIF 3568 2290
+./Beach/Beach_00000079.tif mosaiced_011.TIF 4199 598
+./Seagrass/Seagrass_00000070.tif mosaiced_011.TIF 4068 1916
+./Seagrass/Seagrass_00000071.tif mosaiced_011.TIF 1210 2066
+./Seagrass/Seagrass_00000072.tif mosaiced_011.TIF 354 1434
+./Seagrass/Seagrass_00000073.tif mosaiced_011.TIF 4114 1872
+./Seagrass/Seagrass_00000074.tif mosaiced_011.TIF 4085 1930
+./Seagrass/Seagrass_00000075.tif mosaiced_011.TIF 4121 1905
+./Seagrass/Seagrass_00000076.tif mosaiced_011.TIF 4242 1785
+./Seagrass/Seagrass_00000077.tif mosaiced_011.TIF 383 1486
+./Seagrass/Seagrass_00000078.tif mosaiced_011.TIF 4218 1798
+./Seagrass/Seagrass_00000079.tif mosaiced_011.TIF 4094 1924
+./Terrestrial vegetation/Terrestrial vegetation_00000070.tif mosaiced_011.TIF 1203 900
+./Terrestrial vegetation/Terrestrial vegetation_00000071.tif mosaiced_011.TIF 1710 1072
+./Terrestrial vegetation/Terrestrial vegetation_00000072.tif mosaiced_011.TIF 3576 2208
+./Terrestrial vegetation/Terrestrial vegetation_00000073.tif mosaiced_011.TIF 2251 185
+./Terrestrial vegetation/Terrestrial vegetation_00000074.tif mosaiced_011.TIF 1780 65
+./Terrestrial vegetation/Terrestrial vegetation_00000075.tif mosaiced_011.TIF 1800 830
+./Terrestrial vegetation/Terrestrial vegetation_00000076.tif mosaiced_011.TIF 1802 1133
+./Terrestrial vegetation/Terrestrial vegetation_00000077.tif mosaiced_011.TIF 1087 1134
+./Terrestrial vegetation/Terrestrial vegetation_00000078.tif mosaiced_011.TIF 3169 668
+./Terrestrial vegetation/Terrestrial vegetation_00000079.tif mosaiced_011.TIF 3551 1435
+./Deep water/Deep water_00000070.tif mosaiced_011.TIF 839 2290
+./Deep water/Deep water_00000071.tif mosaiced_011.TIF 177 629
+./Deep water/Deep water_00000072.tif mosaiced_011.TIF 283 78
+./Deep water/Deep water_00000073.tif mosaiced_011.TIF 4610 2080
+./Deep water/Deep water_00000074.tif mosaiced_011.TIF 5241 395
+./Deep water/Deep water_00000075.tif mosaiced_011.TIF 4237 2602
+./Deep water/Deep water_00000076.tif mosaiced_011.TIF 3636 2824
+./Deep water/Deep water_00000077.tif mosaiced_011.TIF 5143 714
+./Deep water/Deep water_00000078.tif mosaiced_011.TIF 2400 2949
+./Deep water/Deep water_00000079.tif mosaiced_011.TIF 4211 70
+./Other or Unknown/Other or Unknown_00000070.tif mosaiced_011.TIF 1424 2494
+./Other or Unknown/Other or Unknown_00000071.tif mosaiced_011.TIF 2084 996
+./Other or Unknown/Other or Unknown_00000072.tif mosaiced_011.TIF 1393 2684
+./Other or Unknown/Other or Unknown_00000073.tif mosaiced_011.TIF 1898 826
+./Other or Unknown/Other or Unknown_00000074.tif mosaiced_011.TIF 999 321
+./Other or Unknown/Other or Unknown_00000075.tif mosaiced_011.TIF 2449 1591
+./Other or Unknown/Other or Unknown_00000076.tif mosaiced_011.TIF 2439 542
+./Other or Unknown/Other or Unknown_00000077.tif mosaiced_011.TIF 1314 2638
+./Other or Unknown/Other or Unknown_00000078.tif mosaiced_011.TIF 1975 1522
+./Other or Unknown/Other or Unknown_00000079.tif mosaiced_011.TIF 963 142
+./Coral/Coral_00000080.tif mosaiced_012.TIF 3374 1331
+./Coral/Coral_00000081.tif mosaiced_012.TIF 371 182
+./Coral/Coral_00000082.tif mosaiced_012.TIF 413 549
+./Coral/Coral_00000083.tif mosaiced_012.TIF 2973 1439
+./Coral/Coral_00000084.tif mosaiced_012.TIF 4611 135
+./Coral/Coral_00000085.tif mosaiced_012.TIF 486 60
+./Coral/Coral_00000086.tif mosaiced_012.TIF 353 485
+./Coral/Coral_00000087.tif mosaiced_012.TIF 3491 1340
+./Coral/Coral_00000088.tif mosaiced_012.TIF 1219 1099
+./Coral/Coral_00000089.tif mosaiced_012.TIF 4846 423
+./Sediment/Sediment_00000080.tif mosaiced_012.TIF 2416 1353
+./Sediment/Sediment_00000081.tif mosaiced_012.TIF 2501 1374
+./Sediment/Sediment_00000082.tif mosaiced_012.TIF 841 845
+./Sediment/Sediment_00000083.tif mosaiced_012.TIF 4559 417
+./Sediment/Sediment_00000084.tif mosaiced_012.TIF 669 712
+./Sediment/Sediment_00000085.tif mosaiced_012.TIF 2466 1323
+./Sediment/Sediment_00000086.tif mosaiced_012.TIF 2280 1395
+./Sediment/Sediment_00000087.tif mosaiced_012.TIF 3036 1369
+./Sediment/Sediment_00000088.tif mosaiced_012.TIF 607 619
+./Sediment/Sediment_00000089.tif mosaiced_012.TIF 2383 1336
+./Beach/Beach_00000080.tif mosaiced_012.TIF 4623 49
+./Beach/Beach_00000081.tif mosaiced_012.TIF 764 694
+./Beach/Beach_00000082.tif mosaiced_012.TIF 369 363
+./Beach/Beach_00000083.tif mosaiced_012.TIF 3185 1329
+./Beach/Beach_00000084.tif mosaiced_012.TIF 4630 83
+./Beach/Beach_00000085.tif mosaiced_012.TIF 4551 431
+./Beach/Beach_00000086.tif mosaiced_012.TIF 848 762
+./Beach/Beach_00000087.tif mosaiced_012.TIF 1943 1260
+./Beach/Beach_00000088.tif mosaiced_012.TIF 1073 950
+./Beach/Beach_00000089.tif mosaiced_012.TIF 1882 1232
+./Seagrass/Seagrass_00000080.tif mosaiced_012.TIF 870 800
+./Seagrass/Seagrass_00000081.tif mosaiced_012.TIF 1333 1030
+./Seagrass/Seagrass_00000082.tif mosaiced_012.TIF 1295 1021
+./Seagrass/Seagrass_00000083.tif mosaiced_012.TIF 517 579
+./Seagrass/Seagrass_00000084.tif mosaiced_012.TIF 1268 1024
+./Seagrass/Seagrass_00000085.tif mosaiced_012.TIF 1301 1018
+./Seagrass/Seagrass_00000086.tif mosaiced_012.TIF 1309 1031
+./Seagrass/Seagrass_00000087.tif mosaiced_012.TIF 374 406
+./Seagrass/Seagrass_00000088.tif mosaiced_012.TIF 1233 1011
+./Seagrass/Seagrass_00000089.tif mosaiced_012.TIF 1192 1002
+./Terrestrial vegetation/Terrestrial vegetation_00000080.tif mosaiced_012.TIF 2289 511
+./Terrestrial vegetation/Terrestrial vegetation_00000081.tif mosaiced_012.TIF 2942 933
+./Terrestrial vegetation/Terrestrial vegetation_00000082.tif mosaiced_012.TIF 2498 213
+./Terrestrial vegetation/Terrestrial vegetation_00000083.tif mosaiced_012.TIF 3156 465
+./Terrestrial vegetation/Terrestrial vegetation_00000084.tif mosaiced_012.TIF 2362 1218
+./Terrestrial vegetation/Terrestrial vegetation_00000085.tif mosaiced_012.TIF 652 114
+./Terrestrial vegetation/Terrestrial vegetation_00000086.tif mosaiced_012.TIF 3206 749
+./Terrestrial vegetation/Terrestrial vegetation_00000087.tif mosaiced_012.TIF 2027 487
+./Terrestrial vegetation/Terrestrial vegetation_00000088.tif mosaiced_012.TIF 2522 1216
+./Terrestrial vegetation/Terrestrial vegetation_00000089.tif mosaiced_012.TIF 2092 844
+./Deep water/Deep water_00000080.tif mosaiced_012.TIF 5158 1138
+./Deep water/Deep water_00000081.tif mosaiced_012.TIF 5288 1367
+./Deep water/Deep water_00000082.tif mosaiced_012.TIF 4730 1478
+./Deep water/Deep water_00000083.tif mosaiced_012.TIF 5040 1312
+./Deep water/Deep water_00000084.tif mosaiced_012.TIF 1195 1519
+./Deep water/Deep water_00000085.tif mosaiced_012.TIF 4743 1563
+./Deep water/Deep water_00000086.tif mosaiced_012.TIF 3667 1716
+./Deep water/Deep water_00000087.tif mosaiced_012.TIF 910 1653
+./Deep water/Deep water_00000088.tif mosaiced_012.TIF 5139 20
+./Deep water/Deep water_00000089.tif mosaiced_012.TIF 3968 1408
+./Other or Unknown/Other or Unknown_00000080.tif mosaiced_012.TIF 1726 77
+./Other or Unknown/Other or Unknown_00000081.tif mosaiced_012.TIF 4297 960
+./Other or Unknown/Other or Unknown_00000082.tif mosaiced_012.TIF 4199 766
+./Other or Unknown/Other or Unknown_00000083.tif mosaiced_012.TIF 2388 726
+./Other or Unknown/Other or Unknown_00000084.tif mosaiced_012.TIF 1700 1113
+./Other or Unknown/Other or Unknown_00000085.tif mosaiced_012.TIF 1343 884
+./Other or Unknown/Other or Unknown_00000086.tif mosaiced_012.TIF 3784 733
+./Other or Unknown/Other or Unknown_00000087.tif mosaiced_012.TIF 1803 186
+./Other or Unknown/Other or Unknown_00000088.tif mosaiced_012.TIF 1995 10
+./Other or Unknown/Other or Unknown_00000089.tif mosaiced_012.TIF 4224 1131
+./Coral/Coral_00000090.tif mosaiced_013.TIF 1314 118
+./Coral/Coral_00000091.tif mosaiced_013.TIF 3878 2376
+./Coral/Coral_00000092.tif mosaiced_013.TIF 1247 247
+./Coral/Coral_00000093.tif mosaiced_013.TIF 2539 2844
+./Coral/Coral_00000094.tif mosaiced_013.TIF 4845 1344
+./Coral/Coral_00000095.tif mosaiced_013.TIF 4983 1723
+./Coral/Coral_00000096.tif mosaiced_013.TIF 4289 2167
+./Coral/Coral_00000097.tif mosaiced_013.TIF 2391 2846
+./Coral/Coral_00000098.tif mosaiced_013.TIF 1498 53
+./Coral/Coral_00000099.tif mosaiced_013.TIF 4634 1050
+./Sediment/Sediment_00000090.tif mosaiced_013.TIF 810 2156
+./Sediment/Sediment_00000091.tif mosaiced_013.TIF 4633 1310
+./Sediment/Sediment_00000092.tif mosaiced_013.TIF 2880 33
+./Sediment/Sediment_00000093.tif mosaiced_013.TIF 2400 2663
+./Sediment/Sediment_00000094.tif mosaiced_013.TIF 1892 2588
+./Sediment/Sediment_00000095.tif mosaiced_013.TIF 771 993
+./Sediment/Sediment_00000096.tif mosaiced_013.TIF 844 1010
+./Sediment/Sediment_00000097.tif mosaiced_013.TIF 612 1131
+./Sediment/Sediment_00000098.tif mosaiced_013.TIF 4398 1142
+./Sediment/Sediment_00000099.tif mosaiced_013.TIF 3211 243
+./Beach/Beach_00000090.tif mosaiced_013.TIF 1476 239
+./Beach/Beach_00000091.tif mosaiced_013.TIF 4531 1206
+./Beach/Beach_00000092.tif mosaiced_013.TIF 3533 2575
+./Beach/Beach_00000093.tif mosaiced_013.TIF 3696 475
+./Beach/Beach_00000094.tif mosaiced_013.TIF 4619 1427
+./Beach/Beach_00000095.tif mosaiced_013.TIF 2948 2701
+./Beach/Beach_00000096.tif mosaiced_013.TIF 1050 2272
+./Beach/Beach_00000097.tif mosaiced_013.TIF 3321 322
+./Beach/Beach_00000098.tif mosaiced_013.TIF 3247 282
+./Beach/Beach_00000099.tif mosaiced_013.TIF 4491 1221
+./Seagrass/Seagrass_00000090.tif mosaiced_013.TIF 4085 2199
+./Seagrass/Seagrass_00000091.tif mosaiced_013.TIF 1579 2421
+./Seagrass/Seagrass_00000092.tif mosaiced_013.TIF 402 1807
+./Seagrass/Seagrass_00000093.tif mosaiced_013.TIF 1313 2350
+./Seagrass/Seagrass_00000094.tif mosaiced_013.TIF 4183 2085
+./Seagrass/Seagrass_00000095.tif mosaiced_013.TIF 1628 2421
+./Seagrass/Seagrass_00000096.tif mosaiced_013.TIF 4234 2055
+./Seagrass/Seagrass_00000097.tif mosaiced_013.TIF 4153 2123
+./Seagrass/Seagrass_00000098.tif mosaiced_013.TIF 1243 2340
+./Seagrass/Seagrass_00000099.tif mosaiced_013.TIF 1569 2401
+./Terrestrial vegetation/Terrestrial vegetation_00000090.tif mosaiced_013.TIF 1664 789
+./Terrestrial vegetation/Terrestrial vegetation_00000091.tif mosaiced_013.TIF 2114 2568
+./Terrestrial vegetation/Terrestrial vegetation_00000092.tif mosaiced_013.TIF 2914 2537
+./Terrestrial vegetation/Terrestrial vegetation_00000093.tif mosaiced_013.TIF 4077 1237
+./Terrestrial vegetation/Terrestrial vegetation_00000094.tif mosaiced_013.TIF 2063 514
+./Terrestrial vegetation/Terrestrial vegetation_00000095.tif mosaiced_013.TIF 2358 541
+./Terrestrial vegetation/Terrestrial vegetation_00000096.tif mosaiced_013.TIF 3856 697
+./Terrestrial vegetation/Terrestrial vegetation_00000097.tif mosaiced_013.TIF 3106 2583
+./Terrestrial vegetation/Terrestrial vegetation_00000098.tif mosaiced_013.TIF 3300 1579
+./Terrestrial vegetation/Terrestrial vegetation_00000099.tif mosaiced_013.TIF 1158 1478
+./Deep water/Deep water_00000090.tif mosaiced_013.TIF 190 597
+./Deep water/Deep water_00000091.tif mosaiced_013.TIF 4263 3144
+./Deep water/Deep water_00000092.tif mosaiced_013.TIF 4447 575
+./Deep water/Deep water_00000093.tif mosaiced_013.TIF 4108 3004
+./Deep water/Deep water_00000094.tif mosaiced_013.TIF 4447 646
+./Deep water/Deep water_00000095.tif mosaiced_013.TIF 3694 3018
+./Deep water/Deep water_00000096.tif mosaiced_013.TIF 4976 2639
+./Deep water/Deep water_00000097.tif mosaiced_013.TIF 3765 3182
+./Deep water/Deep water_00000098.tif mosaiced_013.TIF 5113 50
+./Deep water/Deep water_00000099.tif mosaiced_013.TIF 460 365
+./Other or Unknown/Other or Unknown_00000090.tif mosaiced_013.TIF 3005 1648
+./Other or Unknown/Other or Unknown_00000091.tif mosaiced_013.TIF 2346 3105
+./Other or Unknown/Other or Unknown_00000092.tif mosaiced_013.TIF 235 2433
+./Other or Unknown/Other or Unknown_00000093.tif mosaiced_013.TIF 3339 3136
+./Other or Unknown/Other or Unknown_00000094.tif mosaiced_013.TIF 1626 1614
+./Other or Unknown/Other or Unknown_00000095.tif mosaiced_013.TIF 3022 1792
+./Other or Unknown/Other or Unknown_00000096.tif mosaiced_013.TIF 2536 3212
+./Other or Unknown/Other or Unknown_00000097.tif mosaiced_013.TIF 322 2423
+./Other or Unknown/Other or Unknown_00000098.tif mosaiced_013.TIF 2465 3024
+./Other or Unknown/Other or Unknown_00000099.tif mosaiced_013.TIF 1610 1742
+./Coral/Coral_00000100.tif mosaiced_014.TIF 3287 1504
+./Coral/Coral_00000101.tif mosaiced_014.TIF 1622 3541
+./Coral/Coral_00000102.tif mosaiced_014.TIF 3426 1869
+./Coral/Coral_00000103.tif mosaiced_014.TIF 254 2634
+./Coral/Coral_00000104.tif mosaiced_014.TIF 2237 3382
+./Coral/Coral_00000105.tif mosaiced_014.TIF 1793 3591
+./Coral/Coral_00000106.tif mosaiced_014.TIF 2641 294
+./Coral/Coral_00000107.tif mosaiced_014.TIF 2337 3387
+./Coral/Coral_00000108.tif mosaiced_014.TIF 949 501
+./Coral/Coral_00000109.tif mosaiced_014.TIF 2366 415
+./Sediment/Sediment_00000100.tif mosaiced_014.TIF 2938 828
+./Sediment/Sediment_00000101.tif mosaiced_014.TIF 740 938
+./Sediment/Sediment_00000102.tif mosaiced_014.TIF 1149 2982
+./Sediment/Sediment_00000103.tif mosaiced_014.TIF 1562 3260
+./Sediment/Sediment_00000104.tif mosaiced_014.TIF 3856 1276
+./Sediment/Sediment_00000105.tif mosaiced_014.TIF 2949 1160
+./Sediment/Sediment_00000106.tif mosaiced_014.TIF 2460 533
+./Sediment/Sediment_00000107.tif mosaiced_014.TIF 2860 1022
+./Sediment/Sediment_00000108.tif mosaiced_014.TIF 2931 795
+./Sediment/Sediment_00000109.tif mosaiced_014.TIF 1111 2998
+./Beach/Beach_00000100.tif mosaiced_014.TIF 3003 2607
+./Beach/Beach_00000101.tif mosaiced_014.TIF 444 2249
+./Beach/Beach_00000102.tif mosaiced_014.TIF 3050 2506
+./Beach/Beach_00000103.tif mosaiced_014.TIF 772 1025
+./Beach/Beach_00000104.tif mosaiced_014.TIF 2321 576
+./Beach/Beach_00000105.tif mosaiced_014.TIF 2922 2705
+./Beach/Beach_00000106.tif mosaiced_014.TIF 2103 3227
+./Beach/Beach_00000107.tif mosaiced_014.TIF 389 2014
+./Beach/Beach_00000108.tif mosaiced_014.TIF 2702 2904
+./Beach/Beach_00000109.tif mosaiced_014.TIF 2391 3132
+./Seagrass/Seagrass_00000100.tif mosaiced_014.TIF 2190 3267
+./Seagrass/Seagrass_00000101.tif mosaiced_014.TIF 2820 2819
+./Seagrass/Seagrass_00000102.tif mosaiced_014.TIF 2836 2794
+./Seagrass/Seagrass_00000103.tif mosaiced_014.TIF 2988 2709
+./Seagrass/Seagrass_00000104.tif mosaiced_014.TIF 2414 3159
+./Seagrass/Seagrass_00000105.tif mosaiced_014.TIF 3138 2413
+./Seagrass/Seagrass_00000106.tif mosaiced_014.TIF 3119 2025
+./Seagrass/Seagrass_00000107.tif mosaiced_014.TIF 3053 2543
+./Seagrass/Seagrass_00000108.tif mosaiced_014.TIF 851 940
+./Seagrass/Seagrass_00000109.tif mosaiced_014.TIF 3125 2113
+./Terrestrial vegetation/Terrestrial vegetation_00000100.tif mosaiced_014.TIF 2466 889
+./Terrestrial vegetation/Terrestrial vegetation_00000101.tif mosaiced_014.TIF 2704 1344
+./Terrestrial vegetation/Terrestrial vegetation_00000102.tif mosaiced_014.TIF 1332 970
+./Terrestrial vegetation/Terrestrial vegetation_00000103.tif mosaiced_014.TIF 1932 3076
+./Terrestrial vegetation/Terrestrial vegetation_00000104.tif mosaiced_014.TIF 2199 2300
+./Terrestrial vegetation/Terrestrial vegetation_00000105.tif mosaiced_014.TIF 1443 2913
+./Terrestrial vegetation/Terrestrial vegetation_00000106.tif mosaiced_014.TIF 2620 1821
+./Terrestrial vegetation/Terrestrial vegetation_00000107.tif mosaiced_014.TIF 1197 953
+./Terrestrial vegetation/Terrestrial vegetation_00000108.tif mosaiced_014.TIF 2546 1414
+./Terrestrial vegetation/Terrestrial vegetation_00000109.tif mosaiced_014.TIF 926 1394
+./Deep water/Deep water_00000100.tif mosaiced_014.TIF 219 634
+./Deep water/Deep water_00000101.tif mosaiced_014.TIF 3530 3633
+./Deep water/Deep water_00000102.tif mosaiced_014.TIF 521 3052
+./Deep water/Deep water_00000103.tif mosaiced_014.TIF 3664 3757
+./Deep water/Deep water_00000104.tif mosaiced_014.TIF 664 3279
+./Deep water/Deep water_00000105.tif mosaiced_014.TIF 3770 2776
+./Deep water/Deep water_00000106.tif mosaiced_014.TIF 109 2795
+./Deep water/Deep water_00000107.tif mosaiced_014.TIF 3621 2862
+./Deep water/Deep water_00000108.tif mosaiced_014.TIF 3743 2372
+./Deep water/Deep water_00000109.tif mosaiced_014.TIF 226 3262
+./Other or Unknown/Other or Unknown_00000100.tif mosaiced_014.TIF 1654 2185
+./Other or Unknown/Other or Unknown_00000101.tif mosaiced_014.TIF 3102 2268
+./Other or Unknown/Other or Unknown_00000102.tif mosaiced_014.TIF 1355 1235
+./Other or Unknown/Other or Unknown_00000103.tif mosaiced_014.TIF 2565 2601
+./Other or Unknown/Other or Unknown_00000104.tif mosaiced_014.TIF 1427 1281
+./Other or Unknown/Other or Unknown_00000105.tif mosaiced_014.TIF 2270 2987
+./Other or Unknown/Other or Unknown_00000106.tif mosaiced_014.TIF 2795 2617
+./Other or Unknown/Other or Unknown_00000107.tif mosaiced_014.TIF 492 2119
+./Other or Unknown/Other or Unknown_00000108.tif mosaiced_014.TIF 1308 1245
+./Other or Unknown/Other or Unknown_00000109.tif mosaiced_014.TIF 1557 2007
+./Coral/Coral_00000110.tif mosaiced_015.TIF 3178 4603
+./Coral/Coral_00000111.tif mosaiced_015.TIF 4072 1572
+./Coral/Coral_00000112.tif mosaiced_015.TIF 5214 4417
+./Coral/Coral_00000113.tif mosaiced_015.TIF 4660 1159
+./Coral/Coral_00000114.tif mosaiced_015.TIF 1422 2203
+./Coral/Coral_00000115.tif mosaiced_015.TIF 3776 4273
+./Coral/Coral_00000116.tif mosaiced_015.TIF 3718 2564
+./Coral/Coral_00000117.tif mosaiced_015.TIF 6141 1646
+./Coral/Coral_00000118.tif mosaiced_015.TIF 5285 3965
+./Coral/Coral_00000119.tif mosaiced_015.TIF 5738 3875
+./Sediment/Sediment_00000110.tif mosaiced_015.TIF 1474 3010
+./Sediment/Sediment_00000111.tif mosaiced_015.TIF 3529 1850
+./Sediment/Sediment_00000112.tif mosaiced_015.TIF 5208 4265
+./Sediment/Sediment_00000113.tif mosaiced_015.TIF 2643 1551
+./Sediment/Sediment_00000114.tif mosaiced_015.TIF 4759 1253
+./Sediment/Sediment_00000115.tif mosaiced_015.TIF 2751 1535
+./Sediment/Sediment_00000116.tif mosaiced_015.TIF 5059 4225
+./Sediment/Sediment_00000117.tif mosaiced_015.TIF 3136 4236
+./Sediment/Sediment_00000118.tif mosaiced_015.TIF 2177 3917
+./Sediment/Sediment_00000119.tif mosaiced_015.TIF 4621 1271
+./Beach/Beach_00000110.tif mosaiced_015.TIF 4742 1571
+./Beach/Beach_00000111.tif mosaiced_015.TIF 5822 2883
+./Beach/Beach_00000112.tif mosaiced_015.TIF 2638 1901
+./Beach/Beach_00000113.tif mosaiced_015.TIF 4694 1790
+./Beach/Beach_00000114.tif mosaiced_015.TIF 5038 1424
+./Beach/Beach_00000115.tif mosaiced_015.TIF 5283 3698
+./Beach/Beach_00000116.tif mosaiced_015.TIF 5049 1424
+./Beach/Beach_00000117.tif mosaiced_015.TIF 5578 3431
+./Beach/Beach_00000118.tif mosaiced_015.TIF 5312 1494
+./Beach/Beach_00000119.tif mosaiced_015.TIF 4998 1295
+./Seagrass/Seagrass_00000110.tif mosaiced_015.TIF 2061 2498
+./Seagrass/Seagrass_00000111.tif mosaiced_015.TIF 2013 2446
+./Seagrass/Seagrass_00000112.tif mosaiced_015.TIF 4666 1683
+./Seagrass/Seagrass_00000113.tif mosaiced_015.TIF 4617 1722
+./Seagrass/Seagrass_00000114.tif mosaiced_015.TIF 3495 4225
+./Seagrass/Seagrass_00000115.tif mosaiced_015.TIF 2867 1808
+./Seagrass/Seagrass_00000116.tif mosaiced_015.TIF 3971 1919
+./Seagrass/Seagrass_00000117.tif mosaiced_015.TIF 4220 1867
+./Seagrass/Seagrass_00000118.tif mosaiced_015.TIF 1952 2728
+./Seagrass/Seagrass_00000119.tif mosaiced_015.TIF 2071 3307
+./Terrestrial vegetation/Terrestrial vegetation_00000110.tif mosaiced_015.TIF 5364 3260
+./Terrestrial vegetation/Terrestrial vegetation_00000111.tif mosaiced_015.TIF 2799 1972
+./Terrestrial vegetation/Terrestrial vegetation_00000112.tif mosaiced_015.TIF 4671 3502
+./Terrestrial vegetation/Terrestrial vegetation_00000113.tif mosaiced_015.TIF 2655 2182
+./Terrestrial vegetation/Terrestrial vegetation_00000114.tif mosaiced_015.TIF 3610 2960
+./Terrestrial vegetation/Terrestrial vegetation_00000115.tif mosaiced_015.TIF 5314 3384
+./Terrestrial vegetation/Terrestrial vegetation_00000116.tif mosaiced_015.TIF 5089 3758
+./Terrestrial vegetation/Terrestrial vegetation_00000117.tif mosaiced_015.TIF 5363 2013
+./Terrestrial vegetation/Terrestrial vegetation_00000118.tif mosaiced_015.TIF 5330 2525
+./Terrestrial vegetation/Terrestrial vegetation_00000119.tif mosaiced_015.TIF 5618 2408
+./Deep water/Deep water_00000110.tif mosaiced_015.TIF 7284 4661
+./Deep water/Deep water_00000111.tif mosaiced_015.TIF 5507 5636
+./Deep water/Deep water_00000112.tif mosaiced_015.TIF 5889 540
+./Deep water/Deep water_00000113.tif mosaiced_015.TIF 3088 4709
+./Deep water/Deep water_00000114.tif mosaiced_015.TIF 1966 4795
+./Deep water/Deep water_00000115.tif mosaiced_015.TIF 6292 1527
+./Deep water/Deep water_00000116.tif mosaiced_015.TIF 236 1502
+./Deep water/Deep water_00000117.tif mosaiced_015.TIF 5288 6309
+./Deep water/Deep water_00000118.tif mosaiced_015.TIF 7305 1264
+./Deep water/Deep water_00000119.tif mosaiced_015.TIF 6318 1888
+./Other or Unknown/Other or Unknown_00000110.tif mosaiced_015.TIF 2525 3310
+./Other or Unknown/Other or Unknown_00000111.tif mosaiced_015.TIF 4850 1612
+./Other or Unknown/Other or Unknown_00000112.tif mosaiced_015.TIF 4847 3522
+./Other or Unknown/Other or Unknown_00000113.tif mosaiced_015.TIF 2735 3584
+./Other or Unknown/Other or Unknown_00000114.tif mosaiced_015.TIF 2942 3274
+./Other or Unknown/Other or Unknown_00000115.tif mosaiced_015.TIF 2572 2504
+./Other or Unknown/Other or Unknown_00000116.tif mosaiced_015.TIF 2689 3336
+./Other or Unknown/Other or Unknown_00000117.tif mosaiced_015.TIF 3537 3207
+./Other or Unknown/Other or Unknown_00000118.tif mosaiced_015.TIF 4362 2789
+./Other or Unknown/Other or Unknown_00000119.tif mosaiced_015.TIF 2114 2317
+./Coral/Coral_00000120.tif mosaiced_016.TIF 6165 2572
+./Coral/Coral_00000121.tif mosaiced_016.TIF 3686 1147
+./Coral/Coral_00000122.tif mosaiced_016.TIF 1957 3661
+./Coral/Coral_00000123.tif mosaiced_016.TIF 4509 3929
+./Coral/Coral_00000124.tif mosaiced_016.TIF 3496 3906
+./Coral/Coral_00000125.tif mosaiced_016.TIF 1875 2163
+./Coral/Coral_00000126.tif mosaiced_016.TIF 1747 1807
+./Coral/Coral_00000127.tif mosaiced_016.TIF 2386 3917
+./Coral/Coral_00000128.tif mosaiced_016.TIF 3512 1683
+./Coral/Coral_00000129.tif mosaiced_016.TIF 5812 1728
+./Sediment/Sediment_00000120.tif mosaiced_016.TIF 3581 4006
+./Sediment/Sediment_00000121.tif mosaiced_016.TIF 2898 3994
+./Sediment/Sediment_00000122.tif mosaiced_016.TIF 2342 1399
+./Sediment/Sediment_00000123.tif mosaiced_016.TIF 1744 2522
+./Sediment/Sediment_00000124.tif mosaiced_016.TIF 3625 4007
+./Sediment/Sediment_00000125.tif mosaiced_016.TIF 3625 3967
+./Sediment/Sediment_00000126.tif mosaiced_016.TIF 3506 1766
+./Sediment/Sediment_00000127.tif mosaiced_016.TIF 2348 1401
+./Sediment/Sediment_00000128.tif mosaiced_016.TIF 1521 2933
+./Sediment/Sediment_00000129.tif mosaiced_016.TIF 1615 2331
+./Beach/Beach_00000120.tif mosaiced_016.TIF 5010 1135
+./Beach/Beach_00000121.tif mosaiced_016.TIF 4819 1095
+./Beach/Beach_00000122.tif mosaiced_016.TIF 5031 1164
+./Beach/Beach_00000123.tif mosaiced_016.TIF 5081 1217
+./Beach/Beach_00000124.tif mosaiced_016.TIF 5780 2743
+./Beach/Beach_00000125.tif mosaiced_016.TIF 5888 2553
+./Beach/Beach_00000126.tif mosaiced_016.TIF 5667 2987
+./Beach/Beach_00000127.tif mosaiced_016.TIF 5808 2656
+./Beach/Beach_00000128.tif mosaiced_016.TIF 4749 1313
+./Beach/Beach_00000129.tif mosaiced_016.TIF 5013 1129
+./Seagrass/Seagrass_00000120.tif mosaiced_016.TIF 4672 1496
+./Seagrass/Seagrass_00000121.tif mosaiced_016.TIF 4772 1236
+./Seagrass/Seagrass_00000122.tif mosaiced_016.TIF 2006 2479
+./Seagrass/Seagrass_00000123.tif mosaiced_016.TIF 3513 3920
+./Seagrass/Seagrass_00000124.tif mosaiced_016.TIF 1929 1890
+./Seagrass/Seagrass_00000125.tif mosaiced_016.TIF 3121 1593
+./Seagrass/Seagrass_00000126.tif mosaiced_016.TIF 1820 2907
+./Seagrass/Seagrass_00000127.tif mosaiced_016.TIF 2887 1567
+./Seagrass/Seagrass_00000128.tif mosaiced_016.TIF 3424 3902
+./Seagrass/Seagrass_00000129.tif mosaiced_016.TIF 1868 2673
+./Terrestrial vegetation/Terrestrial vegetation_00000120.tif mosaiced_016.TIF 4099 2646
+./Terrestrial vegetation/Terrestrial vegetation_00000121.tif mosaiced_016.TIF 4766 1881
+./Terrestrial vegetation/Terrestrial vegetation_00000122.tif mosaiced_016.TIF 2626 2806
+./Terrestrial vegetation/Terrestrial vegetation_00000123.tif mosaiced_016.TIF 3190 3017
+./Terrestrial vegetation/Terrestrial vegetation_00000124.tif mosaiced_016.TIF 2840 3498
+./Terrestrial vegetation/Terrestrial vegetation_00000125.tif mosaiced_016.TIF 3323 3633
+./Terrestrial vegetation/Terrestrial vegetation_00000126.tif mosaiced_016.TIF 5043 1149
+./Terrestrial vegetation/Terrestrial vegetation_00000127.tif mosaiced_016.TIF 4706 3768
+./Terrestrial vegetation/Terrestrial vegetation_00000128.tif mosaiced_016.TIF 5316 3038
+./Terrestrial vegetation/Terrestrial vegetation_00000129.tif mosaiced_016.TIF 4226 2514
+./Deep water/Deep water_00000120.tif mosaiced_016.TIF 1455 5629
+./Deep water/Deep water_00000121.tif mosaiced_016.TIF 2975 4841
+./Deep water/Deep water_00000122.tif mosaiced_016.TIF 494 2850
+./Deep water/Deep water_00000123.tif mosaiced_016.TIF 880 4591
+./Deep water/Deep water_00000124.tif mosaiced_016.TIF 6374 2237
+./Deep water/Deep water_00000125.tif mosaiced_016.TIF 302 788
+./Deep water/Deep water_00000126.tif mosaiced_016.TIF 7152 5550
+./Deep water/Deep water_00000127.tif mosaiced_016.TIF 2521 5299
+./Deep water/Deep water_00000128.tif mosaiced_016.TIF 1767 1444
+./Deep water/Deep water_00000129.tif mosaiced_016.TIF 3499 4996
+./Other or Unknown/Other or Unknown_00000120.tif mosaiced_016.TIF 2706 2989
+./Other or Unknown/Other or Unknown_00000121.tif mosaiced_016.TIF 5872 4907
+./Other or Unknown/Other or Unknown_00000122.tif mosaiced_016.TIF 1098 2399
+./Other or Unknown/Other or Unknown_00000123.tif mosaiced_016.TIF 5916 1729
+./Other or Unknown/Other or Unknown_00000124.tif mosaiced_016.TIF 5226 6074
+./Other or Unknown/Other or Unknown_00000125.tif mosaiced_016.TIF 4376 814
+./Other or Unknown/Other or Unknown_00000126.tif mosaiced_016.TIF 4579 2716
+./Other or Unknown/Other or Unknown_00000127.tif mosaiced_016.TIF 2716 2803
+./Other or Unknown/Other or Unknown_00000128.tif mosaiced_016.TIF 4408 950
+./Other or Unknown/Other or Unknown_00000129.tif mosaiced_016.TIF 165 3167
+./Coral/Coral_00000130.tif mosaiced_017.TIF 2493 2190
+./Coral/Coral_00000131.tif mosaiced_017.TIF 2216 1787
+./Coral/Coral_00000132.tif mosaiced_017.TIF 4425 1346
+./Coral/Coral_00000133.tif mosaiced_017.TIF 2725 1647
+./Coral/Coral_00000134.tif mosaiced_017.TIF 1776 2814
+./Coral/Coral_00000135.tif mosaiced_017.TIF 1246 3368
+./Coral/Coral_00000136.tif mosaiced_017.TIF 3841 4810
+./Coral/Coral_00000137.tif mosaiced_017.TIF 2541 4559
+./Coral/Coral_00000138.tif mosaiced_017.TIF 2781 1676
+./Coral/Coral_00000139.tif mosaiced_017.TIF 5557 4416
+./Sediment/Sediment_00000130.tif mosaiced_017.TIF 2863 2103
+./Sediment/Sediment_00000131.tif mosaiced_017.TIF 3083 2124
+./Sediment/Sediment_00000132.tif mosaiced_017.TIF 1769 3729
+./Sediment/Sediment_00000133.tif mosaiced_017.TIF 5317 4251
+./Sediment/Sediment_00000134.tif mosaiced_017.TIF 1919 2647
+./Sediment/Sediment_00000135.tif mosaiced_017.TIF 5983 3856
+./Sediment/Sediment_00000136.tif mosaiced_017.TIF 3617 4713
+./Sediment/Sediment_00000137.tif mosaiced_017.TIF 4051 5532
+./Sediment/Sediment_00000138.tif mosaiced_017.TIF 2092 4137
+./Sediment/Sediment_00000139.tif mosaiced_017.TIF 3691 4578
+./Beach/Beach_00000130.tif mosaiced_017.TIF 4948 1654
+./Beach/Beach_00000131.tif mosaiced_017.TIF 5080 1882
+./Beach/Beach_00000132.tif mosaiced_017.TIF 5577 3846
+./Beach/Beach_00000133.tif mosaiced_017.TIF 4763 2144
+./Beach/Beach_00000134.tif mosaiced_017.TIF 4744 1986
+./Beach/Beach_00000135.tif mosaiced_017.TIF 5854 3253
+./Beach/Beach_00000136.tif mosaiced_017.TIF 4987 1698
+./Beach/Beach_00000137.tif mosaiced_017.TIF 5686 3617
+./Beach/Beach_00000138.tif mosaiced_017.TIF 5350 4057
+./Beach/Beach_00000139.tif mosaiced_017.TIF 4959 1678
+./Seagrass/Seagrass_00000130.tif mosaiced_017.TIF 3425 4607
+./Seagrass/Seagrass_00000131.tif mosaiced_017.TIF 4516 4680
+./Seagrass/Seagrass_00000132.tif mosaiced_017.TIF 4475 2180
+./Seagrass/Seagrass_00000133.tif mosaiced_017.TIF 3205 4424
+./Seagrass/Seagrass_00000134.tif mosaiced_017.TIF 1974 3665
+./Seagrass/Seagrass_00000135.tif mosaiced_017.TIF 2303 4026
+./Seagrass/Seagrass_00000136.tif mosaiced_017.TIF 4868 4640
+./Seagrass/Seagrass_00000137.tif mosaiced_017.TIF 1996 2588
+./Seagrass/Seagrass_00000138.tif mosaiced_017.TIF 4608 2177
+./Seagrass/Seagrass_00000139.tif mosaiced_017.TIF 2092 3747
+./Terrestrial vegetation/Terrestrial vegetation_00000130.tif mosaiced_017.TIF 2045 3439
+./Terrestrial vegetation/Terrestrial vegetation_00000131.tif mosaiced_017.TIF 2681 2670
+./Terrestrial vegetation/Terrestrial vegetation_00000132.tif mosaiced_017.TIF 4213 3075
+./Terrestrial vegetation/Terrestrial vegetation_00000133.tif mosaiced_017.TIF 3496 3227
+./Terrestrial vegetation/Terrestrial vegetation_00000134.tif mosaiced_017.TIF 3314 4294
+./Terrestrial vegetation/Terrestrial vegetation_00000135.tif mosaiced_017.TIF 5731 2805
+./Terrestrial vegetation/Terrestrial vegetation_00000136.tif mosaiced_017.TIF 5340 1934
+./Terrestrial vegetation/Terrestrial vegetation_00000137.tif mosaiced_017.TIF 2802 3535
+./Terrestrial vegetation/Terrestrial vegetation_00000138.tif mosaiced_017.TIF 4583 4163
+./Terrestrial vegetation/Terrestrial vegetation_00000139.tif mosaiced_017.TIF 4632 4400
+./Deep water/Deep water_00000130.tif mosaiced_017.TIF 421 6096
+./Deep water/Deep water_00000131.tif mosaiced_017.TIF 344 4414
+./Deep water/Deep water_00000132.tif mosaiced_017.TIF 7070 5471
+./Deep water/Deep water_00000133.tif mosaiced_017.TIF 6097 5570
+./Deep water/Deep water_00000134.tif mosaiced_017.TIF 7224 3904
+./Deep water/Deep water_00000135.tif mosaiced_017.TIF 2837 5844
+./Deep water/Deep water_00000136.tif mosaiced_017.TIF 390 5518
+./Deep water/Deep water_00000137.tif mosaiced_017.TIF 1204 4609
+./Deep water/Deep water_00000138.tif mosaiced_017.TIF 3641 5979
+./Deep water/Deep water_00000139.tif mosaiced_017.TIF 134 3997
+./Other or Unknown/Other or Unknown_00000130.tif mosaiced_017.TIF 5227 311
+./Other or Unknown/Other or Unknown_00000131.tif mosaiced_017.TIF 2590 1532
+./Other or Unknown/Other or Unknown_00000132.tif mosaiced_017.TIF 2132 1224
+./Other or Unknown/Other or Unknown_00000133.tif mosaiced_017.TIF 4822 1961
+./Other or Unknown/Other or Unknown_00000134.tif mosaiced_017.TIF 3086 1841
+./Other or Unknown/Other or Unknown_00000135.tif mosaiced_017.TIF 5427 1135
+./Other or Unknown/Other or Unknown_00000136.tif mosaiced_017.TIF 4566 1251
+./Other or Unknown/Other or Unknown_00000137.tif mosaiced_017.TIF 3602 361
+./Other or Unknown/Other or Unknown_00000138.tif mosaiced_017.TIF 3073 2773
+./Other or Unknown/Other or Unknown_00000139.tif mosaiced_017.TIF 4782 1357
+./Coral/Coral_00000140.tif mosaiced_018.TIF 6253 2367
+./Coral/Coral_00000141.tif mosaiced_018.TIF 5902 3964
+./Coral/Coral_00000142.tif mosaiced_018.TIF 4462 4605
+./Coral/Coral_00000143.tif mosaiced_018.TIF 1698 3435
+./Coral/Coral_00000144.tif mosaiced_018.TIF 4466 5586
+./Coral/Coral_00000145.tif mosaiced_018.TIF 5292 1462
+./Coral/Coral_00000146.tif mosaiced_018.TIF 1809 4347
+./Coral/Coral_00000147.tif mosaiced_018.TIF 4597 5478
+./Coral/Coral_00000148.tif mosaiced_018.TIF 4145 4939
+./Coral/Coral_00000149.tif mosaiced_018.TIF 3199 4883
+./Sediment/Sediment_00000140.tif mosaiced_018.TIF 4593 4967
+./Sediment/Sediment_00000141.tif mosaiced_018.TIF 4429 2010
+./Sediment/Sediment_00000142.tif mosaiced_018.TIF 4723 1687
+./Sediment/Sediment_00000143.tif mosaiced_018.TIF 1987 3909
+./Sediment/Sediment_00000144.tif mosaiced_018.TIF 4040 5522
+./Sediment/Sediment_00000145.tif mosaiced_018.TIF 5663 4110
+./Sediment/Sediment_00000146.tif mosaiced_018.TIF 4726 1821
+./Sediment/Sediment_00000147.tif mosaiced_018.TIF 2463 2156
+./Sediment/Sediment_00000148.tif mosaiced_018.TIF 4786 1685
+./Sediment/Sediment_00000149.tif mosaiced_018.TIF 2018 4250
+./Beach/Beach_00000140.tif mosaiced_018.TIF 5726 2591
+./Beach/Beach_00000141.tif mosaiced_018.TIF 5728 2603
+./Beach/Beach_00000142.tif mosaiced_018.TIF 4753 2151
+./Beach/Beach_00000143.tif mosaiced_018.TIF 5352 4059
+./Beach/Beach_00000144.tif mosaiced_018.TIF 5849 3249
+./Beach/Beach_00000145.tif mosaiced_018.TIF 5714 2586
+./Beach/Beach_00000146.tif mosaiced_018.TIF 5048 1834
+./Beach/Beach_00000147.tif mosaiced_018.TIF 5671 3658
+./Beach/Beach_00000148.tif mosaiced_018.TIF 5056 1839
+./Beach/Beach_00000149.tif mosaiced_018.TIF 5295 1909
+./Seagrass/Seagrass_00000140.tif mosaiced_018.TIF 5748 2257
+./Seagrass/Seagrass_00000141.tif mosaiced_018.TIF 1675 3283
+./Seagrass/Seagrass_00000142.tif mosaiced_018.TIF 3570 4220
+./Seagrass/Seagrass_00000143.tif mosaiced_018.TIF 4706 1933
+./Seagrass/Seagrass_00000144.tif mosaiced_018.TIF 5448 1867
+./Seagrass/Seagrass_00000145.tif mosaiced_018.TIF 2059 2840
+./Seagrass/Seagrass_00000146.tif mosaiced_018.TIF 2198 3825
+./Seagrass/Seagrass_00000147.tif mosaiced_018.TIF 2165 2567
+./Seagrass/Seagrass_00000148.tif mosaiced_018.TIF 5776 3487
+./Seagrass/Seagrass_00000149.tif mosaiced_018.TIF 4409 4631
+./Terrestrial vegetation/Terrestrial vegetation_00000140.tif mosaiced_018.TIF 5831 3261
+./Terrestrial vegetation/Terrestrial vegetation_00000141.tif mosaiced_018.TIF 5225 3893
+./Terrestrial vegetation/Terrestrial vegetation_00000142.tif mosaiced_018.TIF 4870 4556
+./Terrestrial vegetation/Terrestrial vegetation_00000143.tif mosaiced_018.TIF 4969 1848
+./Terrestrial vegetation/Terrestrial vegetation_00000144.tif mosaiced_018.TIF 4242 4224
+./Terrestrial vegetation/Terrestrial vegetation_00000145.tif mosaiced_018.TIF 3645 3252
+./Terrestrial vegetation/Terrestrial vegetation_00000146.tif mosaiced_018.TIF 5552 2667
+./Terrestrial vegetation/Terrestrial vegetation_00000147.tif mosaiced_018.TIF 3053 3570
+./Terrestrial vegetation/Terrestrial vegetation_00000148.tif mosaiced_018.TIF 5010 3311
+./Terrestrial vegetation/Terrestrial vegetation_00000149.tif mosaiced_018.TIF 4776 3826
+./Deep water/Deep water_00000140.tif mosaiced_018.TIF 7150 237
+./Deep water/Deep water_00000141.tif mosaiced_018.TIF 2184 6257
+./Deep water/Deep water_00000142.tif mosaiced_018.TIF 6069 5534
+./Deep water/Deep water_00000143.tif mosaiced_018.TIF 1618 1425
+./Deep water/Deep water_00000144.tif mosaiced_018.TIF 756 1920
+./Deep water/Deep water_00000145.tif mosaiced_018.TIF 5627 768
+./Deep water/Deep water_00000146.tif mosaiced_018.TIF 1019 3744
+./Deep water/Deep water_00000147.tif mosaiced_018.TIF 71 6453
+./Deep water/Deep water_00000148.tif mosaiced_018.TIF 5484 490
+./Deep water/Deep water_00000149.tif mosaiced_018.TIF 6953 5219
+./Other or Unknown/Other or Unknown_00000140.tif mosaiced_018.TIF 1348 1312
+./Other or Unknown/Other or Unknown_00000141.tif mosaiced_018.TIF 3146 2830
+./Other or Unknown/Other or Unknown_00000142.tif mosaiced_018.TIF 2288 5832
+./Other or Unknown/Other or Unknown_00000143.tif mosaiced_018.TIF 4345 3326
+./Other or Unknown/Other or Unknown_00000144.tif mosaiced_018.TIF 3064 882
+./Other or Unknown/Other or Unknown_00000145.tif mosaiced_018.TIF 2583 1781
+./Other or Unknown/Other or Unknown_00000146.tif mosaiced_018.TIF 1032 1806
+./Other or Unknown/Other or Unknown_00000147.tif mosaiced_018.TIF 4648 3972
+./Other or Unknown/Other or Unknown_00000148.tif mosaiced_018.TIF 168 2802
+./Other or Unknown/Other or Unknown_00000149.tif mosaiced_018.TIF 2555 1784
+./Coral/Coral_00000150.tif mosaiced_020.TIF 2573 5000
+./Coral/Coral_00000151.tif mosaiced_020.TIF 4670 3373
+./Coral/Coral_00000152.tif mosaiced_020.TIF 887 5352
+./Coral/Coral_00000153.tif mosaiced_020.TIF 2658 6142
+./Coral/Coral_00000154.tif mosaiced_020.TIF 4322 5376
+./Coral/Coral_00000155.tif mosaiced_020.TIF 2683 657
+./Coral/Coral_00000156.tif mosaiced_020.TIF 1204 3216
+./Coral/Coral_00000157.tif mosaiced_020.TIF 2240 4022
+./Coral/Coral_00000158.tif mosaiced_020.TIF 6533 2367
+./Coral/Coral_00000159.tif mosaiced_020.TIF 5057 1679
+./Sediment/Sediment_00000150.tif mosaiced_020.TIF 5369 1510
+./Sediment/Sediment_00000151.tif mosaiced_020.TIF 673 5100
+./Sediment/Sediment_00000152.tif mosaiced_020.TIF 1668 5106
+./Sediment/Sediment_00000153.tif mosaiced_020.TIF 5253 1547
+./Sediment/Sediment_00000154.tif mosaiced_020.TIF 7053 1980
+./Sediment/Sediment_00000155.tif mosaiced_020.TIF 7343 1804
+./Sediment/Sediment_00000156.tif mosaiced_020.TIF 6827 2457
+./Sediment/Sediment_00000157.tif mosaiced_020.TIF 5065 1936
+./Sediment/Sediment_00000158.tif mosaiced_020.TIF 2533 2781
+./Sediment/Sediment_00000159.tif mosaiced_020.TIF 6717 2461
+./Beach/Beach_00000150.tif mosaiced_020.TIF 7319 1665
+./Beach/Beach_00000151.tif mosaiced_020.TIF 2766 4435
+./Beach/Beach_00000152.tif mosaiced_020.TIF 5753 2732
+./Beach/Beach_00000153.tif mosaiced_020.TIF 2582 3054
+./Beach/Beach_00000154.tif mosaiced_020.TIF 3065 4537
+./Beach/Beach_00000155.tif mosaiced_020.TIF 2690 4239
+./Beach/Beach_00000156.tif mosaiced_020.TIF 2562 2974
+./Beach/Beach_00000157.tif mosaiced_020.TIF 3107 4537
+./Beach/Beach_00000158.tif mosaiced_020.TIF 2729 4337
+./Beach/Beach_00000159.tif mosaiced_020.TIF 2741 4391
+./Seagrass/Seagrass_00000150.tif mosaiced_020.TIF 2482 3914
+./Seagrass/Seagrass_00000151.tif mosaiced_020.TIF 6879 1877
+./Seagrass/Seagrass_00000152.tif mosaiced_020.TIF 3653 4277
+./Seagrass/Seagrass_00000153.tif mosaiced_020.TIF 2438 3261
+./Seagrass/Seagrass_00000154.tif mosaiced_020.TIF 6785 1935
+./Seagrass/Seagrass_00000155.tif mosaiced_020.TIF 3196 767
+./Seagrass/Seagrass_00000156.tif mosaiced_020.TIF 2466 3750
+./Seagrass/Seagrass_00000157.tif mosaiced_020.TIF 3053 599
+./Seagrass/Seagrass_00000158.tif mosaiced_020.TIF 6803 2003
+./Seagrass/Seagrass_00000159.tif mosaiced_020.TIF 3991 2900
+./Terrestrial vegetation/Terrestrial vegetation_00000150.tif mosaiced_020.TIF 5578 1046
+./Terrestrial vegetation/Terrestrial vegetation_00000151.tif mosaiced_020.TIF 6402 676
+./Terrestrial vegetation/Terrestrial vegetation_00000152.tif mosaiced_020.TIF 3382 849
+./Terrestrial vegetation/Terrestrial vegetation_00000153.tif mosaiced_020.TIF 7419 1361
+./Terrestrial vegetation/Terrestrial vegetation_00000154.tif mosaiced_020.TIF 7019 445
+./Terrestrial vegetation/Terrestrial vegetation_00000155.tif mosaiced_020.TIF 6704 1164
+./Terrestrial vegetation/Terrestrial vegetation_00000156.tif mosaiced_020.TIF 2850 2800
+./Terrestrial vegetation/Terrestrial vegetation_00000157.tif mosaiced_020.TIF 3577 3808
+./Terrestrial vegetation/Terrestrial vegetation_00000158.tif mosaiced_020.TIF 7374 692
+./Terrestrial vegetation/Terrestrial vegetation_00000159.tif mosaiced_020.TIF 5025 1340
+./Deep water/Deep water_00000150.tif mosaiced_020.TIF 80 3633
+./Deep water/Deep water_00000151.tif mosaiced_020.TIF 3546 4966
+./Deep water/Deep water_00000152.tif mosaiced_020.TIF 846 2000
+./Deep water/Deep water_00000153.tif mosaiced_020.TIF 1301 2359
+./Deep water/Deep water_00000154.tif mosaiced_020.TIF 1212 4813
+./Deep water/Deep water_00000155.tif mosaiced_020.TIF 5688 5948
+./Deep water/Deep water_00000156.tif mosaiced_020.TIF 6795 6322
+./Deep water/Deep water_00000157.tif mosaiced_020.TIF 1529 3335
+./Deep water/Deep water_00000158.tif mosaiced_020.TIF 604 3460
+./Deep water/Deep water_00000159.tif mosaiced_020.TIF 4894 6289
+./Other or Unknown/Other or Unknown_00000150.tif mosaiced_020.TIF 4607 1916
+./Other or Unknown/Other or Unknown_00000151.tif mosaiced_020.TIF 6184 1128
+./Other or Unknown/Other or Unknown_00000152.tif mosaiced_020.TIF 2382 1313
+./Other or Unknown/Other or Unknown_00000153.tif mosaiced_020.TIF 2321 1193
+./Other or Unknown/Other or Unknown_00000154.tif mosaiced_020.TIF 3023 2527
+./Other or Unknown/Other or Unknown_00000155.tif mosaiced_020.TIF 2485 55
+./Other or Unknown/Other or Unknown_00000156.tif mosaiced_020.TIF 4016 2438
+./Other or Unknown/Other or Unknown_00000157.tif mosaiced_020.TIF 2737 3593
+./Other or Unknown/Other or Unknown_00000158.tif mosaiced_020.TIF 2861 2308
+./Other or Unknown/Other or Unknown_00000159.tif mosaiced_020.TIF 4280 1819
+./Coral/Coral_00000160.tif mosaiced_021.TIF 2178 1126
+./Coral/Coral_00000161.tif mosaiced_021.TIF 7628 2814
+./Coral/Coral_00000162.tif mosaiced_021.TIF 3660 2147
+./Coral/Coral_00000163.tif mosaiced_021.TIF 3638 3380
+./Coral/Coral_00000164.tif mosaiced_021.TIF 7711 3336
+./Coral/Coral_00000165.tif mosaiced_021.TIF 3022 1521
+./Coral/Coral_00000166.tif mosaiced_021.TIF 1128 2101
+./Coral/Coral_00000167.tif mosaiced_021.TIF 3395 1919
+./Coral/Coral_00000168.tif mosaiced_021.TIF 7492 2542
+./Coral/Coral_00000169.tif mosaiced_021.TIF 2214 1737
+./Sediment/Sediment_00000160.tif mosaiced_021.TIF 6519 2989
+./Sediment/Sediment_00000161.tif mosaiced_021.TIF 6630 2879
+./Sediment/Sediment_00000162.tif mosaiced_021.TIF 6933 2871
+./Sediment/Sediment_00000163.tif mosaiced_021.TIF 7317 3062
+./Sediment/Sediment_00000164.tif mosaiced_021.TIF 930 3052
+./Sediment/Sediment_00000165.tif mosaiced_021.TIF 6705 2238
+./Sediment/Sediment_00000166.tif mosaiced_021.TIF 4716 2649
+./Sediment/Sediment_00000167.tif mosaiced_021.TIF 1610 876
+./Sediment/Sediment_00000168.tif mosaiced_021.TIF 1538 1783
+./Sediment/Sediment_00000169.tif mosaiced_021.TIF 6133 2569
+./Beach/Beach_00000160.tif mosaiced_021.TIF 1876 1812
+./Beach/Beach_00000161.tif mosaiced_021.TIF 1880 1816
+./Beach/Beach_00000162.tif mosaiced_021.TIF 1898 1817
+./Beach/Beach_00000163.tif mosaiced_021.TIF 2030 1905
+./Beach/Beach_00000164.tif mosaiced_021.TIF 1868 1794
+./Beach/Beach_00000165.tif mosaiced_021.TIF 1889 1803
+./Beach/Beach_00000166.tif mosaiced_021.TIF 1894 1821
+./Beach/Beach_00000167.tif mosaiced_021.TIF 1885 1816
+./Beach/Beach_00000168.tif mosaiced_021.TIF 1871 1805
+./Beach/Beach_00000169.tif mosaiced_021.TIF 1868 1801
+./Seagrass/Seagrass_00000160.tif mosaiced_021.TIF 1017 3189
+./Seagrass/Seagrass_00000161.tif mosaiced_021.TIF 1070 3009
+./Seagrass/Seagrass_00000162.tif mosaiced_021.TIF 2339 1886
+./Seagrass/Seagrass_00000163.tif mosaiced_021.TIF 650 3375
+./Seagrass/Seagrass_00000164.tif mosaiced_021.TIF 2091 1830
+./Seagrass/Seagrass_00000165.tif mosaiced_021.TIF 2156 1836
+./Seagrass/Seagrass_00000166.tif mosaiced_021.TIF 1968 1857
+./Seagrass/Seagrass_00000167.tif mosaiced_021.TIF 2219 1848
+./Seagrass/Seagrass_00000168.tif mosaiced_021.TIF 600 3455
+./Seagrass/Seagrass_00000169.tif mosaiced_021.TIF 2374 1948
+./Terrestrial vegetation/Terrestrial vegetation_00000160.tif mosaiced_021.TIF 1441 2827
+./Terrestrial vegetation/Terrestrial vegetation_00000161.tif mosaiced_021.TIF 2723 2455
+./Terrestrial vegetation/Terrestrial vegetation_00000162.tif mosaiced_021.TIF 2541 2985
+./Terrestrial vegetation/Terrestrial vegetation_00000163.tif mosaiced_021.TIF 3033 3398
+./Terrestrial vegetation/Terrestrial vegetation_00000164.tif mosaiced_021.TIF 1535 3338
+./Terrestrial vegetation/Terrestrial vegetation_00000165.tif mosaiced_021.TIF 2917 3054
+./Terrestrial vegetation/Terrestrial vegetation_00000166.tif mosaiced_021.TIF 2550 2572
+./Terrestrial vegetation/Terrestrial vegetation_00000167.tif mosaiced_021.TIF 2109 3326
+./Terrestrial vegetation/Terrestrial vegetation_00000168.tif mosaiced_021.TIF 2632 2377
+./Terrestrial vegetation/Terrestrial vegetation_00000169.tif mosaiced_021.TIF 1182 3309
+./Deep water/Deep water_00000160.tif mosaiced_021.TIF 7565 1177
+./Deep water/Deep water_00000161.tif mosaiced_021.TIF 7130 3087
+./Deep water/Deep water_00000162.tif mosaiced_021.TIF 4417 2383
+./Deep water/Deep water_00000163.tif mosaiced_021.TIF 6187 1115
+./Deep water/Deep water_00000164.tif mosaiced_021.TIF 5029 3295
+./Deep water/Deep water_00000165.tif mosaiced_021.TIF 5680 476
+./Deep water/Deep water_00000166.tif mosaiced_021.TIF 7587 1565
+./Deep water/Deep water_00000167.tif mosaiced_021.TIF 4361 1319
+./Deep water/Deep water_00000168.tif mosaiced_021.TIF 4798 692
+./Deep water/Deep water_00000169.tif mosaiced_021.TIF 2333 597
+./Other or Unknown/Other or Unknown_00000160.tif mosaiced_021.TIF 1679 3061
+./Other or Unknown/Other or Unknown_00000161.tif mosaiced_021.TIF 1231 3057
+./Other or Unknown/Other or Unknown_00000162.tif mosaiced_021.TIF 1342 3151
+./Other or Unknown/Other or Unknown_00000163.tif mosaiced_021.TIF 3162 3372
+./Other or Unknown/Other or Unknown_00000164.tif mosaiced_021.TIF 2137 2422
+./Other or Unknown/Other or Unknown_00000165.tif mosaiced_021.TIF 1855 1791
+./Other or Unknown/Other or Unknown_00000166.tif mosaiced_021.TIF 1726 3215
+./Other or Unknown/Other or Unknown_00000167.tif mosaiced_021.TIF 1483 2777
+./Other or Unknown/Other or Unknown_00000168.tif mosaiced_021.TIF 3896 2822
+./Other or Unknown/Other or Unknown_00000169.tif mosaiced_021.TIF 1170 3135
+./Coral/Coral_00000170.tif mosaiced_023.TIF 2160 3217
+./Coral/Coral_00000171.tif mosaiced_023.TIF 1970 2933
+./Coral/Coral_00000172.tif mosaiced_023.TIF 2698 1289
+./Coral/Coral_00000173.tif mosaiced_023.TIF 1655 470
+./Coral/Coral_00000174.tif mosaiced_023.TIF 2747 1317
+./Coral/Coral_00000175.tif mosaiced_023.TIF 295 1611
+./Coral/Coral_00000176.tif mosaiced_023.TIF 684 2543
+./Coral/Coral_00000177.tif mosaiced_023.TIF 232 894
+./Coral/Coral_00000178.tif mosaiced_023.TIF 1560 2990
+./Coral/Coral_00000179.tif mosaiced_023.TIF 1393 2758
+./Sediment/Sediment_00000170.tif mosaiced_023.TIF 469 1953
+./Sediment/Sediment_00000171.tif mosaiced_023.TIF 3054 2153
+./Sediment/Sediment_00000172.tif mosaiced_023.TIF 3077 1746
+./Sediment/Sediment_00000173.tif mosaiced_023.TIF 799 2455
+./Sediment/Sediment_00000174.tif mosaiced_023.TIF 491 2253
+./Sediment/Sediment_00000175.tif mosaiced_023.TIF 398 2122
+./Sediment/Sediment_00000176.tif mosaiced_023.TIF 3101 2008
+./Sediment/Sediment_00000177.tif mosaiced_023.TIF 2434 2891
+./Sediment/Sediment_00000178.tif mosaiced_023.TIF 797 2517
+./Sediment/Sediment_00000179.tif mosaiced_023.TIF 341 2032
+./Beach/Beach_00000170.tif mosaiced_023.TIF 1730 510
+./Beach/Beach_00000171.tif mosaiced_023.TIF 2627 2773
+./Beach/Beach_00000172.tif mosaiced_023.TIF 1699 513
+./Beach/Beach_00000173.tif mosaiced_023.TIF 1672 2799
+./Beach/Beach_00000174.tif mosaiced_023.TIF 1752 536
+./Beach/Beach_00000175.tif mosaiced_023.TIF 1618 2767
+./Beach/Beach_00000176.tif mosaiced_023.TIF 751 555
+./Beach/Beach_00000177.tif mosaiced_023.TIF 1463 2703
+./Beach/Beach_00000178.tif mosaiced_023.TIF 486 1470
+./Beach/Beach_00000179.tif mosaiced_023.TIF 1435 2698
+./Seagrass/Seagrass_00000170.tif mosaiced_023.TIF 1463 2796
+./Seagrass/Seagrass_00000171.tif mosaiced_023.TIF 553 1851
+./Seagrass/Seagrass_00000172.tif mosaiced_023.TIF 549 1732
+./Seagrass/Seagrass_00000173.tif mosaiced_023.TIF 833 2223
+./Seagrass/Seagrass_00000174.tif mosaiced_023.TIF 2174 2898
+./Seagrass/Seagrass_00000175.tif mosaiced_023.TIF 907 2291
+./Seagrass/Seagrass_00000176.tif mosaiced_023.TIF 1243 2674
+./Seagrass/Seagrass_00000177.tif mosaiced_023.TIF 512 1749
+./Seagrass/Seagrass_00000178.tif mosaiced_023.TIF 1020 2503
+./Seagrass/Seagrass_00000179.tif mosaiced_023.TIF 949 2455
+./Terrestrial vegetation/Terrestrial vegetation_00000170.tif mosaiced_023.TIF 1264 2320
+./Terrestrial vegetation/Terrestrial vegetation_00000171.tif mosaiced_023.TIF 1406 2011
+./Terrestrial vegetation/Terrestrial vegetation_00000172.tif mosaiced_023.TIF 2316 1661
+./Terrestrial vegetation/Terrestrial vegetation_00000173.tif mosaiced_023.TIF 1937 2848
+./Terrestrial vegetation/Terrestrial vegetation_00000174.tif mosaiced_023.TIF 2478 2298
+./Terrestrial vegetation/Terrestrial vegetation_00000175.tif mosaiced_023.TIF 1145 1818
+./Terrestrial vegetation/Terrestrial vegetation_00000176.tif mosaiced_023.TIF 2562 1462
+./Terrestrial vegetation/Terrestrial vegetation_00000177.tif mosaiced_023.TIF 1060 1955
+./Terrestrial vegetation/Terrestrial vegetation_00000178.tif mosaiced_023.TIF 1580 2427
+./Terrestrial vegetation/Terrestrial vegetation_00000179.tif mosaiced_023.TIF 2609 1762
+./Deep water/Deep water_00000170.tif mosaiced_023.TIF 728 233
+./Deep water/Deep water_00000171.tif mosaiced_023.TIF 3323 2307
+./Deep water/Deep water_00000172.tif mosaiced_023.TIF 3365 1366
+./Deep water/Deep water_00000173.tif mosaiced_023.TIF 232 622
+./Deep water/Deep water_00000174.tif mosaiced_023.TIF 470 2855
+./Deep water/Deep water_00000175.tif mosaiced_023.TIF 1856 341
+./Deep water/Deep water_00000176.tif mosaiced_023.TIF 2173 81
+./Deep water/Deep water_00000177.tif mosaiced_023.TIF 3346 2297
+./Deep water/Deep water_00000178.tif mosaiced_023.TIF 457 465
+./Deep water/Deep water_00000179.tif mosaiced_023.TIF 2241 635
+./Other or Unknown/Other or Unknown_00000170.tif mosaiced_023.TIF 972 2233
+./Other or Unknown/Other or Unknown_00000171.tif mosaiced_023.TIF 1199 308
+./Other or Unknown/Other or Unknown_00000172.tif mosaiced_023.TIF 1989 2493
+./Other or Unknown/Other or Unknown_00000173.tif mosaiced_023.TIF 1256 1327
+./Other or Unknown/Other or Unknown_00000174.tif mosaiced_023.TIF 1392 526
+./Other or Unknown/Other or Unknown_00000175.tif mosaiced_023.TIF 1494 1877
+./Other or Unknown/Other or Unknown_00000176.tif mosaiced_023.TIF 1398 1229
+./Other or Unknown/Other or Unknown_00000177.tif mosaiced_023.TIF 716 614
+./Other or Unknown/Other or Unknown_00000178.tif mosaiced_023.TIF 1213 363
+./Other or Unknown/Other or Unknown_00000179.tif mosaiced_023.TIF 1941 2568
+./Coral/Coral_00000180.tif mosaiced_024.TIF 1458 2946
+./Coral/Coral_00000181.tif mosaiced_024.TIF 748 486
+./Coral/Coral_00000182.tif mosaiced_024.TIF 3008 3127
+./Coral/Coral_00000183.tif mosaiced_024.TIF 939 2757
+./Coral/Coral_00000184.tif mosaiced_024.TIF 3186 2303
+./Coral/Coral_00000185.tif mosaiced_024.TIF 3141 1509
+./Coral/Coral_00000186.tif mosaiced_024.TIF 682 554
+./Coral/Coral_00000187.tif mosaiced_024.TIF 657 2185
+./Coral/Coral_00000188.tif mosaiced_024.TIF 2709 3052
+./Coral/Coral_00000189.tif mosaiced_024.TIF 777 2102
+./Sediment/Sediment_00000180.tif mosaiced_024.TIF 419 1810
+./Sediment/Sediment_00000181.tif mosaiced_024.TIF 1966 3190
+./Sediment/Sediment_00000182.tif mosaiced_024.TIF 2545 2955
+./Sediment/Sediment_00000183.tif mosaiced_024.TIF 503 1796
+./Sediment/Sediment_00000184.tif mosaiced_024.TIF 390 1966
+./Sediment/Sediment_00000185.tif mosaiced_024.TIF 376 1879
+./Sediment/Sediment_00000186.tif mosaiced_024.TIF 551 2200
+./Sediment/Sediment_00000187.tif mosaiced_024.TIF 623 2368
+./Sediment/Sediment_00000188.tif mosaiced_024.TIF 564 2251
+./Sediment/Sediment_00000189.tif mosaiced_024.TIF 784 2523
+./Beach/Beach_00000180.tif mosaiced_024.TIF 346 1093
+./Beach/Beach_00000181.tif mosaiced_024.TIF 3108 2746
+./Beach/Beach_00000182.tif mosaiced_024.TIF 2605 2815
+./Beach/Beach_00000183.tif mosaiced_024.TIF 1741 2826
+./Beach/Beach_00000184.tif mosaiced_024.TIF 2326 945
+./Beach/Beach_00000185.tif mosaiced_024.TIF 2644 2763
+./Beach/Beach_00000186.tif mosaiced_024.TIF 1834 563
+./Beach/Beach_00000187.tif mosaiced_024.TIF 634 677
+./Beach/Beach_00000188.tif mosaiced_024.TIF 3110 2282
+./Beach/Beach_00000189.tif mosaiced_024.TIF 434 1307
+./Seagrass/Seagrass_00000180.tif mosaiced_024.TIF 2010 2878
+./Seagrass/Seagrass_00000181.tif mosaiced_024.TIF 1680 2829
+./Seagrass/Seagrass_00000182.tif mosaiced_024.TIF 846 2244
+./Seagrass/Seagrass_00000183.tif mosaiced_024.TIF 616 1896
+./Seagrass/Seagrass_00000184.tif mosaiced_024.TIF 354 1375
+./Seagrass/Seagrass_00000185.tif mosaiced_024.TIF 2152 2899
+./Seagrass/Seagrass_00000186.tif mosaiced_024.TIF 1112 2526
+./Seagrass/Seagrass_00000187.tif mosaiced_024.TIF 760 2207
+./Seagrass/Seagrass_00000188.tif mosaiced_024.TIF 1623 2823
+./Seagrass/Seagrass_00000189.tif mosaiced_024.TIF 397 1521
+./Terrestrial vegetation/Terrestrial vegetation_00000180.tif mosaiced_024.TIF 2115 1349
+./Terrestrial vegetation/Terrestrial vegetation_00000181.tif mosaiced_024.TIF 2601 1516
+./Terrestrial vegetation/Terrestrial vegetation_00000182.tif mosaiced_024.TIF 714 1161
+./Terrestrial vegetation/Terrestrial vegetation_00000183.tif mosaiced_024.TIF 1520 2406
+./Terrestrial vegetation/Terrestrial vegetation_00000184.tif mosaiced_024.TIF 805 864
+./Terrestrial vegetation/Terrestrial vegetation_00000185.tif mosaiced_024.TIF 2263 1956
+./Terrestrial vegetation/Terrestrial vegetation_00000186.tif mosaiced_024.TIF 1773 934
+./Terrestrial vegetation/Terrestrial vegetation_00000187.tif mosaiced_024.TIF 681 729
+./Terrestrial vegetation/Terrestrial vegetation_00000188.tif mosaiced_024.TIF 1017 1393
+./Terrestrial vegetation/Terrestrial vegetation_00000189.tif mosaiced_024.TIF 1819 1458
+./Deep water/Deep water_00000180.tif mosaiced_024.TIF 2213 615
+./Deep water/Deep water_00000181.tif mosaiced_024.TIF 504 2749
+./Deep water/Deep water_00000182.tif mosaiced_024.TIF 1400 3223
+./Deep water/Deep water_00000183.tif mosaiced_024.TIF 1581 3209
+./Deep water/Deep water_00000184.tif mosaiced_024.TIF 137 204
+./Deep water/Deep water_00000185.tif mosaiced_024.TIF 3272 252
+./Deep water/Deep water_00000186.tif mosaiced_024.TIF 2595 266
+./Deep water/Deep water_00000187.tif mosaiced_024.TIF 562 68
+./Deep water/Deep water_00000188.tif mosaiced_024.TIF 639 273
+./Deep water/Deep water_00000189.tif mosaiced_024.TIF 882 2838
+./Other or Unknown/Other or Unknown_00000180.tif mosaiced_024.TIF 3337 2616
+./Other or Unknown/Other or Unknown_00000181.tif mosaiced_024.TIF 801 1485
+./Other or Unknown/Other or Unknown_00000182.tif mosaiced_024.TIF 1210 1576
+./Other or Unknown/Other or Unknown_00000183.tif mosaiced_024.TIF 3156 2335
+./Other or Unknown/Other or Unknown_00000184.tif mosaiced_024.TIF 1352 2823
+./Other or Unknown/Other or Unknown_00000185.tif mosaiced_024.TIF 1871 1722
+./Other or Unknown/Other or Unknown_00000186.tif mosaiced_024.TIF 3307 2588
+./Other or Unknown/Other or Unknown_00000187.tif mosaiced_024.TIF 1577 2633
+./Other or Unknown/Other or Unknown_00000188.tif mosaiced_024.TIF 709 2434
+./Other or Unknown/Other or Unknown_00000189.tif mosaiced_024.TIF 2178 454
+./Coral/Coral_00000190.tif mosaiced_025.TIF 294 1705
+./Coral/Coral_00000191.tif mosaiced_025.TIF 1278 2812
+./Coral/Coral_00000192.tif mosaiced_025.TIF 699 586
+./Coral/Coral_00000193.tif mosaiced_025.TIF 2180 3013
+./Coral/Coral_00000194.tif mosaiced_025.TIF 3194 2969
+./Coral/Coral_00000195.tif mosaiced_025.TIF 2173 3100
+./Coral/Coral_00000196.tif mosaiced_025.TIF 1398 2991
+./Coral/Coral_00000197.tif mosaiced_025.TIF 2224 3136
+./Coral/Coral_00000198.tif mosaiced_025.TIF 3221 1959
+./Coral/Coral_00000199.tif mosaiced_025.TIF 2270 3101
+./Sediment/Sediment_00000190.tif mosaiced_025.TIF 2309 3002
+./Sediment/Sediment_00000191.tif mosaiced_025.TIF 576 727
+./Sediment/Sediment_00000192.tif mosaiced_025.TIF 408 2172
+./Sediment/Sediment_00000193.tif mosaiced_025.TIF 713 2386
+./Sediment/Sediment_00000194.tif mosaiced_025.TIF 462 2148
+./Sediment/Sediment_00000195.tif mosaiced_025.TIF 2613 3190
+./Sediment/Sediment_00000196.tif mosaiced_025.TIF 483 1913
+./Sediment/Sediment_00000197.tif mosaiced_025.TIF 771 2428
+./Sediment/Sediment_00000198.tif mosaiced_025.TIF 636 2321
+./Sediment/Sediment_00000199.tif mosaiced_025.TIF 417 1764
+./Beach/Beach_00000190.tif mosaiced_025.TIF 729 1800
+./Beach/Beach_00000191.tif mosaiced_025.TIF 1881 574
+./Beach/Beach_00000192.tif mosaiced_025.TIF 2025 2846
+./Beach/Beach_00000193.tif mosaiced_025.TIF 2208 2863
+./Beach/Beach_00000194.tif mosaiced_025.TIF 3093 2373
+./Beach/Beach_00000195.tif mosaiced_025.TIF 2313 2857
+./Beach/Beach_00000196.tif mosaiced_025.TIF 993 2430
+./Beach/Beach_00000197.tif mosaiced_025.TIF 817 2059
+./Beach/Beach_00000198.tif mosaiced_025.TIF 2362 1006
+./Beach/Beach_00000199.tif mosaiced_025.TIF 2162 792
+./Seagrass/Seagrass_00000190.tif mosaiced_025.TIF 629 1638
+./Seagrass/Seagrass_00000191.tif mosaiced_025.TIF 648 1784
+./Seagrass/Seagrass_00000192.tif mosaiced_025.TIF 583 1668
+./Seagrass/Seagrass_00000193.tif mosaiced_025.TIF 1000 2524
+./Seagrass/Seagrass_00000194.tif mosaiced_025.TIF 383 1249
+./Seagrass/Seagrass_00000195.tif mosaiced_025.TIF 1837 2894
+./Seagrass/Seagrass_00000196.tif mosaiced_025.TIF 609 1622
+./Seagrass/Seagrass_00000197.tif mosaiced_025.TIF 956 2447
+./Seagrass/Seagrass_00000198.tif mosaiced_025.TIF 574 2073
+./Seagrass/Seagrass_00000199.tif mosaiced_025.TIF 609 1905
+./Terrestrial vegetation/Terrestrial vegetation_00000190.tif mosaiced_025.TIF 920 1920
+./Terrestrial vegetation/Terrestrial vegetation_00000191.tif mosaiced_025.TIF 1989 1528
+./Terrestrial vegetation/Terrestrial vegetation_00000192.tif mosaiced_025.TIF 1765 1264
+./Terrestrial vegetation/Terrestrial vegetation_00000193.tif mosaiced_025.TIF 1750 1897
+./Terrestrial vegetation/Terrestrial vegetation_00000194.tif mosaiced_025.TIF 1251 2320
+./Terrestrial vegetation/Terrestrial vegetation_00000195.tif mosaiced_025.TIF 2001 1426
+./Terrestrial vegetation/Terrestrial vegetation_00000196.tif mosaiced_025.TIF 2175 2263
+./Terrestrial vegetation/Terrestrial vegetation_00000197.tif mosaiced_025.TIF 1267 428
+./Terrestrial vegetation/Terrestrial vegetation_00000198.tif mosaiced_025.TIF 2383 2349
+./Terrestrial vegetation/Terrestrial vegetation_00000199.tif mosaiced_025.TIF 1487 965
+./Deep water/Deep water_00000190.tif mosaiced_025.TIF 937 262
+./Deep water/Deep water_00000191.tif mosaiced_025.TIF 1711 3240
+./Deep water/Deep water_00000192.tif mosaiced_025.TIF 620 3082
+./Deep water/Deep water_00000193.tif mosaiced_025.TIF 3418 1047
+./Deep water/Deep water_00000194.tif mosaiced_025.TIF 673 447
+./Deep water/Deep water_00000195.tif mosaiced_025.TIF 3428 2355
+./Deep water/Deep water_00000196.tif mosaiced_025.TIF 150 3004
+./Deep water/Deep water_00000197.tif mosaiced_025.TIF 793 358
+./Deep water/Deep water_00000198.tif mosaiced_025.TIF 57 108
+./Deep water/Deep water_00000199.tif mosaiced_025.TIF 698 3143
+./Other or Unknown/Other or Unknown_00000190.tif mosaiced_025.TIF 383 967
+./Other or Unknown/Other or Unknown_00000191.tif mosaiced_025.TIF 1594 691
+./Other or Unknown/Other or Unknown_00000192.tif mosaiced_025.TIF 1679 1378
+./Other or Unknown/Other or Unknown_00000193.tif mosaiced_025.TIF 3100 2446
+./Other or Unknown/Other or Unknown_00000194.tif mosaiced_025.TIF 242 1806
+./Other or Unknown/Other or Unknown_00000195.tif mosaiced_025.TIF 1828 1609
+./Other or Unknown/Other or Unknown_00000196.tif mosaiced_025.TIF 3088 1770
+./Other or Unknown/Other or Unknown_00000197.tif mosaiced_025.TIF 2045 1493
+./Other or Unknown/Other or Unknown_00000198.tif mosaiced_025.TIF 2568 2690
+./Other or Unknown/Other or Unknown_00000199.tif mosaiced_025.TIF 1798 2713
+./Coral/Coral_00000200.tif mosaiced_026.TIF 8465 2489
+./Coral/Coral_00000201.tif mosaiced_026.TIF 7943 3449
+./Coral/Coral_00000202.tif mosaiced_026.TIF 2574 6854
+./Coral/Coral_00000203.tif mosaiced_026.TIF 3983 2031
+./Coral/Coral_00000204.tif mosaiced_026.TIF 3061 3199
+./Coral/Coral_00000205.tif mosaiced_026.TIF 6839 6204
+./Coral/Coral_00000206.tif mosaiced_026.TIF 1496 2762
+./Coral/Coral_00000207.tif mosaiced_026.TIF 1845 2934
+./Coral/Coral_00000208.tif mosaiced_026.TIF 8859 1995
+./Coral/Coral_00000209.tif mosaiced_026.TIF 8617 2370
+./Sediment/Sediment_00000200.tif mosaiced_026.TIF 7923 2864
+./Sediment/Sediment_00000201.tif mosaiced_026.TIF 5490 3141
+./Sediment/Sediment_00000202.tif mosaiced_026.TIF 8145 1681
+./Sediment/Sediment_00000203.tif mosaiced_026.TIF 4156 2527
+./Sediment/Sediment_00000204.tif mosaiced_026.TIF 7590 4406
+./Sediment/Sediment_00000205.tif mosaiced_026.TIF 6164 3687
+./Sediment/Sediment_00000206.tif mosaiced_026.TIF 4378 2377
+./Sediment/Sediment_00000207.tif mosaiced_026.TIF 7002 4400
+./Sediment/Sediment_00000208.tif mosaiced_026.TIF 6173 1686
+./Sediment/Sediment_00000209.tif mosaiced_026.TIF 6404 3915
+./Beach/Beach_00000200.tif mosaiced_026.TIF 7438 2277
+./Beach/Beach_00000201.tif mosaiced_026.TIF 4972 2610
+./Beach/Beach_00000202.tif mosaiced_026.TIF 3597 3154
+./Beach/Beach_00000203.tif mosaiced_026.TIF 4551 3330
+./Beach/Beach_00000204.tif mosaiced_026.TIF 7211 3110
+./Beach/Beach_00000205.tif mosaiced_026.TIF 4321 2888
+./Beach/Beach_00000206.tif mosaiced_026.TIF 7183 3176
+./Beach/Beach_00000207.tif mosaiced_026.TIF 7210 2307
+./Beach/Beach_00000208.tif mosaiced_026.TIF 2973 3351
+./Beach/Beach_00000209.tif mosaiced_026.TIF 6939 2370
+./Seagrass/Seagrass_00000200.tif mosaiced_026.TIF 4121 4963
+./Seagrass/Seagrass_00000201.tif mosaiced_026.TIF 4835 3115
+./Seagrass/Seagrass_00000202.tif mosaiced_026.TIF 4108 4578
+./Seagrass/Seagrass_00000203.tif mosaiced_026.TIF 5531 2833
+./Seagrass/Seagrass_00000204.tif mosaiced_026.TIF 4716 5549
+./Seagrass/Seagrass_00000205.tif mosaiced_026.TIF 4685 3279
+./Seagrass/Seagrass_00000206.tif mosaiced_026.TIF 6313 5945
+./Seagrass/Seagrass_00000207.tif mosaiced_026.TIF 6181 5461
+./Seagrass/Seagrass_00000208.tif mosaiced_026.TIF 5679 5504
+./Seagrass/Seagrass_00000209.tif mosaiced_026.TIF 4174 3885
+./Terrestrial vegetation/Terrestrial vegetation_00000200.tif mosaiced_026.TIF 6090 2672
+./Terrestrial vegetation/Terrestrial vegetation_00000201.tif mosaiced_026.TIF 5889 2501
+./Terrestrial vegetation/Terrestrial vegetation_00000202.tif mosaiced_026.TIF 6177 2529
+./Terrestrial vegetation/Terrestrial vegetation_00000203.tif mosaiced_026.TIF 4256 5927
+./Terrestrial vegetation/Terrestrial vegetation_00000204.tif mosaiced_026.TIF 6944 2828
+./Terrestrial vegetation/Terrestrial vegetation_00000205.tif mosaiced_026.TIF 3773 4475
+./Terrestrial vegetation/Terrestrial vegetation_00000206.tif mosaiced_026.TIF 4495 6738
+./Terrestrial vegetation/Terrestrial vegetation_00000207.tif mosaiced_026.TIF 7318 3014
+./Terrestrial vegetation/Terrestrial vegetation_00000208.tif mosaiced_026.TIF 5923 5634
+./Terrestrial vegetation/Terrestrial vegetation_00000209.tif mosaiced_026.TIF 5396 2438
+./Deep water/Deep water_00000200.tif mosaiced_026.TIF 10055 5775
+./Deep water/Deep water_00000201.tif mosaiced_026.TIF 8016 866
+./Deep water/Deep water_00000202.tif mosaiced_026.TIF 8112 6563
+./Deep water/Deep water_00000203.tif mosaiced_026.TIF 8562 926
+./Deep water/Deep water_00000204.tif mosaiced_026.TIF 726 1509
+./Deep water/Deep water_00000205.tif mosaiced_026.TIF 9970 980
+./Deep water/Deep water_00000206.tif mosaiced_026.TIF 733 6765
+./Deep water/Deep water_00000207.tif mosaiced_026.TIF 8427 85
+./Deep water/Deep water_00000208.tif mosaiced_026.TIF 1186 585
+./Deep water/Deep water_00000209.tif mosaiced_026.TIF 7472 5879
+./Other or Unknown/Other or Unknown_00000200.tif mosaiced_026.TIF 830 3186
+./Other or Unknown/Other or Unknown_00000201.tif mosaiced_026.TIF 1911 5822
+./Other or Unknown/Other or Unknown_00000202.tif mosaiced_026.TIF 2422 4376
+./Other or Unknown/Other or Unknown_00000203.tif mosaiced_026.TIF 1122 4774
+./Other or Unknown/Other or Unknown_00000204.tif mosaiced_026.TIF 945 4645
+./Other or Unknown/Other or Unknown_00000205.tif mosaiced_026.TIF 4035 6899
+./Other or Unknown/Other or Unknown_00000206.tif mosaiced_026.TIF 596 3477
+./Other or Unknown/Other or Unknown_00000207.tif mosaiced_026.TIF 3187 2356
+./Other or Unknown/Other or Unknown_00000208.tif mosaiced_026.TIF 4526 6953
+./Other or Unknown/Other or Unknown_00000209.tif mosaiced_026.TIF 3982 6474
+./Coral/Coral_00000210.tif mosaiced_027.TIF 2658 5785
+./Coral/Coral_00000211.tif mosaiced_027.TIF 2774 5751
+./Coral/Coral_00000212.tif mosaiced_027.TIF 1758 3135
+./Coral/Coral_00000213.tif mosaiced_027.TIF 7176 1326
+./Coral/Coral_00000214.tif mosaiced_027.TIF 5471 5426
+./Coral/Coral_00000215.tif mosaiced_027.TIF 1596 2531
+./Coral/Coral_00000216.tif mosaiced_027.TIF 4365 2088
+./Coral/Coral_00000217.tif mosaiced_027.TIF 8893 2598
+./Coral/Coral_00000218.tif mosaiced_027.TIF 7873 3957
+./Coral/Coral_00000219.tif mosaiced_027.TIF 7441 2236
+./Sediment/Sediment_00000210.tif mosaiced_027.TIF 8245 2564
+./Sediment/Sediment_00000211.tif mosaiced_027.TIF 5275 4093
+./Sediment/Sediment_00000212.tif mosaiced_027.TIF 5887 3485
+./Sediment/Sediment_00000213.tif mosaiced_027.TIF 5616 3311
+./Sediment/Sediment_00000214.tif mosaiced_027.TIF 5528 4185
+./Sediment/Sediment_00000215.tif mosaiced_027.TIF 7304 3481
+./Sediment/Sediment_00000216.tif mosaiced_027.TIF 6306 4024
+./Sediment/Sediment_00000217.tif mosaiced_027.TIF 5296 5127
+./Sediment/Sediment_00000218.tif mosaiced_027.TIF 8324 1945
+./Sediment/Sediment_00000219.tif mosaiced_027.TIF 5704 4000
+./Beach/Beach_00000210.tif mosaiced_027.TIF 6120 2429
+./Beach/Beach_00000211.tif mosaiced_027.TIF 6551 2395
+./Beach/Beach_00000212.tif mosaiced_027.TIF 6902 2381
+./Beach/Beach_00000213.tif mosaiced_027.TIF 6216 6040
+./Beach/Beach_00000214.tif mosaiced_027.TIF 4600 2761
+./Beach/Beach_00000215.tif mosaiced_027.TIF 7609 2428
+./Beach/Beach_00000216.tif mosaiced_027.TIF 4569 3316
+./Beach/Beach_00000217.tif mosaiced_027.TIF 6387 2417
+./Beach/Beach_00000218.tif mosaiced_027.TIF 6288 2409
+./Beach/Beach_00000219.tif mosaiced_027.TIF 7206 3118
+./Seagrass/Seagrass_00000210.tif mosaiced_027.TIF 6173 5465
+./Seagrass/Seagrass_00000211.tif mosaiced_027.TIF 7223 2285
+./Seagrass/Seagrass_00000212.tif mosaiced_027.TIF 6706 2324
+./Seagrass/Seagrass_00000213.tif mosaiced_027.TIF 4783 3173
+./Seagrass/Seagrass_00000214.tif mosaiced_027.TIF 4272 3976
+./Seagrass/Seagrass_00000215.tif mosaiced_027.TIF 4472 3470
+./Seagrass/Seagrass_00000216.tif mosaiced_027.TIF 4280 4300
+./Seagrass/Seagrass_00000217.tif mosaiced_027.TIF 5698 5511
+./Seagrass/Seagrass_00000218.tif mosaiced_027.TIF 5444 2840
+./Seagrass/Seagrass_00000219.tif mosaiced_027.TIF 7583 2347
+./Terrestrial vegetation/Terrestrial vegetation_00000210.tif mosaiced_027.TIF 3376 3276
+./Terrestrial vegetation/Terrestrial vegetation_00000211.tif mosaiced_027.TIF 4086 4234
+./Terrestrial vegetation/Terrestrial vegetation_00000212.tif mosaiced_027.TIF 7241 2595
+./Terrestrial vegetation/Terrestrial vegetation_00000213.tif mosaiced_027.TIF 3516 3679
+./Terrestrial vegetation/Terrestrial vegetation_00000214.tif mosaiced_027.TIF 4527 2871
+./Terrestrial vegetation/Terrestrial vegetation_00000215.tif mosaiced_027.TIF 3847 3144
+./Terrestrial vegetation/Terrestrial vegetation_00000216.tif mosaiced_027.TIF 3949 3638
+./Terrestrial vegetation/Terrestrial vegetation_00000217.tif mosaiced_027.TIF 4197 4302
+./Terrestrial vegetation/Terrestrial vegetation_00000218.tif mosaiced_027.TIF 5943 2716
+./Terrestrial vegetation/Terrestrial vegetation_00000219.tif mosaiced_027.TIF 3804 3949
+./Deep water/Deep water_00000210.tif mosaiced_027.TIF 9587 531
+./Deep water/Deep water_00000211.tif mosaiced_027.TIF 9257 2701
+./Deep water/Deep water_00000212.tif mosaiced_027.TIF 9355 4103
+./Deep water/Deep water_00000213.tif mosaiced_027.TIF 8162 4910
+./Deep water/Deep water_00000214.tif mosaiced_027.TIF 778 3537
+./Deep water/Deep water_00000215.tif mosaiced_027.TIF 9783 4575
+./Deep water/Deep water_00000216.tif mosaiced_027.TIF 280 538
+./Deep water/Deep water_00000217.tif mosaiced_027.TIF 9684 4640
+./Deep water/Deep water_00000218.tif mosaiced_027.TIF 3922 1178
+./Deep water/Deep water_00000219.tif mosaiced_027.TIF 10016 5865
+./Other or Unknown/Other or Unknown_00000210.tif mosaiced_027.TIF 5856 4926
+./Other or Unknown/Other or Unknown_00000211.tif mosaiced_027.TIF 4193 5310
+./Other or Unknown/Other or Unknown_00000212.tif mosaiced_027.TIF 4716 2831
+./Other or Unknown/Other or Unknown_00000213.tif mosaiced_027.TIF 4367 3271
+./Other or Unknown/Other or Unknown_00000214.tif mosaiced_027.TIF 4573 5205
+./Other or Unknown/Other or Unknown_00000215.tif mosaiced_027.TIF 5710 6056
+./Other or Unknown/Other or Unknown_00000216.tif mosaiced_027.TIF 4468 5212
+./Other or Unknown/Other or Unknown_00000217.tif mosaiced_027.TIF 3245 4045
+./Other or Unknown/Other or Unknown_00000218.tif mosaiced_027.TIF 3539 3444
+./Other or Unknown/Other or Unknown_00000219.tif mosaiced_027.TIF 3980 5985
+./Coral/Coral_00000220.tif mosaiced_028.TIF 3437 1507
+./Coral/Coral_00000221.tif mosaiced_028.TIF 4390 1713
+./Coral/Coral_00000222.tif mosaiced_028.TIF 4414 2185
+./Coral/Coral_00000223.tif mosaiced_028.TIF 5992 1589
+./Coral/Coral_00000224.tif mosaiced_028.TIF 1911 2267
+./Coral/Coral_00000225.tif mosaiced_028.TIF 6226 847
+./Coral/Coral_00000226.tif mosaiced_028.TIF 6254 1207
+./Coral/Coral_00000227.tif mosaiced_028.TIF 3378 1380
+./Coral/Coral_00000228.tif mosaiced_028.TIF 3100 2253
+./Coral/Coral_00000229.tif mosaiced_028.TIF 2073 2218
+./Sediment/Sediment_00000220.tif mosaiced_028.TIF 2425 1066
+./Sediment/Sediment_00000221.tif mosaiced_028.TIF 2705 703
+./Sediment/Sediment_00000222.tif mosaiced_028.TIF 3113 2213
+./Sediment/Sediment_00000223.tif mosaiced_028.TIF 3297 1975
+./Sediment/Sediment_00000224.tif mosaiced_028.TIF 2213 334
+./Sediment/Sediment_00000225.tif mosaiced_028.TIF 3217 1516
+./Sediment/Sediment_00000226.tif mosaiced_028.TIF 3542 2263
+./Sediment/Sediment_00000227.tif mosaiced_028.TIF 3846 1542
+./Sediment/Sediment_00000228.tif mosaiced_028.TIF 2033 770
+./Sediment/Sediment_00000229.tif mosaiced_028.TIF 2427 1084
+./Beach/Beach_00000220.tif mosaiced_028.TIF 4721 1335
+./Beach/Beach_00000221.tif mosaiced_028.TIF 2976 205
+./Beach/Beach_00000222.tif mosaiced_028.TIF 3676 1441
+./Beach/Beach_00000223.tif mosaiced_028.TIF 3267 1285
+./Beach/Beach_00000224.tif mosaiced_028.TIF 3398 1324
+./Beach/Beach_00000225.tif mosaiced_028.TIF 2991 849
+./Beach/Beach_00000226.tif mosaiced_028.TIF 3182 1050
+./Beach/Beach_00000227.tif mosaiced_028.TIF 3139 1027
+./Beach/Beach_00000228.tif mosaiced_028.TIF 3792 1435
+./Beach/Beach_00000229.tif mosaiced_028.TIF 4539 1525
+./Seagrass/Seagrass_00000220.tif mosaiced_028.TIF 3555 1465
+./Seagrass/Seagrass_00000221.tif mosaiced_028.TIF 3694 1466
+./Seagrass/Seagrass_00000222.tif mosaiced_028.TIF 3822 1469
+./Seagrass/Seagrass_00000223.tif mosaiced_028.TIF 3476 1426
+./Seagrass/Seagrass_00000224.tif mosaiced_028.TIF 3996 1508
+./Seagrass/Seagrass_00000225.tif mosaiced_028.TIF 3916 1483
+./Seagrass/Seagrass_00000226.tif mosaiced_028.TIF 4511 1558
+./Seagrass/Seagrass_00000227.tif mosaiced_028.TIF 2967 240
+./Seagrass/Seagrass_00000228.tif mosaiced_028.TIF 4012 1553
+./Seagrass/Seagrass_00000229.tif mosaiced_028.TIF 2959 219
+./Terrestrial vegetation/Terrestrial vegetation_00000220.tif mosaiced_028.TIF 4712 1251
+./Terrestrial vegetation/Terrestrial vegetation_00000221.tif mosaiced_028.TIF 3504 1336
+./Terrestrial vegetation/Terrestrial vegetation_00000222.tif mosaiced_028.TIF 3348 1178
+./Terrestrial vegetation/Terrestrial vegetation_00000223.tif mosaiced_028.TIF 2993 637
+./Terrestrial vegetation/Terrestrial vegetation_00000224.tif mosaiced_028.TIF 3043 762
+./Terrestrial vegetation/Terrestrial vegetation_00000225.tif mosaiced_028.TIF 3032 251
+./Terrestrial vegetation/Terrestrial vegetation_00000226.tif mosaiced_028.TIF 3322 612
+./Terrestrial vegetation/Terrestrial vegetation_00000227.tif mosaiced_028.TIF 3364 632
+./Terrestrial vegetation/Terrestrial vegetation_00000228.tif mosaiced_028.TIF 3479 1119
+./Terrestrial vegetation/Terrestrial vegetation_00000229.tif mosaiced_028.TIF 4091 975
+./Deep water/Deep water_00000220.tif mosaiced_028.TIF 6801 2654
+./Deep water/Deep water_00000221.tif mosaiced_028.TIF 370 3298
+./Deep water/Deep water_00000222.tif mosaiced_028.TIF 676 2119
+./Deep water/Deep water_00000223.tif mosaiced_028.TIF 624 4135
+./Deep water/Deep water_00000224.tif mosaiced_028.TIF 936 1100
+./Deep water/Deep water_00000225.tif mosaiced_028.TIF 6748 1463
+./Deep water/Deep water_00000226.tif mosaiced_028.TIF 840 1198
+./Deep water/Deep water_00000227.tif mosaiced_028.TIF 3346 2785
+./Deep water/Deep water_00000228.tif mosaiced_028.TIF 4323 4045
+./Deep water/Deep water_00000229.tif mosaiced_028.TIF 6937 2694
+./Other or Unknown/Other or Unknown_00000220.tif mosaiced_028.TIF 5327 1069
+./Other or Unknown/Other or Unknown_00000221.tif mosaiced_028.TIF 6344 2633
+./Other or Unknown/Other or Unknown_00000222.tif mosaiced_028.TIF 5176 1838
+./Other or Unknown/Other or Unknown_00000223.tif mosaiced_028.TIF 5305 682
+./Other or Unknown/Other or Unknown_00000224.tif mosaiced_028.TIF 6146 1436
+./Other or Unknown/Other or Unknown_00000225.tif mosaiced_028.TIF 5917 784
+./Other or Unknown/Other or Unknown_00000226.tif mosaiced_028.TIF 5450 2827
+./Other or Unknown/Other or Unknown_00000227.tif mosaiced_028.TIF 4987 2215
+./Other or Unknown/Other or Unknown_00000228.tif mosaiced_028.TIF 2872 3971
+./Other or Unknown/Other or Unknown_00000229.tif mosaiced_028.TIF 5782 619
+./Coral/Coral_00000230.tif mosaiced_029.TIF 3940 3408
+./Coral/Coral_00000231.tif mosaiced_029.TIF 4236 1720
+./Coral/Coral_00000232.tif mosaiced_029.TIF 2690 3817
+./Coral/Coral_00000233.tif mosaiced_029.TIF 6802 2691
+./Coral/Coral_00000234.tif mosaiced_029.TIF 6757 2975
+./Coral/Coral_00000235.tif mosaiced_029.TIF 2310 2805
+./Coral/Coral_00000236.tif mosaiced_029.TIF 6366 3274
+./Coral/Coral_00000237.tif mosaiced_029.TIF 6845 1964
+./Coral/Coral_00000238.tif mosaiced_029.TIF 5200 3471
+./Coral/Coral_00000239.tif mosaiced_029.TIF 7025 1901
+./Sediment/Sediment_00000230.tif mosaiced_029.TIF 2500 1279
+./Sediment/Sediment_00000231.tif mosaiced_029.TIF 3219 3737
+./Sediment/Sediment_00000232.tif mosaiced_029.TIF 4409 1779
+./Sediment/Sediment_00000233.tif mosaiced_029.TIF 4251 3583
+./Sediment/Sediment_00000234.tif mosaiced_029.TIF 2481 902
+./Sediment/Sediment_00000235.tif mosaiced_029.TIF 2803 2181
+./Sediment/Sediment_00000236.tif mosaiced_029.TIF 2401 3607
+./Sediment/Sediment_00000237.tif mosaiced_029.TIF 3096 3667
+./Sediment/Sediment_00000238.tif mosaiced_029.TIF 5036 3970
+./Sediment/Sediment_00000239.tif mosaiced_029.TIF 3674 3692
+./Beach/Beach_00000230.tif mosaiced_029.TIF 3457 2126
+./Beach/Beach_00000231.tif mosaiced_029.TIF 5689 2924
+./Beach/Beach_00000232.tif mosaiced_029.TIF 4996 3448
+./Beach/Beach_00000233.tif mosaiced_029.TIF 3805 3207
+./Beach/Beach_00000234.tif mosaiced_029.TIF 5441 3030
+./Beach/Beach_00000235.tif mosaiced_029.TIF 5099 3393
+./Beach/Beach_00000236.tif mosaiced_029.TIF 3884 3242
+./Beach/Beach_00000237.tif mosaiced_029.TIF 3992 3300
+./Beach/Beach_00000238.tif mosaiced_029.TIF 3470 2828
+./Beach/Beach_00000239.tif mosaiced_029.TIF 3940 1371
+./Seagrass/Seagrass_00000230.tif mosaiced_029.TIF 6014 2525
+./Seagrass/Seagrass_00000231.tif mosaiced_029.TIF 6192 1836
+./Seagrass/Seagrass_00000232.tif mosaiced_029.TIF 5561 3040
+./Seagrass/Seagrass_00000233.tif mosaiced_029.TIF 5911 1898
+./Seagrass/Seagrass_00000234.tif mosaiced_029.TIF 5004 3487
+./Seagrass/Seagrass_00000235.tif mosaiced_029.TIF 4491 3510
+./Seagrass/Seagrass_00000236.tif mosaiced_029.TIF 4488 3490
+./Seagrass/Seagrass_00000237.tif mosaiced_029.TIF 4238 625
+./Seagrass/Seagrass_00000238.tif mosaiced_029.TIF 5493 3058
+./Seagrass/Seagrass_00000239.tif mosaiced_029.TIF 5557 3072
+./Terrestrial vegetation/Terrestrial vegetation_00000230.tif mosaiced_029.TIF 4576 2762
+./Terrestrial vegetation/Terrestrial vegetation_00000231.tif mosaiced_029.TIF 5775 2660
+./Terrestrial vegetation/Terrestrial vegetation_00000232.tif mosaiced_029.TIF 3800 2647
+./Terrestrial vegetation/Terrestrial vegetation_00000233.tif mosaiced_029.TIF 6077 2363
+./Terrestrial vegetation/Terrestrial vegetation_00000234.tif mosaiced_029.TIF 6236 2000
+./Terrestrial vegetation/Terrestrial vegetation_00000235.tif mosaiced_029.TIF 5394 2576
+./Terrestrial vegetation/Terrestrial vegetation_00000236.tif mosaiced_029.TIF 3842 2563
+./Terrestrial vegetation/Terrestrial vegetation_00000237.tif mosaiced_029.TIF 3984 2454
+./Terrestrial vegetation/Terrestrial vegetation_00000238.tif mosaiced_029.TIF 4321 2210
+./Terrestrial vegetation/Terrestrial vegetation_00000239.tif mosaiced_029.TIF 3124 1402
+./Deep water/Deep water_00000230.tif mosaiced_029.TIF 4282 4878
+./Deep water/Deep water_00000231.tif mosaiced_029.TIF 747 4272
+./Deep water/Deep water_00000232.tif mosaiced_029.TIF 2985 5153
+./Deep water/Deep water_00000233.tif mosaiced_029.TIF 6068 4645
+./Deep water/Deep water_00000234.tif mosaiced_029.TIF 8233 5568
+./Deep water/Deep water_00000235.tif mosaiced_029.TIF 8206 3767
+./Deep water/Deep water_00000236.tif mosaiced_029.TIF 8032 2880
+./Deep water/Deep water_00000237.tif mosaiced_029.TIF 4188 5819
+./Deep water/Deep water_00000238.tif mosaiced_029.TIF 9101 3375
+./Deep water/Deep water_00000239.tif mosaiced_029.TIF 1370 4458
+./Other or Unknown/Other or Unknown_00000230.tif mosaiced_029.TIF 3523 227
+./Other or Unknown/Other or Unknown_00000231.tif mosaiced_029.TIF 1263 912
+./Other or Unknown/Other or Unknown_00000232.tif mosaiced_029.TIF 1967 4049
+./Other or Unknown/Other or Unknown_00000233.tif mosaiced_029.TIF 1697 580
+./Other or Unknown/Other or Unknown_00000234.tif mosaiced_029.TIF 1845 4350
+./Other or Unknown/Other or Unknown_00000235.tif mosaiced_029.TIF 1826 2941
+./Other or Unknown/Other or Unknown_00000236.tif mosaiced_029.TIF 1690 2017
+./Other or Unknown/Other or Unknown_00000237.tif mosaiced_029.TIF 1561 653
+./Other or Unknown/Other or Unknown_00000238.tif mosaiced_029.TIF 2225 2459
+./Other or Unknown/Other or Unknown_00000239.tif mosaiced_029.TIF 1339 5047
+./Coral/Coral_00000240.tif mosaiced_030.TIF 4843 1304
+./Coral/Coral_00000241.tif mosaiced_030.TIF 4694 3132
+./Coral/Coral_00000242.tif mosaiced_030.TIF 6746 88
+./Coral/Coral_00000243.tif mosaiced_030.TIF 1782 1606
+./Coral/Coral_00000244.tif mosaiced_030.TIF 5788 1327
+./Coral/Coral_00000245.tif mosaiced_030.TIF 2829 561
+./Coral/Coral_00000246.tif mosaiced_030.TIF 5789 2134
+./Coral/Coral_00000247.tif mosaiced_030.TIF 2835 741
+./Coral/Coral_00000248.tif mosaiced_030.TIF 3858 2842
+./Coral/Coral_00000249.tif mosaiced_030.TIF 4432 3119
+./Sediment/Sediment_00000240.tif mosaiced_030.TIF 3426 2266
+./Sediment/Sediment_00000241.tif mosaiced_030.TIF 4041 2174
+./Sediment/Sediment_00000242.tif mosaiced_030.TIF 2825 908
+./Sediment/Sediment_00000243.tif mosaiced_030.TIF 2839 1315
+./Sediment/Sediment_00000244.tif mosaiced_030.TIF 2366 1608
+./Sediment/Sediment_00000245.tif mosaiced_030.TIF 3546 2059
+./Sediment/Sediment_00000246.tif mosaiced_030.TIF 3239 2326
+./Sediment/Sediment_00000247.tif mosaiced_030.TIF 2573 823
+./Sediment/Sediment_00000248.tif mosaiced_030.TIF 5640 1568
+./Sediment/Sediment_00000249.tif mosaiced_030.TIF 6039 425
+./Beach/Beach_00000240.tif mosaiced_030.TIF 3238 1276
+./Beach/Beach_00000241.tif mosaiced_030.TIF 4419 1592
+./Beach/Beach_00000242.tif mosaiced_030.TIF 3380 1303
+./Beach/Beach_00000243.tif mosaiced_030.TIF 4826 1179
+./Beach/Beach_00000244.tif mosaiced_030.TIF 4210 1658
+./Beach/Beach_00000245.tif mosaiced_030.TIF 4849 1166
+./Beach/Beach_00000246.tif mosaiced_030.TIF 4365 1642
+./Beach/Beach_00000247.tif mosaiced_030.TIF 4648 1457
+./Beach/Beach_00000248.tif mosaiced_030.TIF 2994 846
+./Beach/Beach_00000249.tif mosaiced_030.TIF 5855 68
+./Seagrass/Seagrass_00000240.tif mosaiced_030.TIF 4731 1415
+./Seagrass/Seagrass_00000241.tif mosaiced_030.TIF 5638 364
+./Seagrass/Seagrass_00000242.tif mosaiced_030.TIF 4661 1502
+./Seagrass/Seagrass_00000243.tif mosaiced_030.TIF 5778 156
+./Seagrass/Seagrass_00000244.tif mosaiced_030.TIF 5670 227
+./Seagrass/Seagrass_00000245.tif mosaiced_030.TIF 3902 1462
+./Seagrass/Seagrass_00000246.tif mosaiced_030.TIF 4718 1343
+./Seagrass/Seagrass_00000247.tif mosaiced_030.TIF 4197 1666
+./Seagrass/Seagrass_00000248.tif mosaiced_030.TIF 4395 1656
+./Seagrass/Seagrass_00000249.tif mosaiced_030.TIF 4022 1553
+./Terrestrial vegetation/Terrestrial vegetation_00000240.tif mosaiced_030.TIF 4356 947
+./Terrestrial vegetation/Terrestrial vegetation_00000241.tif mosaiced_030.TIF 3636 350
+./Terrestrial vegetation/Terrestrial vegetation_00000242.tif mosaiced_030.TIF 4135 1503
+./Terrestrial vegetation/Terrestrial vegetation_00000243.tif mosaiced_030.TIF 3684 311
+./Terrestrial vegetation/Terrestrial vegetation_00000244.tif mosaiced_030.TIF 3213 48
+./Terrestrial vegetation/Terrestrial vegetation_00000245.tif mosaiced_030.TIF 3626 857
+./Terrestrial vegetation/Terrestrial vegetation_00000246.tif mosaiced_030.TIF 4003 290
+./Terrestrial vegetation/Terrestrial vegetation_00000247.tif mosaiced_030.TIF 4253 1613
+./Terrestrial vegetation/Terrestrial vegetation_00000248.tif mosaiced_030.TIF 3865 651
+./Terrestrial vegetation/Terrestrial vegetation_00000249.tif mosaiced_030.TIF 3789 1186
+./Deep water/Deep water_00000240.tif mosaiced_030.TIF 5676 4148
+./Deep water/Deep water_00000241.tif mosaiced_030.TIF 1252 595
+./Deep water/Deep water_00000242.tif mosaiced_030.TIF 171 2668
+./Deep water/Deep water_00000243.tif mosaiced_030.TIF 776 1968
+./Deep water/Deep water_00000244.tif mosaiced_030.TIF 6987 1217
+./Deep water/Deep water_00000245.tif mosaiced_030.TIF 7523 1821
+./Deep water/Deep water_00000246.tif mosaiced_030.TIF 6445 3692
+./Deep water/Deep water_00000247.tif mosaiced_030.TIF 7921 2155
+./Deep water/Deep water_00000248.tif mosaiced_030.TIF 1018 3111
+./Deep water/Deep water_00000249.tif mosaiced_030.TIF 985 1478
+./Other or Unknown/Other or Unknown_00000240.tif mosaiced_030.TIF 103 1034
+./Other or Unknown/Other or Unknown_00000241.tif mosaiced_030.TIF 3747 876
+./Other or Unknown/Other or Unknown_00000242.tif mosaiced_030.TIF 4934 3383
+./Other or Unknown/Other or Unknown_00000243.tif mosaiced_030.TIF 120 410
+./Other or Unknown/Other or Unknown_00000244.tif mosaiced_030.TIF 3414 545
+./Other or Unknown/Other or Unknown_00000245.tif mosaiced_030.TIF 4933 3427
+./Other or Unknown/Other or Unknown_00000246.tif mosaiced_030.TIF 1343 2744
+./Other or Unknown/Other or Unknown_00000247.tif mosaiced_030.TIF 6050 1973
+./Other or Unknown/Other or Unknown_00000248.tif mosaiced_030.TIF 3943 3182
+./Other or Unknown/Other or Unknown_00000249.tif mosaiced_030.TIF 1486 1166
+./Coral/Coral_00000250.tif mosaiced_031.TIF 7409 5159
+./Coral/Coral_00000251.tif mosaiced_031.TIF 4805 2398
+./Coral/Coral_00000252.tif mosaiced_031.TIF 8832 2657
+./Coral/Coral_00000253.tif mosaiced_031.TIF 7191 1346
+./Coral/Coral_00000254.tif mosaiced_031.TIF 6829 6246
+./Coral/Coral_00000255.tif mosaiced_031.TIF 3529 2174
+./Coral/Coral_00000256.tif mosaiced_031.TIF 7298 5588
+./Coral/Coral_00000257.tif mosaiced_031.TIF 3930 2847
+./Coral/Coral_00000258.tif mosaiced_031.TIF 1667 2435
+./Coral/Coral_00000259.tif mosaiced_031.TIF 4500 3613
+./Sediment/Sediment_00000250.tif mosaiced_031.TIF 7392 2174
+./Sediment/Sediment_00000251.tif mosaiced_031.TIF 8153 1656
+./Sediment/Sediment_00000252.tif mosaiced_031.TIF 6565 6236
+./Sediment/Sediment_00000253.tif mosaiced_031.TIF 6049 4263
+./Sediment/Sediment_00000254.tif mosaiced_031.TIF 6853 4418
+./Sediment/Sediment_00000255.tif mosaiced_031.TIF 7052 4172
+./Sediment/Sediment_00000256.tif mosaiced_031.TIF 7809 1658
+./Sediment/Sediment_00000257.tif mosaiced_031.TIF 4920 4064
+./Sediment/Sediment_00000258.tif mosaiced_031.TIF 8094 3111
+./Sediment/Sediment_00000259.tif mosaiced_031.TIF 5589 5029
+./Beach/Beach_00000250.tif mosaiced_031.TIF 7443 2277
+./Beach/Beach_00000251.tif mosaiced_031.TIF 5203 2730
+./Beach/Beach_00000252.tif mosaiced_031.TIF 4323 2879
+./Beach/Beach_00000253.tif mosaiced_031.TIF 5030 2632
+./Beach/Beach_00000254.tif mosaiced_031.TIF 4806 3120
+./Beach/Beach_00000255.tif mosaiced_031.TIF 4170 4860
+./Beach/Beach_00000256.tif mosaiced_031.TIF 7016 2361
+./Beach/Beach_00000257.tif mosaiced_031.TIF 5122 2722
+./Beach/Beach_00000258.tif mosaiced_031.TIF 7204 3119
+./Beach/Beach_00000259.tif mosaiced_031.TIF 6424 5670
+./Seagrass/Seagrass_00000250.tif mosaiced_031.TIF 4290 5191
+./Seagrass/Seagrass_00000251.tif mosaiced_031.TIF 5263 2869
+./Seagrass/Seagrass_00000252.tif mosaiced_031.TIF 6489 2388
+./Seagrass/Seagrass_00000253.tif mosaiced_031.TIF 7251 2268
+./Seagrass/Seagrass_00000254.tif mosaiced_031.TIF 5780 6629
+./Seagrass/Seagrass_00000255.tif mosaiced_031.TIF 4666 3273
+./Seagrass/Seagrass_00000256.tif mosaiced_031.TIF 5253 2691
+./Seagrass/Seagrass_00000257.tif mosaiced_031.TIF 6322 5810
+./Seagrass/Seagrass_00000258.tif mosaiced_031.TIF 7641 2634
+./Seagrass/Seagrass_00000259.tif mosaiced_031.TIF 6706 3086
+./Terrestrial vegetation/Terrestrial vegetation_00000250.tif mosaiced_031.TIF 3575 6153
+./Terrestrial vegetation/Terrestrial vegetation_00000251.tif mosaiced_031.TIF 7468 2420
+./Terrestrial vegetation/Terrestrial vegetation_00000252.tif mosaiced_031.TIF 3298 4942
+./Terrestrial vegetation/Terrestrial vegetation_00000253.tif mosaiced_031.TIF 4359 5313
+./Terrestrial vegetation/Terrestrial vegetation_00000254.tif mosaiced_031.TIF 6147 2636
+./Terrestrial vegetation/Terrestrial vegetation_00000255.tif mosaiced_031.TIF 4028 6461
+./Terrestrial vegetation/Terrestrial vegetation_00000256.tif mosaiced_031.TIF 6861 3052
+./Terrestrial vegetation/Terrestrial vegetation_00000257.tif mosaiced_031.TIF 7137 3096
+./Terrestrial vegetation/Terrestrial vegetation_00000258.tif mosaiced_031.TIF 6838 2783
+./Terrestrial vegetation/Terrestrial vegetation_00000259.tif mosaiced_031.TIF 3941 3272
+./Deep water/Deep water_00000250.tif mosaiced_031.TIF 4313 263
+./Deep water/Deep water_00000251.tif mosaiced_031.TIF 10144 5563
+./Deep water/Deep water_00000252.tif mosaiced_031.TIF 7581 6674
+./Deep water/Deep water_00000253.tif mosaiced_031.TIF 7263 947
+./Deep water/Deep water_00000254.tif mosaiced_031.TIF 957 5273
+./Deep water/Deep water_00000255.tif mosaiced_031.TIF 2757 1403
+./Deep water/Deep water_00000256.tif mosaiced_031.TIF 7951 4435
+./Deep water/Deep water_00000257.tif mosaiced_031.TIF 1366 283
+./Deep water/Deep water_00000258.tif mosaiced_031.TIF 1838 376
+./Deep water/Deep water_00000259.tif mosaiced_031.TIF 11 3097
+./Other or Unknown/Other or Unknown_00000250.tif mosaiced_031.TIF 9117 51
+./Other or Unknown/Other or Unknown_00000251.tif mosaiced_031.TIF 9850 2446
+./Other or Unknown/Other or Unknown_00000252.tif mosaiced_031.TIF 3538 3329
+./Other or Unknown/Other or Unknown_00000253.tif mosaiced_031.TIF 10216 1637
+./Other or Unknown/Other or Unknown_00000254.tif mosaiced_031.TIF 9517 2073
+./Other or Unknown/Other or Unknown_00000255.tif mosaiced_031.TIF 189 2205
+./Other or Unknown/Other or Unknown_00000256.tif mosaiced_031.TIF 9289 3055
+./Other or Unknown/Other or Unknown_00000257.tif mosaiced_031.TIF 3702 4041
+./Other or Unknown/Other or Unknown_00000258.tif mosaiced_031.TIF 3748 4133
+./Other or Unknown/Other or Unknown_00000259.tif mosaiced_031.TIF 5234 5777
+./Coral/Coral_00000260.tif mosaiced_032.TIF 3283 4516
+./Coral/Coral_00000261.tif mosaiced_032.TIF 5509 2917
+./Coral/Coral_00000262.tif mosaiced_032.TIF 2929 2262
+./Coral/Coral_00000263.tif mosaiced_032.TIF 7716 2535
+./Coral/Coral_00000264.tif mosaiced_032.TIF 5211 1507
+./Coral/Coral_00000265.tif mosaiced_032.TIF 2649 5592
+./Coral/Coral_00000266.tif mosaiced_032.TIF 2484 6861
+./Coral/Coral_00000267.tif mosaiced_032.TIF 5624 1342
+./Coral/Coral_00000268.tif mosaiced_032.TIF 2715 5426
+./Coral/Coral_00000269.tif mosaiced_032.TIF 7596 4897
+./Sediment/Sediment_00000260.tif mosaiced_032.TIF 6085 1433
+./Sediment/Sediment_00000261.tif mosaiced_032.TIF 5269 3069
+./Sediment/Sediment_00000262.tif mosaiced_032.TIF 3467 6331
+./Sediment/Sediment_00000263.tif mosaiced_032.TIF 2885 4096
+./Sediment/Sediment_00000264.tif mosaiced_032.TIF 7470 1627
+./Sediment/Sediment_00000265.tif mosaiced_032.TIF 3075 2657
+./Sediment/Sediment_00000266.tif mosaiced_032.TIF 6295 3521
+./Sediment/Sediment_00000267.tif mosaiced_032.TIF 6890 1664
+./Sediment/Sediment_00000268.tif mosaiced_032.TIF 6532 3625
+./Sediment/Sediment_00000269.tif mosaiced_032.TIF 5289 4536
+./Beach/Beach_00000260.tif mosaiced_032.TIF 7599 2672
+./Beach/Beach_00000261.tif mosaiced_032.TIF 4957 2602
+./Beach/Beach_00000262.tif mosaiced_032.TIF 3197 3715
+./Beach/Beach_00000263.tif mosaiced_032.TIF 7305 3016
+./Beach/Beach_00000264.tif mosaiced_032.TIF 3590 3162
+./Beach/Beach_00000265.tif mosaiced_032.TIF 7411 2272
+./Beach/Beach_00000266.tif mosaiced_032.TIF 6834 2380
+./Beach/Beach_00000267.tif mosaiced_032.TIF 4954 2598
+./Beach/Beach_00000268.tif mosaiced_032.TIF 7298 2279
+./Beach/Beach_00000269.tif mosaiced_032.TIF 5489 2471
+./Seagrass/Seagrass_00000260.tif mosaiced_032.TIF 5217 2935
+./Seagrass/Seagrass_00000261.tif mosaiced_032.TIF 4601 3402
+./Seagrass/Seagrass_00000262.tif mosaiced_032.TIF 6963 2333
+./Seagrass/Seagrass_00000263.tif mosaiced_032.TIF 4533 5397
+./Seagrass/Seagrass_00000264.tif mosaiced_032.TIF 3492 3202
+./Seagrass/Seagrass_00000265.tif mosaiced_032.TIF 6900 2357
+./Seagrass/Seagrass_00000266.tif mosaiced_032.TIF 4167 4548
+./Seagrass/Seagrass_00000267.tif mosaiced_032.TIF 7194 2266
+./Seagrass/Seagrass_00000268.tif mosaiced_032.TIF 6300 2386
+./Seagrass/Seagrass_00000269.tif mosaiced_032.TIF 5423 2871
+./Terrestrial vegetation/Terrestrial vegetation_00000260.tif mosaiced_032.TIF 3711 2946
+./Terrestrial vegetation/Terrestrial vegetation_00000261.tif mosaiced_032.TIF 6118 2541
+./Terrestrial vegetation/Terrestrial vegetation_00000262.tif mosaiced_032.TIF 6370 2908
+./Terrestrial vegetation/Terrestrial vegetation_00000263.tif mosaiced_032.TIF 3201 3669
+./Terrestrial vegetation/Terrestrial vegetation_00000264.tif mosaiced_032.TIF 6748 2883
+./Terrestrial vegetation/Terrestrial vegetation_00000265.tif mosaiced_032.TIF 3929 3611
+./Terrestrial vegetation/Terrestrial vegetation_00000266.tif mosaiced_032.TIF 3273 4694
+./Terrestrial vegetation/Terrestrial vegetation_00000267.tif mosaiced_032.TIF 4139 4264
+./Terrestrial vegetation/Terrestrial vegetation_00000268.tif mosaiced_032.TIF 5662 2762
+./Terrestrial vegetation/Terrestrial vegetation_00000269.tif mosaiced_032.TIF 4232 3514
+./Deep water/Deep water_00000260.tif mosaiced_032.TIF 857 328
+./Deep water/Deep water_00000261.tif mosaiced_032.TIF 1453 3794
+./Deep water/Deep water_00000262.tif mosaiced_032.TIF 4479 1642
+./Deep water/Deep water_00000263.tif mosaiced_032.TIF 1358 6197
+./Deep water/Deep water_00000264.tif mosaiced_032.TIF 82 7138
+./Deep water/Deep water_00000265.tif mosaiced_032.TIF 8934 6640
+./Deep water/Deep water_00000266.tif mosaiced_032.TIF 379 7180
+./Deep water/Deep water_00000267.tif mosaiced_032.TIF 9989 3895
+./Deep water/Deep water_00000268.tif mosaiced_032.TIF 5913 580
+./Deep water/Deep water_00000269.tif mosaiced_032.TIF 8450 6590
+./Other or Unknown/Other or Unknown_00000260.tif mosaiced_032.TIF 9677 1758
+./Other or Unknown/Other or Unknown_00000261.tif mosaiced_032.TIF 5216 5725
+./Other or Unknown/Other or Unknown_00000262.tif mosaiced_032.TIF 7414 3998
+./Other or Unknown/Other or Unknown_00000263.tif mosaiced_032.TIF 4158 4088
+./Other or Unknown/Other or Unknown_00000264.tif mosaiced_032.TIF 8434 4661
+./Other or Unknown/Other or Unknown_00000265.tif mosaiced_032.TIF 8537 4046
+./Other or Unknown/Other or Unknown_00000266.tif mosaiced_032.TIF 1427 2712
+./Other or Unknown/Other or Unknown_00000267.tif mosaiced_032.TIF 7676 6054
+./Other or Unknown/Other or Unknown_00000268.tif mosaiced_032.TIF 4844 5627
+./Other or Unknown/Other or Unknown_00000269.tif mosaiced_032.TIF 5035 5716
+./Coral/Coral_00000270.tif mosaiced_033.TIF 2146 2976
+./Coral/Coral_00000271.tif mosaiced_033.TIF 631 1664
+./Coral/Coral_00000272.tif mosaiced_033.TIF 949 395
+./Coral/Coral_00000273.tif mosaiced_033.TIF 2432 3118
+./Coral/Coral_00000274.tif mosaiced_033.TIF 2424 3097
+./Coral/Coral_00000275.tif mosaiced_033.TIF 2720 824
+./Coral/Coral_00000276.tif mosaiced_033.TIF 717 2100
+./Coral/Coral_00000277.tif mosaiced_033.TIF 1317 2845
+./Coral/Coral_00000278.tif mosaiced_033.TIF 3398 3115
+./Coral/Coral_00000279.tif mosaiced_033.TIF 2362 3238
+./Sediment/Sediment_00000270.tif mosaiced_033.TIF 2030 2784
+./Sediment/Sediment_00000271.tif mosaiced_033.TIF 2596 970
+./Sediment/Sediment_00000272.tif mosaiced_033.TIF 776 1053
+./Sediment/Sediment_00000273.tif mosaiced_033.TIF 2363 862
+./Sediment/Sediment_00000274.tif mosaiced_033.TIF 3032 2951
+./Sediment/Sediment_00000275.tif mosaiced_033.TIF 3476 1949
+./Sediment/Sediment_00000276.tif mosaiced_033.TIF 2058 2407
+./Sediment/Sediment_00000277.tif mosaiced_033.TIF 3706 2793
+./Sediment/Sediment_00000278.tif mosaiced_033.TIF 2276 2987
+./Sediment/Sediment_00000279.tif mosaiced_033.TIF 3213 2947
+./Beach/Beach_00000270.tif mosaiced_033.TIF 899 1659
+./Beach/Beach_00000271.tif mosaiced_033.TIF 996 1956
+./Beach/Beach_00000272.tif mosaiced_033.TIF 1336 2313
+./Beach/Beach_00000273.tif mosaiced_033.TIF 2525 1319
+./Beach/Beach_00000274.tif mosaiced_033.TIF 2843 2622
+./Beach/Beach_00000275.tif mosaiced_033.TIF 2369 1060
+./Beach/Beach_00000276.tif mosaiced_033.TIF 2836 2635
+./Beach/Beach_00000277.tif mosaiced_033.TIF 844 1809
+./Beach/Beach_00000278.tif mosaiced_033.TIF 1311 2310
+./Beach/Beach_00000279.tif mosaiced_033.TIF 1517 2297
+./Seagrass/Seagrass_00000270.tif mosaiced_033.TIF 2688 1452
+./Seagrass/Seagrass_00000271.tif mosaiced_033.TIF 2573 1369
+./Seagrass/Seagrass_00000272.tif mosaiced_033.TIF 2237 765
+./Seagrass/Seagrass_00000273.tif mosaiced_033.TIF 2207 744
+./Seagrass/Seagrass_00000274.tif mosaiced_033.TIF 2992 1668
+./Seagrass/Seagrass_00000275.tif mosaiced_033.TIF 2602 1385
+./Seagrass/Seagrass_00000276.tif mosaiced_033.TIF 2412 1126
+./Seagrass/Seagrass_00000277.tif mosaiced_033.TIF 2707 1460
+./Seagrass/Seagrass_00000278.tif mosaiced_033.TIF 2664 1454
+./Seagrass/Seagrass_00000279.tif mosaiced_033.TIF 2581 1385
+./Terrestrial vegetation/Terrestrial vegetation_00000270.tif mosaiced_033.TIF 1939 2002
+./Terrestrial vegetation/Terrestrial vegetation_00000271.tif mosaiced_033.TIF 2666 2331
+./Terrestrial vegetation/Terrestrial vegetation_00000272.tif mosaiced_033.TIF 2871 1700
+./Terrestrial vegetation/Terrestrial vegetation_00000273.tif mosaiced_033.TIF 2247 954
+./Terrestrial vegetation/Terrestrial vegetation_00000274.tif mosaiced_033.TIF 2323 1002
+./Terrestrial vegetation/Terrestrial vegetation_00000275.tif mosaiced_033.TIF 2671 2444
+./Terrestrial vegetation/Terrestrial vegetation_00000276.tif mosaiced_033.TIF 963 1759
+./Terrestrial vegetation/Terrestrial vegetation_00000277.tif mosaiced_033.TIF 2009 791
+./Terrestrial vegetation/Terrestrial vegetation_00000278.tif mosaiced_033.TIF 1510 1192
+./Terrestrial vegetation/Terrestrial vegetation_00000279.tif mosaiced_033.TIF 1958 1358
+./Deep water/Deep water_00000270.tif mosaiced_033.TIF 2877 371
+./Deep water/Deep water_00000271.tif mosaiced_033.TIF 1672 3372
+./Deep water/Deep water_00000272.tif mosaiced_033.TIF 233 461
+./Deep water/Deep water_00000273.tif mosaiced_033.TIF 2474 3831
+./Deep water/Deep water_00000274.tif mosaiced_033.TIF 406 2674
+./Deep water/Deep water_00000275.tif mosaiced_033.TIF 4339 2266
+./Deep water/Deep water_00000276.tif mosaiced_033.TIF 1316 3607
+./Deep water/Deep water_00000277.tif mosaiced_033.TIF 290 448
+./Deep water/Deep water_00000278.tif mosaiced_033.TIF 4363 582
+./Deep water/Deep water_00000279.tif mosaiced_033.TIF 360 2769
+./Other or Unknown/Other or Unknown_00000270.tif mosaiced_033.TIF 2049 1391
+./Other or Unknown/Other or Unknown_00000271.tif mosaiced_033.TIF 2462 2124
+./Other or Unknown/Other or Unknown_00000272.tif mosaiced_033.TIF 1171 944
+./Other or Unknown/Other or Unknown_00000273.tif mosaiced_033.TIF 1077 885
+./Other or Unknown/Other or Unknown_00000274.tif mosaiced_033.TIF 1098 1533
+./Other or Unknown/Other or Unknown_00000275.tif mosaiced_033.TIF 2350 2516
+./Other or Unknown/Other or Unknown_00000276.tif mosaiced_033.TIF 1235 2137
+./Other or Unknown/Other or Unknown_00000277.tif mosaiced_033.TIF 2609 1947
+./Other or Unknown/Other or Unknown_00000278.tif mosaiced_033.TIF 2864 2069
+./Other or Unknown/Other or Unknown_00000279.tif mosaiced_033.TIF 2320 348
+./Coral/Coral_00000280.tif mosaiced_034.TIF 4009 7751
+./Coral/Coral_00000281.tif mosaiced_034.TIF 5913 1666
+./Coral/Coral_00000282.tif mosaiced_034.TIF 12821 6274
+./Coral/Coral_00000283.tif mosaiced_034.TIF 5742 7328
+./Coral/Coral_00000284.tif mosaiced_034.TIF 15282 3583
+./Coral/Coral_00000285.tif mosaiced_034.TIF 1324 7650
+./Coral/Coral_00000286.tif mosaiced_034.TIF 4050 1526
+./Coral/Coral_00000287.tif mosaiced_034.TIF 14316 4536
+./Coral/Coral_00000288.tif mosaiced_034.TIF 17144 729
+./Coral/Coral_00000289.tif mosaiced_034.TIF 11252 8119
+./Sediment/Sediment_00000280.tif mosaiced_034.TIF 5302 2478
+./Sediment/Sediment_00000281.tif mosaiced_034.TIF 12962 2275
+./Sediment/Sediment_00000282.tif mosaiced_034.TIF 14849 477
+./Sediment/Sediment_00000283.tif mosaiced_034.TIF 4963 4494
+./Sediment/Sediment_00000284.tif mosaiced_034.TIF 10271 5121
+./Sediment/Sediment_00000285.tif mosaiced_034.TIF 5160 6426
+./Sediment/Sediment_00000286.tif mosaiced_034.TIF 5559 5791
+./Sediment/Sediment_00000287.tif mosaiced_034.TIF 1955 7277
+./Sediment/Sediment_00000288.tif mosaiced_034.TIF 10209 6019
+./Sediment/Sediment_00000289.tif mosaiced_034.TIF 6170 504
+./Beach/Beach_00000280.tif mosaiced_034.TIF 16420 679
+./Beach/Beach_00000281.tif mosaiced_034.TIF 16235 985
+./Beach/Beach_00000282.tif mosaiced_034.TIF 16059 1085
+./Beach/Beach_00000283.tif mosaiced_034.TIF 15836 1223
+./Beach/Beach_00000284.tif mosaiced_034.TIF 16568 592
+./Beach/Beach_00000285.tif mosaiced_034.TIF 15941 1171
+./Beach/Beach_00000286.tif mosaiced_034.TIF 16247 937
+./Beach/Beach_00000287.tif mosaiced_034.TIF 16372 743
+./Beach/Beach_00000288.tif mosaiced_034.TIF 15765 1321
+./Beach/Beach_00000289.tif mosaiced_034.TIF 15843 1220
+./Terrestrial vegetation/Terrestrial vegetation_00000280.tif mosaiced_034.TIF 13155 3885
+./Terrestrial vegetation/Terrestrial vegetation_00000281.tif mosaiced_034.TIF 12478 3863
+./Terrestrial vegetation/Terrestrial vegetation_00000282.tif mosaiced_034.TIF 12566 3955
+./Terrestrial vegetation/Terrestrial vegetation_00000283.tif mosaiced_034.TIF 12888 4067
+./Terrestrial vegetation/Terrestrial vegetation_00000284.tif mosaiced_034.TIF 12620 3567
+./Terrestrial vegetation/Terrestrial vegetation_00000285.tif mosaiced_034.TIF 12905 4048
+./Terrestrial vegetation/Terrestrial vegetation_00000286.tif mosaiced_034.TIF 12483 3621
+./Terrestrial vegetation/Terrestrial vegetation_00000287.tif mosaiced_034.TIF 12769 3608
+./Terrestrial vegetation/Terrestrial vegetation_00000288.tif mosaiced_034.TIF 13021 3970
+./Terrestrial vegetation/Terrestrial vegetation_00000289.tif mosaiced_034.TIF 13042 3760
+./Deep water/Deep water_00000280.tif mosaiced_034.TIF 16980 4245
+./Deep water/Deep water_00000281.tif mosaiced_034.TIF 17188 7705
+./Deep water/Deep water_00000282.tif mosaiced_034.TIF 16340 1424
+./Deep water/Deep water_00000283.tif mosaiced_034.TIF 16196 7828
+./Deep water/Deep water_00000284.tif mosaiced_034.TIF 13787 8507
+./Deep water/Deep water_00000285.tif mosaiced_034.TIF 14032 7734
+./Deep water/Deep water_00000286.tif mosaiced_034.TIF 17064 5804
+./Deep water/Deep water_00000287.tif mosaiced_034.TIF 17291 2990
+./Deep water/Deep water_00000288.tif mosaiced_034.TIF 6148 8872
+./Deep water/Deep water_00000289.tif mosaiced_034.TIF 2516 1959
+./Other or Unknown/Other or Unknown_00000280.tif mosaiced_034.TIF 2179 5990
+./Other or Unknown/Other or Unknown_00000281.tif mosaiced_034.TIF 6699 169
+./Other or Unknown/Other or Unknown_00000282.tif mosaiced_034.TIF 11958 3153
+./Other or Unknown/Other or Unknown_00000283.tif mosaiced_034.TIF 13774 6517
+./Other or Unknown/Other or Unknown_00000284.tif mosaiced_034.TIF 8478 335
+./Other or Unknown/Other or Unknown_00000285.tif mosaiced_034.TIF 13360 3440
+./Other or Unknown/Other or Unknown_00000286.tif mosaiced_034.TIF 13992 6360
+./Other or Unknown/Other or Unknown_00000287.tif mosaiced_034.TIF 541 5760
+./Other or Unknown/Other or Unknown_00000288.tif mosaiced_034.TIF 6758 543
+./Other or Unknown/Other or Unknown_00000289.tif mosaiced_034.TIF 5381 967
+./Coral/Coral_00000290.tif mosaiced_035.TIF 2968 4487
+./Coral/Coral_00000291.tif mosaiced_035.TIF 14207 5269
+./Coral/Coral_00000292.tif mosaiced_035.TIF 14669 7708
+./Coral/Coral_00000293.tif mosaiced_035.TIF 2024 7255
+./Coral/Coral_00000294.tif mosaiced_035.TIF 2969 4340
+./Coral/Coral_00000295.tif mosaiced_035.TIF 8312 5615
+./Coral/Coral_00000296.tif mosaiced_035.TIF 12819 8107
+./Coral/Coral_00000297.tif mosaiced_035.TIF 3599 8210
+./Coral/Coral_00000298.tif mosaiced_035.TIF 14212 4522
+./Coral/Coral_00000299.tif mosaiced_035.TIF 3158 5658
+./Sediment/Sediment_00000290.tif mosaiced_035.TIF 10462 3428
+./Sediment/Sediment_00000291.tif mosaiced_035.TIF 9920 411
+./Sediment/Sediment_00000292.tif mosaiced_035.TIF 5135 7308
+./Sediment/Sediment_00000293.tif mosaiced_035.TIF 7199 3806
+./Sediment/Sediment_00000294.tif mosaiced_035.TIF 10195 4148
+./Sediment/Sediment_00000295.tif mosaiced_035.TIF 9616 4720
+./Sediment/Sediment_00000296.tif mosaiced_035.TIF 3883 3820
+./Sediment/Sediment_00000297.tif mosaiced_035.TIF 9859 8174
+./Sediment/Sediment_00000298.tif mosaiced_035.TIF 13794 6674
+./Sediment/Sediment_00000299.tif mosaiced_035.TIF 7771 3162
+./Beach/Beach_00000290.tif mosaiced_035.TIF 6450 3201
+./Beach/Beach_00000291.tif mosaiced_035.TIF 12658 2362
+./Beach/Beach_00000292.tif mosaiced_035.TIF 12722 7911
+./Beach/Beach_00000293.tif mosaiced_035.TIF 8308 977
+./Beach/Beach_00000294.tif mosaiced_035.TIF 10115 400
+./Beach/Beach_00000295.tif mosaiced_035.TIF 12752 7836
+./Beach/Beach_00000296.tif mosaiced_035.TIF 13421 5704
+./Beach/Beach_00000297.tif mosaiced_035.TIF 14368 6070
+./Beach/Beach_00000298.tif mosaiced_035.TIF 14488 5231
+./Beach/Beach_00000299.tif mosaiced_035.TIF 13063 7624
+./Seagrass/Seagrass_00000280.tif mosaiced_035.TIF 10045 435
+./Seagrass/Seagrass_00000281.tif mosaiced_035.TIF 8003 2239
+./Seagrass/Seagrass_00000282.tif mosaiced_035.TIF 7651 302
+./Seagrass/Seagrass_00000283.tif mosaiced_035.TIF 6312 3297
+./Seagrass/Seagrass_00000284.tif mosaiced_035.TIF 14693 5216
+./Seagrass/Seagrass_00000285.tif mosaiced_035.TIF 11807 228
+./Seagrass/Seagrass_00000286.tif mosaiced_035.TIF 12566 1960
+./Seagrass/Seagrass_00000287.tif mosaiced_035.TIF 7139 2818
+./Seagrass/Seagrass_00000288.tif mosaiced_035.TIF 6842 2928
+./Seagrass/Seagrass_00000289.tif mosaiced_035.TIF 6228 3351
+./Terrestrial vegetation/Terrestrial vegetation_00000290.tif mosaiced_035.TIF 12387 3170
+./Terrestrial vegetation/Terrestrial vegetation_00000291.tif mosaiced_035.TIF 14052 5947
+./Terrestrial vegetation/Terrestrial vegetation_00000292.tif mosaiced_035.TIF 13286 6103
+./Terrestrial vegetation/Terrestrial vegetation_00000293.tif mosaiced_035.TIF 4291 991
+./Terrestrial vegetation/Terrestrial vegetation_00000294.tif mosaiced_035.TIF 6103 3229
+./Terrestrial vegetation/Terrestrial vegetation_00000295.tif mosaiced_035.TIF 6080 2719
+./Terrestrial vegetation/Terrestrial vegetation_00000296.tif mosaiced_035.TIF 14004 5636
+./Terrestrial vegetation/Terrestrial vegetation_00000297.tif mosaiced_035.TIF 4132 537
+./Terrestrial vegetation/Terrestrial vegetation_00000298.tif mosaiced_035.TIF 4438 262
+./Terrestrial vegetation/Terrestrial vegetation_00000299.tif mosaiced_035.TIF 5277 2404
+./Deep water/Deep water_00000290.tif mosaiced_035.TIF 16528 3618
+./Deep water/Deep water_00000291.tif mosaiced_035.TIF 15493 1792
+./Deep water/Deep water_00000292.tif mosaiced_035.TIF 16295 6828
+./Deep water/Deep water_00000293.tif mosaiced_035.TIF 15856 5132
+./Deep water/Deep water_00000294.tif mosaiced_035.TIF 14537 1699
+./Deep water/Deep water_00000295.tif mosaiced_035.TIF 382 3541
+./Deep water/Deep water_00000296.tif mosaiced_035.TIF 15471 116
+./Deep water/Deep water_00000297.tif mosaiced_035.TIF 14755 2450
+./Deep water/Deep water_00000298.tif mosaiced_035.TIF 14902 4024
+./Deep water/Deep water_00000299.tif mosaiced_035.TIF 25 3051
+./Other or Unknown/Other or Unknown_00000290.tif mosaiced_035.TIF 14654 6577
+./Other or Unknown/Other or Unknown_00000291.tif mosaiced_035.TIF 8060 1351
+./Other or Unknown/Other or Unknown_00000292.tif mosaiced_035.TIF 3127 2083
+./Other or Unknown/Other or Unknown_00000293.tif mosaiced_035.TIF 1901 3084
+./Other or Unknown/Other or Unknown_00000294.tif mosaiced_035.TIF 6263 10
+./Other or Unknown/Other or Unknown_00000295.tif mosaiced_035.TIF 8333 882
+./Other or Unknown/Other or Unknown_00000296.tif mosaiced_035.TIF 6259 4270
+./Other or Unknown/Other or Unknown_00000297.tif mosaiced_035.TIF 3617 2579
+./Other or Unknown/Other or Unknown_00000298.tif mosaiced_035.TIF 8249 1392
+./Other or Unknown/Other or Unknown_00000299.tif mosaiced_035.TIF 8816 1133
+./Coral/Coral_00000300.tif mosaiced_036.TIF 15868 2316
+./Coral/Coral_00000301.tif mosaiced_036.TIF 4633 859
+./Coral/Coral_00000302.tif mosaiced_036.TIF 14316 4196
+./Coral/Coral_00000303.tif mosaiced_036.TIF 17460 168
+./Coral/Coral_00000304.tif mosaiced_036.TIF 12986 5820
+./Coral/Coral_00000305.tif mosaiced_036.TIF 3731 1469
+./Coral/Coral_00000306.tif mosaiced_036.TIF 4834 244
+./Coral/Coral_00000307.tif mosaiced_036.TIF 12929 5817
+./Coral/Coral_00000308.tif mosaiced_036.TIF 15872 2588
+./Coral/Coral_00000309.tif mosaiced_036.TIF 17600 105
+./Sediment/Sediment_00000300.tif mosaiced_036.TIF 10662 2958
+./Sediment/Sediment_00000301.tif mosaiced_036.TIF 8855 1180
+./Sediment/Sediment_00000302.tif mosaiced_036.TIF 15188 1132
+./Sediment/Sediment_00000303.tif mosaiced_036.TIF 11625 6117
+./Sediment/Sediment_00000304.tif mosaiced_036.TIF 4854 1552
+./Sediment/Sediment_00000305.tif mosaiced_036.TIF 12724 1820
+./Sediment/Sediment_00000306.tif mosaiced_036.TIF 7813 3638
+./Sediment/Sediment_00000307.tif mosaiced_036.TIF 15253 1176
+./Sediment/Sediment_00000308.tif mosaiced_036.TIF 8704 520
+./Sediment/Sediment_00000309.tif mosaiced_036.TIF 5309 2583
+./Beach/Beach_00000300.tif mosaiced_036.TIF 16255 454
+./Beach/Beach_00000301.tif mosaiced_036.TIF 16577 95
+./Beach/Beach_00000302.tif mosaiced_036.TIF 16373 255
+./Beach/Beach_00000303.tif mosaiced_036.TIF 16566 91
+./Beach/Beach_00000304.tif mosaiced_036.TIF 16298 412
+./Beach/Beach_00000305.tif mosaiced_036.TIF 12401 3228
+./Beach/Beach_00000306.tif mosaiced_036.TIF 6124 1508
+./Beach/Beach_00000307.tif mosaiced_036.TIF 16690 29
+./Beach/Beach_00000308.tif mosaiced_036.TIF 16561 92
+./Beach/Beach_00000309.tif mosaiced_036.TIF 16399 193
+./Terrestrial vegetation/Terrestrial vegetation_00000300.tif mosaiced_036.TIF 6142 858
+./Terrestrial vegetation/Terrestrial vegetation_00000301.tif mosaiced_036.TIF 13002 3274
+./Terrestrial vegetation/Terrestrial vegetation_00000302.tif mosaiced_036.TIF 12877 2655
+./Terrestrial vegetation/Terrestrial vegetation_00000303.tif mosaiced_036.TIF 13011 2684
+./Terrestrial vegetation/Terrestrial vegetation_00000304.tif mosaiced_036.TIF 13098 3264
+./Terrestrial vegetation/Terrestrial vegetation_00000305.tif mosaiced_036.TIF 12847 3325
+./Terrestrial vegetation/Terrestrial vegetation_00000306.tif mosaiced_036.TIF 13133 3238
+./Terrestrial vegetation/Terrestrial vegetation_00000307.tif mosaiced_036.TIF 12700 2944
+./Terrestrial vegetation/Terrestrial vegetation_00000308.tif mosaiced_036.TIF 12848 2631
+./Terrestrial vegetation/Terrestrial vegetation_00000309.tif mosaiced_036.TIF 13102 2707
+./Deep water/Deep water_00000300.tif mosaiced_036.TIF 1752 3765
+./Deep water/Deep water_00000301.tif mosaiced_036.TIF 7028 7816
+./Deep water/Deep water_00000302.tif mosaiced_036.TIF 5029 6679
+./Deep water/Deep water_00000303.tif mosaiced_036.TIF 18302 3086
+./Deep water/Deep water_00000304.tif mosaiced_036.TIF 18488 7305
+./Deep water/Deep water_00000305.tif mosaiced_036.TIF 242 6607
+./Deep water/Deep water_00000306.tif mosaiced_036.TIF 20128 4830
+./Deep water/Deep water_00000307.tif mosaiced_036.TIF 19866 5305
+./Deep water/Deep water_00000308.tif mosaiced_036.TIF 5105 7637
+./Deep water/Deep water_00000309.tif mosaiced_036.TIF 6675 6877
+./Other or Unknown/Other or Unknown_00000300.tif mosaiced_036.TIF 3792 7095
+./Other or Unknown/Other or Unknown_00000301.tif mosaiced_036.TIF 6294 6021
+./Other or Unknown/Other or Unknown_00000302.tif mosaiced_036.TIF 11126 7366
+./Other or Unknown/Other or Unknown_00000303.tif mosaiced_036.TIF 1566 4088
+./Other or Unknown/Other or Unknown_00000304.tif mosaiced_036.TIF 10249 7291
+./Other or Unknown/Other or Unknown_00000305.tif mosaiced_036.TIF 11365 1426
+./Other or Unknown/Other or Unknown_00000306.tif mosaiced_036.TIF 11866 1824
+./Other or Unknown/Other or Unknown_00000307.tif mosaiced_036.TIF 2006 8027
+./Other or Unknown/Other or Unknown_00000308.tif mosaiced_036.TIF 11131 7553
+./Other or Unknown/Other or Unknown_00000309.tif mosaiced_036.TIF 4018 6543
+./Coral/Coral_00000310.tif mosaiced_037.TIF 13190 5235
+./Coral/Coral_00000311.tif mosaiced_037.TIF 4028 7376
+./Coral/Coral_00000312.tif mosaiced_037.TIF 12552 3827
+./Coral/Coral_00000313.tif mosaiced_037.TIF 1231 5972
+./Coral/Coral_00000314.tif mosaiced_037.TIF 1007 5595
+./Coral/Coral_00000315.tif mosaiced_037.TIF 1471 7953
+./Coral/Coral_00000316.tif mosaiced_037.TIF 3695 965
+./Coral/Coral_00000317.tif mosaiced_037.TIF 7151 834
+./Coral/Coral_00000318.tif mosaiced_037.TIF 14827 3816
+./Coral/Coral_00000319.tif mosaiced_037.TIF 1731 7158
+./Sediment/Sediment_00000310.tif mosaiced_037.TIF 7003 2747
+./Sediment/Sediment_00000311.tif mosaiced_037.TIF 5295 3615
+./Sediment/Sediment_00000312.tif mosaiced_037.TIF 13032 1996
+./Sediment/Sediment_00000313.tif mosaiced_037.TIF 9546 5917
+./Sediment/Sediment_00000314.tif mosaiced_037.TIF 3931 5760
+./Sediment/Sediment_00000315.tif mosaiced_037.TIF 14632 3597
+./Sediment/Sediment_00000316.tif mosaiced_037.TIF 4361 3891
+./Sediment/Sediment_00000317.tif mosaiced_037.TIF 5577 1949
+./Sediment/Sediment_00000318.tif mosaiced_037.TIF 11774 7386
+./Sediment/Sediment_00000319.tif mosaiced_037.TIF 10763 6077
+./Beach/Beach_00000310.tif mosaiced_037.TIF 15942 827
+./Beach/Beach_00000311.tif mosaiced_037.TIF 16143 700
+./Beach/Beach_00000312.tif mosaiced_037.TIF 16527 292
+./Beach/Beach_00000313.tif mosaiced_037.TIF 16393 404
+./Beach/Beach_00000314.tif mosaiced_037.TIF 15919 850
+./Beach/Beach_00000315.tif mosaiced_037.TIF 16380 426
+./Beach/Beach_00000316.tif mosaiced_037.TIF 16620 251
+./Beach/Beach_00000317.tif mosaiced_037.TIF 16269 595
+./Beach/Beach_00000318.tif mosaiced_037.TIF 12423 3638
+./Beach/Beach_00000319.tif mosaiced_037.TIF 12682 3803
+./Terrestrial vegetation/Terrestrial vegetation_00000310.tif mosaiced_037.TIF 12941 3149
+./Terrestrial vegetation/Terrestrial vegetation_00000311.tif mosaiced_037.TIF 12777 3788
+./Terrestrial vegetation/Terrestrial vegetation_00000312.tif mosaiced_037.TIF 12696 3797
+./Terrestrial vegetation/Terrestrial vegetation_00000313.tif mosaiced_037.TIF 12494 3721
+./Terrestrial vegetation/Terrestrial vegetation_00000314.tif mosaiced_037.TIF 13000 3535
+./Terrestrial vegetation/Terrestrial vegetation_00000315.tif mosaiced_037.TIF 12650 3074
+./Terrestrial vegetation/Terrestrial vegetation_00000316.tif mosaiced_037.TIF 12611 3280
+./Terrestrial vegetation/Terrestrial vegetation_00000317.tif mosaiced_037.TIF 12945 3738
+./Terrestrial vegetation/Terrestrial vegetation_00000318.tif mosaiced_037.TIF 12918 3461
+./Terrestrial vegetation/Terrestrial vegetation_00000319.tif mosaiced_037.TIF 6177 1083
+./Deep water/Deep water_00000310.tif mosaiced_037.TIF 16710 3483
+./Deep water/Deep water_00000311.tif mosaiced_037.TIF 2388 1988
+./Deep water/Deep water_00000312.tif mosaiced_037.TIF 13553 6956
+./Deep water/Deep water_00000313.tif mosaiced_037.TIF 12390 7474
+./Deep water/Deep water_00000314.tif mosaiced_037.TIF 13322 7050
+./Deep water/Deep water_00000315.tif mosaiced_037.TIF 431 2860
+./Deep water/Deep water_00000316.tif mosaiced_037.TIF 18969 5364
+./Deep water/Deep water_00000317.tif mosaiced_037.TIF 16106 7789
+./Deep water/Deep water_00000318.tif mosaiced_037.TIF 5603 7474
+./Deep water/Deep water_00000319.tif mosaiced_037.TIF 13713 6695
+./Other or Unknown/Other or Unknown_00000310.tif mosaiced_037.TIF 3177 4125
+./Other or Unknown/Other or Unknown_00000311.tif mosaiced_037.TIF 8029 6596
+./Other or Unknown/Other or Unknown_00000312.tif mosaiced_037.TIF 7103 7470
+./Other or Unknown/Other or Unknown_00000313.tif mosaiced_037.TIF 7374 5595
+./Other or Unknown/Other or Unknown_00000314.tif mosaiced_037.TIF 7676 5712
+./Other or Unknown/Other or Unknown_00000315.tif mosaiced_037.TIF 5817 5404
+./Other or Unknown/Other or Unknown_00000316.tif mosaiced_037.TIF 10161 7876
+./Other or Unknown/Other or Unknown_00000317.tif mosaiced_037.TIF 7984 5356
+./Other or Unknown/Other or Unknown_00000318.tif mosaiced_037.TIF 6427 5491
+./Other or Unknown/Other or Unknown_00000319.tif mosaiced_037.TIF 5950 5798
+./Coral/Coral_00000320.tif mosaiced_038.TIF 6478 2317
+./Coral/Coral_00000321.tif mosaiced_038.TIF 331 1105
+./Coral/Coral_00000322.tif mosaiced_038.TIF 1687 3745
+./Coral/Coral_00000323.tif mosaiced_038.TIF 5451 2925
+./Coral/Coral_00000324.tif mosaiced_038.TIF 3187 1430
+./Coral/Coral_00000325.tif mosaiced_038.TIF 11034 4054
+./Coral/Coral_00000326.tif mosaiced_038.TIF 1143 2940
+./Coral/Coral_00000327.tif mosaiced_038.TIF 776 1865
+./Coral/Coral_00000328.tif mosaiced_038.TIF 8321 3596
+./Coral/Coral_00000329.tif mosaiced_038.TIF 8321 3566
+./Sediment/Sediment_00000320.tif mosaiced_038.TIF 2813 2381
+./Sediment/Sediment_00000321.tif mosaiced_038.TIF 6272 3493
+./Sediment/Sediment_00000322.tif mosaiced_038.TIF 5411 3163
+./Sediment/Sediment_00000323.tif mosaiced_038.TIF 3793 4792
+./Sediment/Sediment_00000324.tif mosaiced_038.TIF 2352 5082
+./Sediment/Sediment_00000325.tif mosaiced_038.TIF 5056 3510
+./Sediment/Sediment_00000326.tif mosaiced_038.TIF 4409 2944
+./Sediment/Sediment_00000327.tif mosaiced_038.TIF 3893 3479
+./Sediment/Sediment_00000328.tif mosaiced_038.TIF 2974 5336
+./Sediment/Sediment_00000329.tif mosaiced_038.TIF 2818 5051
+./Beach/Beach_00000320.tif mosaiced_038.TIF 4003 3609
+./Beach/Beach_00000321.tif mosaiced_038.TIF 4111 3626
+./Beach/Beach_00000322.tif mosaiced_038.TIF 11033 4627
+./Beach/Beach_00000323.tif mosaiced_038.TIF 11516 5228
+./Beach/Beach_00000324.tif mosaiced_038.TIF 9103 4936
+./Beach/Beach_00000325.tif mosaiced_038.TIF 4865 4347
+./Beach/Beach_00000326.tif mosaiced_038.TIF 3110 5050
+./Beach/Beach_00000327.tif mosaiced_038.TIF 11096 4571
+./Beach/Beach_00000328.tif mosaiced_038.TIF 9552 4852
+./Beach/Beach_00000329.tif mosaiced_038.TIF 3677 3522
+./Seagrass/Seagrass_00000290.tif mosaiced_038.TIF 10124 4752
+./Seagrass/Seagrass_00000291.tif mosaiced_038.TIF 10953 4719
+./Seagrass/Seagrass_00000292.tif mosaiced_038.TIF 8822 4999
+./Seagrass/Seagrass_00000293.tif mosaiced_038.TIF 11166 5059
+./Seagrass/Seagrass_00000294.tif mosaiced_038.TIF 6874 5140
+./Seagrass/Seagrass_00000295.tif mosaiced_038.TIF 10749 4560
+./Seagrass/Seagrass_00000296.tif mosaiced_038.TIF 9702 4893
+./Seagrass/Seagrass_00000297.tif mosaiced_038.TIF 7657 4688
+./Seagrass/Seagrass_00000298.tif mosaiced_038.TIF 10222 4753
+./Seagrass/Seagrass_00000299.tif mosaiced_038.TIF 9633 3910
+./Terrestrial vegetation/Terrestrial vegetation_00000320.tif mosaiced_038.TIF 11475 4827
+./Terrestrial vegetation/Terrestrial vegetation_00000321.tif mosaiced_038.TIF 2952 3532
+./Terrestrial vegetation/Terrestrial vegetation_00000322.tif mosaiced_038.TIF 11221 4661
+./Terrestrial vegetation/Terrestrial vegetation_00000323.tif mosaiced_038.TIF 3641 3698
+./Terrestrial vegetation/Terrestrial vegetation_00000324.tif mosaiced_038.TIF 3675 3755
+./Terrestrial vegetation/Terrestrial vegetation_00000325.tif mosaiced_038.TIF 3424 5283
+./Terrestrial vegetation/Terrestrial vegetation_00000326.tif mosaiced_038.TIF 3119 5028
+./Terrestrial vegetation/Terrestrial vegetation_00000327.tif mosaiced_038.TIF 8779 4936
+./Terrestrial vegetation/Terrestrial vegetation_00000328.tif mosaiced_038.TIF 10416 4570
+./Terrestrial vegetation/Terrestrial vegetation_00000329.tif mosaiced_038.TIF 2646 3725
+./Deep water/Deep water_00000320.tif mosaiced_038.TIF 4413 386
+./Deep water/Deep water_00000321.tif mosaiced_038.TIF 6314 385
+./Deep water/Deep water_00000322.tif mosaiced_038.TIF 12033 1333
+./Deep water/Deep water_00000323.tif mosaiced_038.TIF 7520 2196
+./Deep water/Deep water_00000324.tif mosaiced_038.TIF 3058 869
+./Deep water/Deep water_00000325.tif mosaiced_038.TIF 689 3829
+./Deep water/Deep water_00000326.tif mosaiced_038.TIF 12879 1440
+./Deep water/Deep water_00000327.tif mosaiced_038.TIF 3138 903
+./Deep water/Deep water_00000328.tif mosaiced_038.TIF 10656 1988
+./Deep water/Deep water_00000329.tif mosaiced_038.TIF 10465 529
+./Other or Unknown/Other or Unknown_00000320.tif mosaiced_038.TIF 10371 3261
+./Other or Unknown/Other or Unknown_00000321.tif mosaiced_038.TIF 10583 4001
+./Other or Unknown/Other or Unknown_00000322.tif mosaiced_038.TIF 10464 2338
+./Other or Unknown/Other or Unknown_00000323.tif mosaiced_038.TIF 10655 3709
+./Other or Unknown/Other or Unknown_00000324.tif mosaiced_038.TIF 145 2402
+./Other or Unknown/Other or Unknown_00000325.tif mosaiced_038.TIF 3653 3147
+./Other or Unknown/Other or Unknown_00000326.tif mosaiced_038.TIF 5436 2770
+./Other or Unknown/Other or Unknown_00000327.tif mosaiced_038.TIF 6716 3841
+./Other or Unknown/Other or Unknown_00000328.tif mosaiced_038.TIF 2682 2206
+./Other or Unknown/Other or Unknown_00000329.tif mosaiced_038.TIF 9740 3828
+./Coral/Coral_00000330.tif mosaiced_039.TIF 2619 1248
+./Coral/Coral_00000331.tif mosaiced_039.TIF 1139 1606
+./Coral/Coral_00000332.tif mosaiced_039.TIF 1634 572
+./Coral/Coral_00000333.tif mosaiced_039.TIF 2674 1422
+./Coral/Coral_00000334.tif mosaiced_039.TIF 2539 1096
+./Coral/Coral_00000335.tif mosaiced_039.TIF 2180 669
+./Coral/Coral_00000336.tif mosaiced_039.TIF 2156 1871
+./Coral/Coral_00000337.tif mosaiced_039.TIF 1557 2036
+./Coral/Coral_00000338.tif mosaiced_039.TIF 2834 1762
+./Coral/Coral_00000339.tif mosaiced_039.TIF 915 1372
+./Sediment/Sediment_00000330.tif mosaiced_039.TIF 1174 1457
+./Sediment/Sediment_00000331.tif mosaiced_039.TIF 1280 1469
+./Sediment/Sediment_00000332.tif mosaiced_039.TIF 1236 1241
+./Sediment/Sediment_00000333.tif mosaiced_039.TIF 1155 1356
+./Sediment/Sediment_00000334.tif mosaiced_039.TIF 830 1424
+./Sediment/Sediment_00000335.tif mosaiced_039.TIF 1245 879
+./Sediment/Sediment_00000336.tif mosaiced_039.TIF 1856 1874
+./Sediment/Sediment_00000337.tif mosaiced_039.TIF 1287 1367
+./Sediment/Sediment_00000338.tif mosaiced_039.TIF 805 1381
+./Sediment/Sediment_00000339.tif mosaiced_039.TIF 1241 1411
+./Beach/Beach_00000330.tif mosaiced_039.TIF 1405 1166
+./Beach/Beach_00000331.tif mosaiced_039.TIF 1802 841
+./Beach/Beach_00000332.tif mosaiced_039.TIF 2526 1120
+./Beach/Beach_00000333.tif mosaiced_039.TIF 1409 1365
+./Beach/Beach_00000334.tif mosaiced_039.TIF 2356 960
+./Beach/Beach_00000335.tif mosaiced_039.TIF 2606 1306
+./Beach/Beach_00000336.tif mosaiced_039.TIF 1394 1318
+./Beach/Beach_00000337.tif mosaiced_039.TIF 1475 1501
+./Beach/Beach_00000338.tif mosaiced_039.TIF 1412 1207
+./Beach/Beach_00000339.tif mosaiced_039.TIF 1518 875
+./Seagrass/Seagrass_00000300.tif mosaiced_039.TIF 1471 1540
+./Seagrass/Seagrass_00000301.tif mosaiced_039.TIF 1326 935
+./Seagrass/Seagrass_00000302.tif mosaiced_039.TIF 1493 796
+./Seagrass/Seagrass_00000303.tif mosaiced_039.TIF 1418 1474
+./Seagrass/Seagrass_00000304.tif mosaiced_039.TIF 2063 1820
+./Seagrass/Seagrass_00000305.tif mosaiced_039.TIF 1461 1568
+./Seagrass/Seagrass_00000306.tif mosaiced_039.TIF 1402 1430
+./Seagrass/Seagrass_00000307.tif mosaiced_039.TIF 1391 1364
+./Seagrass/Seagrass_00000308.tif mosaiced_039.TIF 1445 1539
+./Seagrass/Seagrass_00000309.tif mosaiced_039.TIF 1466 870
+./Terrestrial vegetation/Terrestrial vegetation_00000330.tif mosaiced_039.TIF 2251 1342
+./Terrestrial vegetation/Terrestrial vegetation_00000331.tif mosaiced_039.TIF 2268 1409
+./Terrestrial vegetation/Terrestrial vegetation_00000332.tif mosaiced_039.TIF 2467 1160
+./Terrestrial vegetation/Terrestrial vegetation_00000333.tif mosaiced_039.TIF 1955 1604
+./Terrestrial vegetation/Terrestrial vegetation_00000334.tif mosaiced_039.TIF 1644 1810
+./Terrestrial vegetation/Terrestrial vegetation_00000335.tif mosaiced_039.TIF 2313 1247
+./Terrestrial vegetation/Terrestrial vegetation_00000336.tif mosaiced_039.TIF 1779 1800
+./Terrestrial vegetation/Terrestrial vegetation_00000337.tif mosaiced_039.TIF 2365 1684
+./Terrestrial vegetation/Terrestrial vegetation_00000338.tif mosaiced_039.TIF 1942 963
+./Terrestrial vegetation/Terrestrial vegetation_00000339.tif mosaiced_039.TIF 2468 1758
+./Deep water/Deep water_00000330.tif mosaiced_039.TIF 1521 2901
+./Deep water/Deep water_00000331.tif mosaiced_039.TIF 852 1558
+./Deep water/Deep water_00000332.tif mosaiced_039.TIF 152 1455
+./Deep water/Deep water_00000333.tif mosaiced_039.TIF 2940 1886
+./Deep water/Deep water_00000334.tif mosaiced_039.TIF 3221 1497
+./Deep water/Deep water_00000335.tif mosaiced_039.TIF 517 3029
+./Deep water/Deep water_00000336.tif mosaiced_039.TIF 1216 2989
+./Deep water/Deep water_00000337.tif mosaiced_039.TIF 2902 712
+./Deep water/Deep water_00000338.tif mosaiced_039.TIF 324 1270
+./Deep water/Deep water_00000339.tif mosaiced_039.TIF 85 117
+./Other or Unknown/Other or Unknown_00000330.tif mosaiced_039.TIF 2364 2319
+./Other or Unknown/Other or Unknown_00000331.tif mosaiced_039.TIF 1654 1210
+./Other or Unknown/Other or Unknown_00000332.tif mosaiced_039.TIF 1656 1377
+./Other or Unknown/Other or Unknown_00000333.tif mosaiced_039.TIF 1558 1324
+./Other or Unknown/Other or Unknown_00000334.tif mosaiced_039.TIF 2243 2490
+./Other or Unknown/Other or Unknown_00000335.tif mosaiced_039.TIF 901 987
+./Other or Unknown/Other or Unknown_00000336.tif mosaiced_039.TIF 2254 2406
+./Other or Unknown/Other or Unknown_00000337.tif mosaiced_039.TIF 3157 2144
+./Other or Unknown/Other or Unknown_00000338.tif mosaiced_039.TIF 731 123
+./Other or Unknown/Other or Unknown_00000339.tif mosaiced_039.TIF 811 794
+./Coral/Coral_00000340.tif mosaiced_040.TIF 2513 308
+./Coral/Coral_00000341.tif mosaiced_040.TIF 1751 455
+./Coral/Coral_00000342.tif mosaiced_040.TIF 1290 999
+./Coral/Coral_00000343.tif mosaiced_040.TIF 1307 622
+./Coral/Coral_00000344.tif mosaiced_040.TIF 1309 919
+./Coral/Coral_00000345.tif mosaiced_040.TIF 1532 762
+./Coral/Coral_00000346.tif mosaiced_040.TIF 1005 279
+./Coral/Coral_00000347.tif mosaiced_040.TIF 1391 405
+./Coral/Coral_00000348.tif mosaiced_040.TIF 1345 974
+./Coral/Coral_00000349.tif mosaiced_040.TIF 1546 800
+./Sediment/Sediment_00000340.tif mosaiced_040.TIF 952 121
+./Sediment/Sediment_00000341.tif mosaiced_040.TIF 2121 237
+./Sediment/Sediment_00000342.tif mosaiced_040.TIF 1921 299
+./Sediment/Sediment_00000343.tif mosaiced_040.TIF 2056 553
+./Sediment/Sediment_00000344.tif mosaiced_040.TIF 1168 857
+./Sediment/Sediment_00000345.tif mosaiced_040.TIF 1133 596
+./Sediment/Sediment_00000346.tif mosaiced_040.TIF 2434 143
+./Sediment/Sediment_00000347.tif mosaiced_040.TIF 1783 306
+./Sediment/Sediment_00000348.tif mosaiced_040.TIF 2078 227
+./Sediment/Sediment_00000349.tif mosaiced_040.TIF 1870 311
+./Beach/Beach_00000340.tif mosaiced_040.TIF 2438 107
+./Beach/Beach_00000341.tif mosaiced_040.TIF 1985 233
+./Beach/Beach_00000342.tif mosaiced_040.TIF 1603 252
+./Beach/Beach_00000343.tif mosaiced_040.TIF 1926 247
+./Beach/Beach_00000344.tif mosaiced_040.TIF 1608 252
+./Beach/Beach_00000345.tif mosaiced_040.TIF 2431 124
+./Beach/Beach_00000346.tif mosaiced_040.TIF 2314 217
+./Beach/Beach_00000347.tif mosaiced_040.TIF 2251 234
+./Beach/Beach_00000348.tif mosaiced_040.TIF 2495 14
+./Beach/Beach_00000349.tif mosaiced_040.TIF 2059 219
+./Seagrass/Seagrass_00000310.tif mosaiced_040.TIF 1867 262
+./Seagrass/Seagrass_00000311.tif mosaiced_040.TIF 1577 255
+./Seagrass/Seagrass_00000312.tif mosaiced_040.TIF 1420 77
+./Seagrass/Seagrass_00000313.tif mosaiced_040.TIF 1928 257
+./Seagrass/Seagrass_00000314.tif mosaiced_040.TIF 1426 58
+./Seagrass/Seagrass_00000315.tif mosaiced_040.TIF 1472 173
+./Seagrass/Seagrass_00000316.tif mosaiced_040.TIF 2002 248
+./Seagrass/Seagrass_00000317.tif mosaiced_040.TIF 1538 218
+./Seagrass/Seagrass_00000318.tif mosaiced_040.TIF 2101 246
+./Seagrass/Seagrass_00000319.tif mosaiced_040.TIF 1437 74
+./Terrestrial vegetation/Terrestrial vegetation_00000340.tif mosaiced_040.TIF 2317 158
+./Terrestrial vegetation/Terrestrial vegetation_00000341.tif mosaiced_040.TIF 1887 200
+./Terrestrial vegetation/Terrestrial vegetation_00000342.tif mosaiced_040.TIF 2007 45
+./Terrestrial vegetation/Terrestrial vegetation_00000343.tif mosaiced_040.TIF 1928 205
+./Terrestrial vegetation/Terrestrial vegetation_00000344.tif mosaiced_040.TIF 1666 201
+./Terrestrial vegetation/Terrestrial vegetation_00000345.tif mosaiced_040.TIF 1494 72
+./Terrestrial vegetation/Terrestrial vegetation_00000346.tif mosaiced_040.TIF 1445 44
+./Terrestrial vegetation/Terrestrial vegetation_00000347.tif mosaiced_040.TIF 1880 27
+./Terrestrial vegetation/Terrestrial vegetation_00000348.tif mosaiced_040.TIF 1789 100
+./Terrestrial vegetation/Terrestrial vegetation_00000349.tif mosaiced_040.TIF 2251 192
+./Deep water/Deep water_00000340.tif mosaiced_040.TIF 1994 889
+./Deep water/Deep water_00000341.tif mosaiced_040.TIF 807 1468
+./Deep water/Deep water_00000342.tif mosaiced_040.TIF 3066 250
+./Deep water/Deep water_00000343.tif mosaiced_040.TIF 1933 853
+./Deep water/Deep water_00000344.tif mosaiced_040.TIF 303 408
+./Deep water/Deep water_00000345.tif mosaiced_040.TIF 2148 819
+./Deep water/Deep water_00000346.tif mosaiced_040.TIF 494 363
+./Deep water/Deep water_00000347.tif mosaiced_040.TIF 2313 1178
+./Deep water/Deep water_00000348.tif mosaiced_040.TIF 417 196
+./Deep water/Deep water_00000349.tif mosaiced_040.TIF 2892 418
+./Other or Unknown/Other or Unknown_00000340.tif mosaiced_040.TIF 1835 1421
+./Other or Unknown/Other or Unknown_00000341.tif mosaiced_040.TIF 1850 1398
+./Other or Unknown/Other or Unknown_00000342.tif mosaiced_040.TIF 2451 138
+./Other or Unknown/Other or Unknown_00000343.tif mosaiced_040.TIF 1830 1441
+./Other or Unknown/Other or Unknown_00000344.tif mosaiced_040.TIF 1846 1383
+./Other or Unknown/Other or Unknown_00000345.tif mosaiced_040.TIF 1852 1405
+./Other or Unknown/Other or Unknown_00000346.tif mosaiced_040.TIF 2070 215
+./Other or Unknown/Other or Unknown_00000347.tif mosaiced_040.TIF 691 574
+./Other or Unknown/Other or Unknown_00000348.tif mosaiced_040.TIF 2238 233
+./Other or Unknown/Other or Unknown_00000349.tif mosaiced_040.TIF 1431 24
+./Coral/Coral_00000350.tif mosaiced_041.TIF 1898 567
+./Coral/Coral_00000351.tif mosaiced_041.TIF 2380 929
+./Coral/Coral_00000352.tif mosaiced_041.TIF 648 1052
+./Coral/Coral_00000353.tif mosaiced_041.TIF 2592 1205
+./Coral/Coral_00000354.tif mosaiced_041.TIF 1000 1040
+./Coral/Coral_00000355.tif mosaiced_041.TIF 1547 713
+./Coral/Coral_00000356.tif mosaiced_041.TIF 1762 665
+./Coral/Coral_00000357.tif mosaiced_041.TIF 375 1143
+./Coral/Coral_00000358.tif mosaiced_041.TIF 1633 771
+./Coral/Coral_00000359.tif mosaiced_041.TIF 1011 735
+./Sediment/Sediment_00000350.tif mosaiced_041.TIF 1267 1047
+./Sediment/Sediment_00000351.tif mosaiced_041.TIF 1294 775
+./Sediment/Sediment_00000352.tif mosaiced_041.TIF 829 783
+./Sediment/Sediment_00000353.tif mosaiced_041.TIF 1966 837
+./Sediment/Sediment_00000354.tif mosaiced_041.TIF 1198 726
+./Sediment/Sediment_00000355.tif mosaiced_041.TIF 1272 683
+./Sediment/Sediment_00000356.tif mosaiced_041.TIF 2302 897
+./Sediment/Sediment_00000357.tif mosaiced_041.TIF 1034 1168
+./Sediment/Sediment_00000358.tif mosaiced_041.TIF 1184 1223
+./Sediment/Sediment_00000359.tif mosaiced_041.TIF 1708 728
+./Beach/Beach_00000350.tif mosaiced_041.TIF 1422 983
+./Beach/Beach_00000351.tif mosaiced_041.TIF 1400 1166
+./Beach/Beach_00000352.tif mosaiced_041.TIF 1682 869
+./Beach/Beach_00000353.tif mosaiced_041.TIF 2078 863
+./Beach/Beach_00000354.tif mosaiced_041.TIF 1620 876
+./Beach/Beach_00000355.tif mosaiced_041.TIF 1403 1221
+./Beach/Beach_00000356.tif mosaiced_041.TIF 1411 1215
+./Beach/Beach_00000357.tif mosaiced_041.TIF 1789 843
+./Beach/Beach_00000358.tif mosaiced_041.TIF 2003 863
+./Beach/Beach_00000359.tif mosaiced_041.TIF 1419 1066
+./Seagrass/Seagrass_00000320.tif mosaiced_041.TIF 1345 1065
+./Seagrass/Seagrass_00000321.tif mosaiced_041.TIF 1539 824
+./Seagrass/Seagrass_00000322.tif mosaiced_041.TIF 1366 1088
+./Seagrass/Seagrass_00000323.tif mosaiced_041.TIF 1395 1084
+./Seagrass/Seagrass_00000324.tif mosaiced_041.TIF 1333 956
+./Seagrass/Seagrass_00000325.tif mosaiced_041.TIF 1489 800
+./Seagrass/Seagrass_00000326.tif mosaiced_041.TIF 1318 1054
+./Seagrass/Seagrass_00000327.tif mosaiced_041.TIF 1326 1108
+./Seagrass/Seagrass_00000328.tif mosaiced_041.TIF 1383 1125
+./Seagrass/Seagrass_00000329.tif mosaiced_041.TIF 1397 1084
+./Terrestrial vegetation/Terrestrial vegetation_00000350.tif mosaiced_041.TIF 2168 1109
+./Terrestrial vegetation/Terrestrial vegetation_00000351.tif mosaiced_041.TIF 1764 1088
+./Terrestrial vegetation/Terrestrial vegetation_00000352.tif mosaiced_041.TIF 1742 1065
+./Terrestrial vegetation/Terrestrial vegetation_00000353.tif mosaiced_041.TIF 1504 1037
+./Terrestrial vegetation/Terrestrial vegetation_00000354.tif mosaiced_041.TIF 2175 1026
+./Terrestrial vegetation/Terrestrial vegetation_00000355.tif mosaiced_041.TIF 1533 1137
+./Terrestrial vegetation/Terrestrial vegetation_00000356.tif mosaiced_041.TIF 2065 1203
+./Terrestrial vegetation/Terrestrial vegetation_00000357.tif mosaiced_041.TIF 1452 1234
+./Terrestrial vegetation/Terrestrial vegetation_00000358.tif mosaiced_041.TIF 1794 1043
+./Terrestrial vegetation/Terrestrial vegetation_00000359.tif mosaiced_041.TIF 1780 878
+./Deep water/Deep water_00000350.tif mosaiced_041.TIF 868 315
+./Deep water/Deep water_00000351.tif mosaiced_041.TIF 1082 314
+./Deep water/Deep water_00000352.tif mosaiced_041.TIF 3252 177
+./Deep water/Deep water_00000353.tif mosaiced_041.TIF 2075 169
+./Deep water/Deep water_00000354.tif mosaiced_041.TIF 1691 221
+./Deep water/Deep water_00000355.tif mosaiced_041.TIF 3143 246
+./Deep water/Deep water_00000356.tif mosaiced_041.TIF 1757 66
+./Deep water/Deep water_00000357.tif mosaiced_041.TIF 1990 484
+./Deep water/Deep water_00000358.tif mosaiced_041.TIF 318 262
+./Deep water/Deep water_00000359.tif mosaiced_041.TIF 421 746
+./Other or Unknown/Other or Unknown_00000350.tif mosaiced_041.TIF 2534 151
+./Other or Unknown/Other or Unknown_00000351.tif mosaiced_041.TIF 2575 545
+./Other or Unknown/Other or Unknown_00000352.tif mosaiced_041.TIF 2720 745
+./Other or Unknown/Other or Unknown_00000353.tif mosaiced_041.TIF 3066 919
+./Other or Unknown/Other or Unknown_00000354.tif mosaiced_041.TIF 2910 952
+./Other or Unknown/Other or Unknown_00000355.tif mosaiced_041.TIF 2656 1086
+./Other or Unknown/Other or Unknown_00000356.tif mosaiced_041.TIF 3257 1230
+./Other or Unknown/Other or Unknown_00000357.tif mosaiced_041.TIF 2427 750
+./Other or Unknown/Other or Unknown_00000358.tif mosaiced_041.TIF 2637 892
+./Other or Unknown/Other or Unknown_00000359.tif mosaiced_041.TIF 2475 588

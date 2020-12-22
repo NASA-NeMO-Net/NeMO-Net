@@ -1,0 +1,1 @@
+./Coral/Coral_00000000.tif mosaiced_003.TIF 2782 4537

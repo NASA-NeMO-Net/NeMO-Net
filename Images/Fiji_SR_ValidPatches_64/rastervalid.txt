@@ -1,0 +1,813 @@
+./Shallow fore reef terrace/Shallow fore reef terrace_00000000.tif test_rasterlores.TIF 606 2646
+./Shallow fore reef slope/Shallow fore reef slope_00000000.tif test_rasterlores.TIF 1176 1218
+./Fore reef sand flats/Fore reef sand flats_00000000.tif test_rasterlores.TIF 2976 4704
+./Coralline algal ridge/Coralline algal ridge_00000000.tif test_rasterlores.TIF 3802 2372
+./Back reef rubble dominated/Back reef rubble dominated_00000000.tif test_rasterlores.TIF 3793 2413
+./Back reef sediment dominated/Back reef sediment dominated_00000000.tif test_rasterlores.TIF 766 2571
+./Back reef pavement/Back reef pavement_00000000.tif test_rasterlores.TIF 1021 1731
+./Back reef coral framework/Back reef coral framework_00000000.tif test_rasterlores.TIF 3697 2469
+./Back reef coral bommies/Back reef coral bommies_00000000.tif test_rasterlores.TIF 3008 4597
+./Dense seagrass meadows/Dense seagrass meadows_00000000.tif test_rasterlores.TIF 987 1845
+./Deep ocean water/Deep ocean water_00000000.tif test_rasterlores.TIF 498 4145
+./Deep lagoonal water/Deep lagoonal water_00000000.tif test_rasterlores.TIF 983 3843
+./Terrestrial vegetation/Terrestrial vegetation_00000000.tif test_rasterlores.TIF 3769 3075
+./Beach sand/Beach sand_00000000.tif test_rasterlores.TIF 2859 992
+./Urban/Urban_00000000.tif test_rasterlores.TIF 2128 1135
+./NoData/NoData_00000000.tif test_rasterlores.TIF 3424 3015
+./Clouds/Clouds_00000000.tif test_rasterlores.TIF 3703 2715
+./Shallow fore reef terrace/Shallow fore reef terrace_00000001.tif test_rasterlores.TIF 664 3419
+./Shallow fore reef slope/Shallow fore reef slope_00000001.tif test_rasterlores.TIF 1974 893
+./Fore reef sand flats/Fore reef sand flats_00000001.tif test_rasterlores.TIF 637 3275
+./Coralline algal ridge/Coralline algal ridge_00000001.tif test_rasterlores.TIF 3752 2158
+./Back reef rubble dominated/Back reef rubble dominated_00000001.tif test_rasterlores.TIF 2914 4577
+./Back reef sediment dominated/Back reef sediment dominated_00000001.tif test_rasterlores.TIF 3352 942
+./Back reef pavement/Back reef pavement_00000001.tif test_rasterlores.TIF 774 3332
+./Back reef coral framework/Back reef coral framework_00000001.tif test_rasterlores.TIF 2745 888
+./Back reef coral bommies/Back reef coral bommies_00000001.tif test_rasterlores.TIF 2580 935
+./Dense seagrass meadows/Dense seagrass meadows_00000001.tif test_rasterlores.TIF 3093 4417
+./Deep ocean water/Deep ocean water_00000001.tif test_rasterlores.TIF 4226 1890
+./Deep lagoonal water/Deep lagoonal water_00000001.tif test_rasterlores.TIF 1016 3844
+./Terrestrial vegetation/Terrestrial vegetation_00000001.tif test_rasterlores.TIF 3263 1246
+./Beach sand/Beach sand_00000001.tif test_rasterlores.TIF 3662 4007
+./Urban/Urban_00000001.tif test_rasterlores.TIF 1991 1145
+./NoData/NoData_00000001.tif test_rasterlores.TIF 3561 2919
+./Clouds/Clouds_00000001.tif test_rasterlores.TIF 3787 2693
+./Shallow fore reef terrace/Shallow fore reef terrace_00000002.tif test_rasterlores.TIF 3575 885
+./Shallow fore reef slope/Shallow fore reef slope_00000002.tif test_rasterlores.TIF 1833 924
+./Fore reef sand flats/Fore reef sand flats_00000002.tif test_rasterlores.TIF 3809 2100
+./Coralline algal ridge/Coralline algal ridge_00000002.tif test_rasterlores.TIF 1120 1485
+./Back reef rubble dominated/Back reef rubble dominated_00000002.tif test_rasterlores.TIF 3070 4530
+./Back reef sediment dominated/Back reef sediment dominated_00000002.tif test_rasterlores.TIF 2495 1063
+./Back reef pavement/Back reef pavement_00000002.tif test_rasterlores.TIF 2047 4606
+./Back reef coral framework/Back reef coral framework_00000002.tif test_rasterlores.TIF 2897 4609
+./Back reef coral bommies/Back reef coral bommies_00000002.tif test_rasterlores.TIF 3395 931
+./Dense seagrass meadows/Dense seagrass meadows_00000002.tif test_rasterlores.TIF 1238 1492
+./Deep ocean water/Deep ocean water_00000002.tif test_rasterlores.TIF 1146 1207
+./Deep lagoonal water/Deep lagoonal water_00000002.tif test_rasterlores.TIF 1060 3879
+./Terrestrial vegetation/Terrestrial vegetation_00000002.tif test_rasterlores.TIF 2248 2700
+./Beach sand/Beach sand_00000002.tif test_rasterlores.TIF 939 2137
+./Urban/Urban_00000002.tif test_rasterlores.TIF 2214 1158
+./NoData/NoData_00000002.tif test_rasterlores.TIF 2225 3002
+./Clouds/Clouds_00000002.tif test_rasterlores.TIF 3460 3012
+./Shallow fore reef terrace/Shallow fore reef terrace_00000003.tif test_rasterlores.TIF 2337 3325
+./Shallow fore reef slope/Shallow fore reef slope_00000003.tif test_rasterlores.TIF 1902 2507
+./Deep fore reef slope/Deep fore reef slope_00000000.tif test_rasterlores.TIF 679 1132
+./Fore reef sand flats/Fore reef sand flats_00000003.tif test_rasterlores.TIF 5274 1538
+./Coralline algal ridge/Coralline algal ridge_00000003.tif test_rasterlores.TIF 5005 931
+./Back reef rubble dominated/Back reef rubble dominated_00000003.tif test_rasterlores.TIF 4079 891
+./Back reef pavement/Back reef pavement_00000003.tif test_rasterlores.TIF 2780 3581
+./Back reef coral framework/Back reef coral framework_00000003.tif test_rasterlores.TIF 2060 2586
+./Back reef coral bommies/Back reef coral bommies_00000003.tif test_rasterlores.TIF 4675 1043
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000000.tif test_rasterlores.TIF 3322 2760
+./Lagoonal floor barren/Lagoonal floor barren_00000000.tif test_rasterlores.TIF 2074 1094
+./Lagoonal floor macroalgae on sediment/Lagoonal floor macroalgae on sediment_00000000.tif test_rasterlores.TIF 3953 2284
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000000.tif test_rasterlores.TIF 2341 2681
+./Lagoonal patch reefs/Lagoonal patch reefs_00000000.tif test_rasterlores.TIF 767 329
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000000.tif test_rasterlores.TIF 2623 3091
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000000.tif test_rasterlores.TIF 2917 110
+./Dense seagrass meadows/Dense seagrass meadows_00000003.tif test_rasterlores.TIF 3772 626
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000000.tif test_rasterlores.TIF 3464 2769
+./Mangroves/Mangroves_00000000.tif test_rasterlores.TIF 3453 1119
+./Mud flats/Mud flats_00000000.tif test_rasterlores.TIF 3954 1356
+./Deep ocean water/Deep ocean water_00000003.tif test_rasterlores.TIF 320 2175
+./Terrestrial vegetation/Terrestrial vegetation_00000003.tif test_rasterlores.TIF 4838 1428
+./Beach sand/Beach sand_00000003.tif test_rasterlores.TIF 3914 1761
+./Inland waters/Inland waters_00000000.tif test_rasterlores.TIF 3435 701
+./Urban/Urban_00000003.tif test_rasterlores.TIF 3663 530
+./NoData/NoData_00000003.tif test_rasterlores.TIF 1404 226
+./Shallow fore reef terrace/Shallow fore reef terrace_00000004.tif test_rasterlores.TIF 5288 3215
+./Shallow fore reef slope/Shallow fore reef slope_00000004.tif test_rasterlores.TIF 4035 1984
+./Deep fore reef slope/Deep fore reef slope_00000001.tif test_rasterlores.TIF 4964 4105
+./Fore reef sand flats/Fore reef sand flats_00000004.tif test_rasterlores.TIF 2040 4459
+./Coralline algal ridge/Coralline algal ridge_00000004.tif test_rasterlores.TIF 2972 501
+./Back reef rubble dominated/Back reef rubble dominated_00000004.tif test_rasterlores.TIF 666 2264
+./Back reef pavement/Back reef pavement_00000004.tif test_rasterlores.TIF 2422 5067
+./Back reef coral framework/Back reef coral framework_00000004.tif test_rasterlores.TIF 1324 3370
+./Back reef coral bommies/Back reef coral bommies_00000004.tif test_rasterlores.TIF 1163 3125
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000001.tif test_rasterlores.TIF 3283 4729
+./Lagoonal floor barren/Lagoonal floor barren_00000001.tif test_rasterlores.TIF 2478 3947
+./Lagoonal floor macroalgae on sediment/Lagoonal floor macroalgae on sediment_00000001.tif test_rasterlores.TIF 3721 3386
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000001.tif test_rasterlores.TIF 3020 1744
+./Lagoonal patch reefs/Lagoonal patch reefs_00000001.tif test_rasterlores.TIF 2603 4219
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000001.tif test_rasterlores.TIF 2873 4200
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000001.tif test_rasterlores.TIF 2930 3355
+./Dense seagrass meadows/Dense seagrass meadows_00000004.tif test_rasterlores.TIF 2746 1388
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000001.tif test_rasterlores.TIF 3476 4617
+./Mangroves/Mangroves_00000001.tif test_rasterlores.TIF 3282 1507
+./Mud flats/Mud flats_00000001.tif test_rasterlores.TIF 3947 3214
+./Deep ocean water/Deep ocean water_00000004.tif test_rasterlores.TIF 1412 5481
+./Terrestrial vegetation/Terrestrial vegetation_00000004.tif test_rasterlores.TIF 2070 1165
+./Beach sand/Beach sand_00000004.tif test_rasterlores.TIF 4079 4558
+./Inland waters/Inland waters_00000001.tif test_rasterlores.TIF 1615 3203
+./Urban/Urban_00000004.tif test_rasterlores.TIF 3691 2295
+./NoData/NoData_00000004.tif test_rasterlores.TIF 1958 1460
+./Clouds/Clouds_00000003.tif test_rasterlores.TIF 918 1230
+./Shallow fore reef terrace/Shallow fore reef terrace_00000005.tif test_rasterlores.TIF 4107 904
+./Shallow fore reef slope/Shallow fore reef slope_00000005.tif test_rasterlores.TIF 2384 5263
+./Deep fore reef slope/Deep fore reef slope_00000002.tif test_rasterlores.TIF 1085 3572
+./Fore reef sand flats/Fore reef sand flats_00000005.tif test_rasterlores.TIF 403 1973
+./Coralline algal ridge/Coralline algal ridge_00000005.tif test_rasterlores.TIF 1375 3950
+./Back reef rubble dominated/Back reef rubble dominated_00000005.tif test_rasterlores.TIF 2619 580
+./Back reef pavement/Back reef pavement_00000005.tif test_rasterlores.TIF 2196 4556
+./Back reef coral framework/Back reef coral framework_00000005.tif test_rasterlores.TIF 2183 4367
+./Back reef coral bommies/Back reef coral bommies_00000005.tif test_rasterlores.TIF 2273 4513
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000002.tif test_rasterlores.TIF 3382 4541
+./Lagoonal floor barren/Lagoonal floor barren_00000002.tif test_rasterlores.TIF 2356 2085
+./Lagoonal floor macroalgae on sediment/Lagoonal floor macroalgae on sediment_00000002.tif test_rasterlores.TIF 3855 3614
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000002.tif test_rasterlores.TIF 2975 5109
+./Lagoonal patch reefs/Lagoonal patch reefs_00000002.tif test_rasterlores.TIF 1369 3291
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000002.tif test_rasterlores.TIF 1169 2971
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000002.tif test_rasterlores.TIF 1495 2068
+./Dense seagrass meadows/Dense seagrass meadows_00000005.tif test_rasterlores.TIF 2434 1360
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000002.tif test_rasterlores.TIF 3467 4619
+./Mangroves/Mangroves_00000002.tif test_rasterlores.TIF 3254 1416
+./Mud flats/Mud flats_00000002.tif test_rasterlores.TIF 3947 3212
+./Deep ocean water/Deep ocean water_00000005.tif test_rasterlores.TIF 3894 5330
+./Terrestrial vegetation/Terrestrial vegetation_00000005.tif test_rasterlores.TIF 4309 3525
+./Beach sand/Beach sand_00000005.tif test_rasterlores.TIF 3275 4019
+./Inland waters/Inland waters_00000002.tif test_rasterlores.TIF 3806 4618
+./Urban/Urban_00000005.tif test_rasterlores.TIF 3669 2341
+./NoData/NoData_00000005.tif test_rasterlores.TIF 1483 2978
+./Clouds/Clouds_00000004.tif test_rasterlores.TIF 1347 610
+./Shallow fore reef terrace/Shallow fore reef terrace_00000006.tif test_rasterlores.TIF 2307 344
+./Shallow fore reef slope/Shallow fore reef slope_00000006.tif test_rasterlores.TIF 1061 1253
+./Deep fore reef slope/Deep fore reef slope_00000003.tif test_rasterlores.TIF 1449 744
+./Fore reef sand flats/Fore reef sand flats_00000006.tif test_rasterlores.TIF 962 1448
+./Coralline algal ridge/Coralline algal ridge_00000006.tif test_rasterlores.TIF 3311 3599
+./Back reef rubble dominated/Back reef rubble dominated_00000006.tif test_rasterlores.TIF 3797 996
+./Back reef sediment dominated/Back reef sediment dominated_00000003.tif test_rasterlores.TIF 2066 688
+./Back reef pavement/Back reef pavement_00000006.tif test_rasterlores.TIF 4896 2022
+./Back reef coral framework/Back reef coral framework_00000006.tif test_rasterlores.TIF 4704 2444
+./Back reef coral bommies/Back reef coral bommies_00000006.tif test_rasterlores.TIF 1032 2916
+./Dense seagrass meadows/Dense seagrass meadows_00000006.tif test_rasterlores.TIF 1741 3057
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000003.tif test_rasterlores.TIF 1267 3104
+./Deep ocean water/Deep ocean water_00000006.tif test_rasterlores.TIF 3577 393
+./Terrestrial vegetation/Terrestrial vegetation_00000006.tif test_rasterlores.TIF 3065 1798
+./Beach sand/Beach sand_00000006.tif test_rasterlores.TIF 4647 1896
+./Urban/Urban_00000006.tif test_rasterlores.TIF 4353 2592
+./NoData/NoData_00000006.tif test_rasterlores.TIF 1420 1010
+./Clouds/Clouds_00000005.tif test_rasterlores.TIF 964 2742
+./Shallow fore reef terrace/Shallow fore reef terrace_00000007.tif test_rasterlores.TIF 4491 2003
+./Shallow fore reef slope/Shallow fore reef slope_00000007.tif test_rasterlores.TIF 4312 317
+./Deep fore reef slope/Deep fore reef slope_00000004.tif test_rasterlores.TIF 1402 2488
+./Fore reef sand flats/Fore reef sand flats_00000007.tif test_rasterlores.TIF 664 838
+./Coralline algal ridge/Coralline algal ridge_00000007.tif test_rasterlores.TIF 4949 1815
+./Back reef rubble dominated/Back reef rubble dominated_00000007.tif test_rasterlores.TIF 2841 2713
+./Back reef sediment dominated/Back reef sediment dominated_00000004.tif test_rasterlores.TIF 4000 518
+./Back reef pavement/Back reef pavement_00000007.tif test_rasterlores.TIF 4161 2332
+./Back reef coral framework/Back reef coral framework_00000007.tif test_rasterlores.TIF 2939 2634
+./Back reef coral bommies/Back reef coral bommies_00000007.tif test_rasterlores.TIF 4693 1772
+./Dense seagrass meadows/Dense seagrass meadows_00000007.tif test_rasterlores.TIF 4320 1937
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000004.tif test_rasterlores.TIF 2763 2594
+./Deep ocean water/Deep ocean water_00000007.tif test_rasterlores.TIF 2372 2867
+./Terrestrial vegetation/Terrestrial vegetation_00000007.tif test_rasterlores.TIF 1790 378
+./Beach sand/Beach sand_00000007.tif test_rasterlores.TIF 2504 2486
+./Urban/Urban_00000007.tif test_rasterlores.TIF 515 1434
+./NoData/NoData_00000007.tif test_rasterlores.TIF 1780 134
+./Clouds/Clouds_00000006.tif test_rasterlores.TIF 2217 2223
+./Shallow fore reef terrace/Shallow fore reef terrace_00000008.tif test_rasterlores.TIF 1048 1289
+./Shallow fore reef slope/Shallow fore reef slope_00000008.tif test_rasterlores.TIF 304 317
+./Deep fore reef slope/Deep fore reef slope_00000005.tif test_rasterlores.TIF 1522 1475
+./Fore reef sand flats/Fore reef sand flats_00000008.tif test_rasterlores.TIF 630 58
+./Coralline algal ridge/Coralline algal ridge_00000008.tif test_rasterlores.TIF 5088 706
+./Back reef rubble dominated/Back reef rubble dominated_00000008.tif test_rasterlores.TIF 5026 475
+./Back reef sediment dominated/Back reef sediment dominated_00000005.tif test_rasterlores.TIF 2436 1467
+./Back reef pavement/Back reef pavement_00000008.tif test_rasterlores.TIF 389 388
+./Back reef coral framework/Back reef coral framework_00000008.tif test_rasterlores.TIF 2025 1462
+./Back reef coral bommies/Back reef coral bommies_00000008.tif test_rasterlores.TIF 2689 1695
+./Dense seagrass meadows/Dense seagrass meadows_00000008.tif test_rasterlores.TIF 560 635
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000005.tif test_rasterlores.TIF 2900 1506
+./Deep ocean water/Deep ocean water_00000008.tif test_rasterlores.TIF 404 929
+./Terrestrial vegetation/Terrestrial vegetation_00000008.tif test_rasterlores.TIF 1885 679
+./Beach sand/Beach sand_00000008.tif test_rasterlores.TIF 4585 16
+./Urban/Urban_00000008.tif test_rasterlores.TIF 571 392
+./NoData/NoData_00000008.tif test_rasterlores.TIF 584 396
+./Clouds/Clouds_00000007.tif test_rasterlores.TIF 4393 898
+./Shallow fore reef terrace/Shallow fore reef terrace_00000009.tif test_rasterlores.TIF 412 2034
+./Shallow fore reef slope/Shallow fore reef slope_00000009.tif test_rasterlores.TIF 317 1561
+./Deep fore reef slope/Deep fore reef slope_00000006.tif test_rasterlores.TIF 1393 245
+./Fore reef sand flats/Fore reef sand flats_00000009.tif test_rasterlores.TIF 1044 908
+./Coralline algal ridge/Coralline algal ridge_00000009.tif test_rasterlores.TIF 4832 2125
+./Back reef rubble dominated/Back reef rubble dominated_00000009.tif test_rasterlores.TIF 2754 0
+./Back reef sediment dominated/Back reef sediment dominated_00000006.tif test_rasterlores.TIF 4109 883
+./Back reef pavement/Back reef pavement_00000009.tif test_rasterlores.TIF 1989 127
+./Back reef coral framework/Back reef coral framework_00000009.tif test_rasterlores.TIF 3407 2911
+./Back reef coral bommies/Back reef coral bommies_00000009.tif test_rasterlores.TIF 4677 1147
+./Dense seagrass meadows/Dense seagrass meadows_00000009.tif test_rasterlores.TIF 1730 2543
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000006.tif test_rasterlores.TIF 3405 2845
+./Deep ocean water/Deep ocean water_00000009.tif test_rasterlores.TIF 1855 3379
+./Terrestrial vegetation/Terrestrial vegetation_00000009.tif test_rasterlores.TIF 3922 2078
+./Beach sand/Beach sand_00000009.tif test_rasterlores.TIF 3558 2727
+./Urban/Urban_00000009.tif test_rasterlores.TIF 1410 470
+./NoData/NoData_00000009.tif test_rasterlores.TIF 1553 627
+./Clouds/Clouds_00000008.tif test_rasterlores.TIF 3295 1557
+./Shallow fore reef terrace/Shallow fore reef terrace_00000010.tif test_rasterlores.TIF 559 1141
+./Shallow fore reef slope/Shallow fore reef slope_00000010.tif test_rasterlores.TIF 912 624
+./Deep fore reef slope/Deep fore reef slope_00000007.tif test_rasterlores.TIF 3155 3060
+./Fore reef sand flats/Fore reef sand flats_00000010.tif test_rasterlores.TIF 550 1777
+./Coralline algal ridge/Coralline algal ridge_00000010.tif test_rasterlores.TIF 2794 3399
+./Back reef rubble dominated/Back reef rubble dominated_00000010.tif test_rasterlores.TIF 2098 557
+./Back reef sediment dominated/Back reef sediment dominated_00000007.tif test_rasterlores.TIF 3293 1398
+./Back reef pavement/Back reef pavement_00000010.tif test_rasterlores.TIF 1727 440
+./Back reef coral framework/Back reef coral framework_00000010.tif test_rasterlores.TIF 2966 679
+./Back reef coral bommies/Back reef coral bommies_00000010.tif test_rasterlores.TIF 1386 3619
+./Lagoonal floor barren/Lagoonal floor barren_00000003.tif test_rasterlores.TIF 990 2936
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000003.tif test_rasterlores.TIF 2641 727
+./Lagoonal patch reefs/Lagoonal patch reefs_00000003.tif test_rasterlores.TIF 1159 2771
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000003.tif test_rasterlores.TIF 1453 3478
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000003.tif test_rasterlores.TIF 1193 892
+./Dense seagrass meadows/Dense seagrass meadows_00000010.tif test_rasterlores.TIF 3171 2683
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000007.tif test_rasterlores.TIF 1028 991
+./Deep ocean water/Deep ocean water_00000010.tif test_rasterlores.TIF 3855 3706
+./Terrestrial vegetation/Terrestrial vegetation_00000010.tif test_rasterlores.TIF 1751 1435
+./Beach sand/Beach sand_00000010.tif test_rasterlores.TIF 1513 756
+./Inland waters/Inland waters_00000003.tif test_rasterlores.TIF 1673 2372
+./Urban/Urban_00000010.tif test_rasterlores.TIF 1270 1645
+./NoData/NoData_00000010.tif test_rasterlores.TIF 1450 1527
+./Shallow fore reef terrace/Shallow fore reef terrace_00000011.tif test_rasterlores.TIF 5939 1439
+./Shallow fore reef slope/Shallow fore reef slope_00000011.tif test_rasterlores.TIF 6336 2729
+./Deep fore reef slope/Deep fore reef slope_00000008.tif test_rasterlores.TIF 6225 3230
+./Fore reef sand flats/Fore reef sand flats_00000011.tif test_rasterlores.TIF 6159 3506
+./Coralline algal ridge/Coralline algal ridge_00000011.tif test_rasterlores.TIF 3997 5049
+./Back reef rubble dominated/Back reef rubble dominated_00000011.tif test_rasterlores.TIF 5559 4068
+./Back reef sediment dominated/Back reef sediment dominated_00000008.tif test_rasterlores.TIF 5250 4370
+./Back reef pavement/Back reef pavement_00000011.tif test_rasterlores.TIF 6059 3466
+./Back reef coral framework/Back reef coral framework_00000011.tif test_rasterlores.TIF 2533 1813
+./Back reef coral bommies/Back reef coral bommies_00000011.tif test_rasterlores.TIF 3116 1635
+./Lagoonal floor barren/Lagoonal floor barren_00000004.tif test_rasterlores.TIF 3421 4427
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000004.tif test_rasterlores.TIF 4545 1566
+./Lagoonal patch reefs/Lagoonal patch reefs_00000004.tif test_rasterlores.TIF 3504 1764
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000004.tif test_rasterlores.TIF 1584 2588
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000004.tif test_rasterlores.TIF 3572 4426
+./Dense seagrass meadows/Dense seagrass meadows_00000011.tif test_rasterlores.TIF 4289 2429
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000008.tif test_rasterlores.TIF 5263 4366
+./Mangroves/Mangroves_00000003.tif test_rasterlores.TIF 2092 3088
+./Mud flats/Mud flats_00000003.tif test_rasterlores.TIF 2736 2017
+./Deep ocean water/Deep ocean water_00000011.tif test_rasterlores.TIF 194 5615
+./Deep lagoonal water/Deep lagoonal water_00000003.tif test_rasterlores.TIF 3815 2238
+./Terrestrial vegetation/Terrestrial vegetation_00000011.tif test_rasterlores.TIF 2590 3776
+./Beach sand/Beach sand_00000011.tif test_rasterlores.TIF 5725 3526
+./Inland waters/Inland waters_00000004.tif test_rasterlores.TIF 5542 1998
+./Urban/Urban_00000011.tif test_rasterlores.TIF 2582 2046
+./NoData/NoData_00000011.tif test_rasterlores.TIF 2592 3592
+./Lagoonal floor bommie field/Lagoonal floor bommie field_00000000.tif test_rasterlores.TIF 4310 4721
+./Shallow fore reef terrace/Shallow fore reef terrace_00000012.tif test_rasterlores.TIF 5991 1204
+./Shallow fore reef slope/Shallow fore reef slope_00000012.tif test_rasterlores.TIF 6190 1322
+./Deep fore reef slope/Deep fore reef slope_00000009.tif test_rasterlores.TIF 5144 5060
+./Fore reef sand flats/Fore reef sand flats_00000012.tif test_rasterlores.TIF 1551 3337
+./Coralline algal ridge/Coralline algal ridge_00000012.tif test_rasterlores.TIF 4378 5046
+./Back reef rubble dominated/Back reef rubble dominated_00000012.tif test_rasterlores.TIF 2523 1366
+./Back reef sediment dominated/Back reef sediment dominated_00000009.tif test_rasterlores.TIF 5129 4024
+./Back reef pavement/Back reef pavement_00000012.tif test_rasterlores.TIF 2516 4017
+./Back reef coral framework/Back reef coral framework_00000012.tif test_rasterlores.TIF 4735 4749
+./Back reef coral bommies/Back reef coral bommies_00000012.tif test_rasterlores.TIF 6185 2080
+./Lagoonal floor barren/Lagoonal floor barren_00000005.tif test_rasterlores.TIF 1871 3228
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000005.tif test_rasterlores.TIF 1926 3034
+./Lagoonal patch reefs/Lagoonal patch reefs_00000005.tif test_rasterlores.TIF 1603 2982
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000005.tif test_rasterlores.TIF 2136 2117
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000005.tif test_rasterlores.TIF 2921 1751
+./Dense seagrass meadows/Dense seagrass meadows_00000012.tif test_rasterlores.TIF 2111 2761
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000009.tif test_rasterlores.TIF 4359 4681
+./Mangroves/Mangroves_00000004.tif test_rasterlores.TIF 2469 3526
+./Mud flats/Mud flats_00000004.tif test_rasterlores.TIF 5451 1352
+./Deep ocean water/Deep ocean water_00000012.tif test_rasterlores.TIF 2074 852
+./Deep lagoonal water/Deep lagoonal water_00000004.tif test_rasterlores.TIF 3731 1861
+./Terrestrial vegetation/Terrestrial vegetation_00000012.tif test_rasterlores.TIF 4291 3288
+./Beach sand/Beach sand_00000012.tif test_rasterlores.TIF 5726 3262
+./Inland waters/Inland waters_00000005.tif test_rasterlores.TIF 5506 1783
+./Urban/Urban_00000012.tif test_rasterlores.TIF 4952 1345
+./NoData/NoData_00000012.tif test_rasterlores.TIF 4879 2614
+./Lagoonal floor bommie field/Lagoonal floor bommie field_00000001.tif test_rasterlores.TIF 1658 2362
+./Clouds/Clouds_00000009.tif test_rasterlores.TIF 5341 4076
+./Shallow fore reef terrace/Shallow fore reef terrace_00000013.tif test_rasterlores.TIF 1666 4163
+./Shallow fore reef slope/Shallow fore reef slope_00000013.tif test_rasterlores.TIF 6177 3662
+./Deep fore reef slope/Deep fore reef slope_00000010.tif test_rasterlores.TIF 1777 4248
+./Fore reef sand flats/Fore reef sand flats_00000013.tif test_rasterlores.TIF 1174 2958
+./Coralline algal ridge/Coralline algal ridge_00000013.tif test_rasterlores.TIF 6114 3699
+./Back reef rubble dominated/Back reef rubble dominated_00000013.tif test_rasterlores.TIF 4662 4841
+./Back reef sediment dominated/Back reef sediment dominated_00000010.tif test_rasterlores.TIF 5135 4745
+./Back reef pavement/Back reef pavement_00000013.tif test_rasterlores.TIF 4316 5617
+./Back reef coral framework/Back reef coral framework_00000013.tif test_rasterlores.TIF 4639 4736
+./Back reef coral bommies/Back reef coral bommies_00000013.tif test_rasterlores.TIF 3384 4967
+./Lagoonal floor barren/Lagoonal floor barren_00000006.tif test_rasterlores.TIF 4956 1702
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000006.tif test_rasterlores.TIF 2109 3897
+./Lagoonal patch reefs/Lagoonal patch reefs_00000006.tif test_rasterlores.TIF 2194 4301
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000006.tif test_rasterlores.TIF 3243 2267
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000006.tif test_rasterlores.TIF 3297 4806
+./Dense seagrass meadows/Dense seagrass meadows_00000013.tif test_rasterlores.TIF 3698 4353
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000010.tif test_rasterlores.TIF 5039 5146
+./Mangroves/Mangroves_00000005.tif test_rasterlores.TIF 3751 3096
+./Mud flats/Mud flats_00000005.tif test_rasterlores.TIF 5558 2231
+./Deep ocean water/Deep ocean water_00000013.tif test_rasterlores.TIF 6361 3805
+./Deep lagoonal water/Deep lagoonal water_00000005.tif test_rasterlores.TIF 4247 2855
+./Terrestrial vegetation/Terrestrial vegetation_00000013.tif test_rasterlores.TIF 3370 3537
+./Beach sand/Beach sand_00000013.tif test_rasterlores.TIF 5438 2051
+./Inland waters/Inland waters_00000006.tif test_rasterlores.TIF 5512 2417
+./Urban/Urban_00000013.tif test_rasterlores.TIF 4926 2132
+./NoData/NoData_00000013.tif test_rasterlores.TIF 4503 2675
+./Lagoonal floor bommie field/Lagoonal floor bommie field_00000002.tif test_rasterlores.TIF 1408 3071
+./Clouds/Clouds_00000010.tif test_rasterlores.TIF 6167 1025
+./Shallow fore reef terrace/Shallow fore reef terrace_00000014.tif test_rasterlores.TIF 3748 5333
+./Shallow fore reef slope/Shallow fore reef slope_00000014.tif test_rasterlores.TIF 6270 3495
+./Deep fore reef slope/Deep fore reef slope_00000011.tif test_rasterlores.TIF 4906 1393
+./Fore reef sand flats/Fore reef sand flats_00000014.tif test_rasterlores.TIF 3786 5401
+./Coralline algal ridge/Coralline algal ridge_00000014.tif test_rasterlores.TIF 2598 4787
+./Back reef rubble dominated/Back reef rubble dominated_00000014.tif test_rasterlores.TIF 5887 3895
+./Back reef sediment dominated/Back reef sediment dominated_00000011.tif test_rasterlores.TIF 5194 4695
+./Back reef pavement/Back reef pavement_00000014.tif test_rasterlores.TIF 2289 2669
+./Back reef coral framework/Back reef coral framework_00000014.tif test_rasterlores.TIF 1589 2809
+./Back reef coral bommies/Back reef coral bommies_00000014.tif test_rasterlores.TIF 4335 5406
+./Lagoonal floor barren/Lagoonal floor barren_00000007.tif test_rasterlores.TIF 3103 2240
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000007.tif test_rasterlores.TIF 2607 2303
+./Lagoonal patch reefs/Lagoonal patch reefs_00000007.tif test_rasterlores.TIF 2416 4384
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000007.tif test_rasterlores.TIF 3429 2243
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000007.tif test_rasterlores.TIF 4206 2261
+./Dense seagrass meadows/Dense seagrass meadows_00000014.tif test_rasterlores.TIF 5096 4605
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000011.tif test_rasterlores.TIF 4571 5380
+./Mangroves/Mangroves_00000006.tif test_rasterlores.TIF 2439 2482
+./Mud flats/Mud flats_00000006.tif test_rasterlores.TIF 5545 2273
+./Deep ocean water/Deep ocean water_00000014.tif test_rasterlores.TIF 6712 1275
+./Deep lagoonal water/Deep lagoonal water_00000006.tif test_rasterlores.TIF 3783 2644
+./Terrestrial vegetation/Terrestrial vegetation_00000014.tif test_rasterlores.TIF 2545 3593
+./Beach sand/Beach sand_00000014.tif test_rasterlores.TIF 5146 1943
+./Inland waters/Inland waters_00000007.tif test_rasterlores.TIF 5553 2415
+./Urban/Urban_00000014.tif test_rasterlores.TIF 5880 3449
+./NoData/NoData_00000014.tif test_rasterlores.TIF 2468 3320
+./Lagoonal floor bommie field/Lagoonal floor bommie field_00000003.tif test_rasterlores.TIF 1599 3208
+./Clouds/Clouds_00000011.tif test_rasterlores.TIF 3557 4307
+./Shallow fore reef terrace/Shallow fore reef terrace_00000015.tif test_rasterlores.TIF 3026 6421
+./Shallow fore reef slope/Shallow fore reef slope_00000015.tif test_rasterlores.TIF 3226 6377
+./Deep fore reef slope/Deep fore reef slope_00000012.tif test_rasterlores.TIF 2543 1828
+./Fore reef sand flats/Fore reef sand flats_00000015.tif test_rasterlores.TIF 1949 3065
+./Coralline algal ridge/Coralline algal ridge_00000015.tif test_rasterlores.TIF 1256 5555
+./Back reef rubble dominated/Back reef rubble dominated_00000015.tif test_rasterlores.TIF 6093 3389
+./Back reef sediment dominated/Back reef sediment dominated_00000012.tif test_rasterlores.TIF 6655 2775
+./Back reef pavement/Back reef pavement_00000015.tif test_rasterlores.TIF 6835 2777
+./Back reef coral framework/Back reef coral framework_00000015.tif test_rasterlores.TIF 4784 4493
+./Back reef coral bommies/Back reef coral bommies_00000015.tif test_rasterlores.TIF 3030 5452
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000003.tif test_rasterlores.TIF 6047 3210
+./Lagoonal floor barren/Lagoonal floor barren_00000008.tif test_rasterlores.TIF 2276 4087
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000008.tif test_rasterlores.TIF 3296 5363
+./Lagoonal patch reefs/Lagoonal patch reefs_00000008.tif test_rasterlores.TIF 1867 4969
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000008.tif test_rasterlores.TIF 3141 5271
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000008.tif test_rasterlores.TIF 3951 4168
+./Dense seagrass meadows/Dense seagrass meadows_00000015.tif test_rasterlores.TIF 2763 4400
+./Mangroves/Mangroves_00000007.tif test_rasterlores.TIF 3521 891
+./Deep ocean water/Deep ocean water_00000015.tif test_rasterlores.TIF 1547 6414
+./Deep lagoonal water/Deep lagoonal water_00000007.tif test_rasterlores.TIF 4933 2562
+./Terrestrial vegetation/Terrestrial vegetation_00000015.tif test_rasterlores.TIF 5085 591
+./Beach sand/Beach sand_00000015.tif test_rasterlores.TIF 2840 4443
+./Urban/Urban_00000015.tif test_rasterlores.TIF 2738 3754
+./NoData/NoData_00000015.tif test_rasterlores.TIF 7425 1559
+./Clouds/Clouds_00000012.tif test_rasterlores.TIF 2632 559
+./Shallow fore reef terrace/Shallow fore reef terrace_00000016.tif test_rasterlores.TIF 7706 2700
+./Shallow fore reef slope/Shallow fore reef slope_00000016.tif test_rasterlores.TIF 5614 2111
+./Deep fore reef slope/Deep fore reef slope_00000013.tif test_rasterlores.TIF 994 2373
+./Fore reef sand flats/Fore reef sand flats_00000016.tif test_rasterlores.TIF 6937 2355
+./Coralline algal ridge/Coralline algal ridge_00000016.tif test_rasterlores.TIF 8122 3564
+./Back reef rubble dominated/Back reef rubble dominated_00000016.tif test_rasterlores.TIF 7917 3462
+./Back reef sediment dominated/Back reef sediment dominated_00000013.tif test_rasterlores.TIF 3131 2080
+./Back reef pavement/Back reef pavement_00000016.tif test_rasterlores.TIF 1136 2774
+./Back reef coral framework/Back reef coral framework_00000016.tif test_rasterlores.TIF 6739 2615
+./Back reef coral bommies/Back reef coral bommies_00000016.tif test_rasterlores.TIF 3230 1757
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000004.tif test_rasterlores.TIF 7582 3293
+./Lagoonal floor barren/Lagoonal floor barren_00000009.tif test_rasterlores.TIF 5983 3032
+./Lagoonal floor macroalgae on sediment/Lagoonal floor macroalgae on sediment_00000003.tif test_rasterlores.TIF 1643 1376
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000009.tif test_rasterlores.TIF 1744 1703
+./Lagoonal patch reefs/Lagoonal patch reefs_00000009.tif test_rasterlores.TIF 1666 1352
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000009.tif test_rasterlores.TIF 2776 1957
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000009.tif test_rasterlores.TIF 1966 1852
+./Dense seagrass meadows/Dense seagrass meadows_00000016.tif test_rasterlores.TIF 763 3677
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000012.tif test_rasterlores.TIF 2619 1483
+./Mangroves/Mangroves_00000008.tif test_rasterlores.TIF 3643 3442
+./Deep ocean water/Deep ocean water_00000016.tif test_rasterlores.TIF 7034 428
+./Deep lagoonal water/Deep lagoonal water_00000008.tif test_rasterlores.TIF 7608 3648
+./Terrestrial vegetation/Terrestrial vegetation_00000016.tif test_rasterlores.TIF 1908 3284
+./Beach sand/Beach sand_00000016.tif test_rasterlores.TIF 2017 1945
+./Urban/Urban_00000016.tif test_rasterlores.TIF 1941 1952
+./NoData/NoData_00000016.tif test_rasterlores.TIF 2045 2251
+./Lagoonal floor bommie field/Lagoonal floor bommie field_00000004.tif test_rasterlores.TIF 2900 1916
+./Clouds/Clouds_00000013.tif test_rasterlores.TIF 4220 2912
+./Shallow fore reef terrace/Shallow fore reef terrace_00000017.tif test_rasterlores.TIF 1566 436
+./Shallow fore reef slope/Shallow fore reef slope_00000017.tif test_rasterlores.TIF 1819 3308
+./Deep fore reef slope/Deep fore reef slope_00000014.tif test_rasterlores.TIF 3399 2576
+./Fore reef sand flats/Fore reef sand flats_00000017.tif test_rasterlores.TIF 2008 3292
+./Coralline algal ridge/Coralline algal ridge_00000017.tif test_rasterlores.TIF 370 1620
+./Back reef rubble dominated/Back reef rubble dominated_00000017.tif test_rasterlores.TIF 2030 3104
+./Back reef sediment dominated/Back reef sediment dominated_00000014.tif test_rasterlores.TIF 657 2410
+./Back reef pavement/Back reef pavement_00000017.tif test_rasterlores.TIF 3447 2263
+./Back reef coral framework/Back reef coral framework_00000017.tif test_rasterlores.TIF 1058 2369
+./Back reef coral bommies/Back reef coral bommies_00000017.tif test_rasterlores.TIF 821 2560
+./Lagoonal floor macroalgae on sediment/Lagoonal floor macroalgae on sediment_00000004.tif test_rasterlores.TIF 579 1909
+./Lagoonal patch reefs/Lagoonal patch reefs_00000010.tif test_rasterlores.TIF 746 1915
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000010.tif test_rasterlores.TIF 837 1982
+./Dense seagrass meadows/Dense seagrass meadows_00000017.tif test_rasterlores.TIF 725 1817
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000013.tif test_rasterlores.TIF 2850 2911
+./Deep ocean water/Deep ocean water_00000017.tif test_rasterlores.TIF 114 2290
+./Terrestrial vegetation/Terrestrial vegetation_00000017.tif test_rasterlores.TIF 1307 2482
+./Beach sand/Beach sand_00000017.tif test_rasterlores.TIF 997 2243
+./Inland waters/Inland waters_00000008.tif test_rasterlores.TIF 1020 1918
+./Urban/Urban_00000017.tif test_rasterlores.TIF 1104 2253
+./NoData/NoData_00000017.tif test_rasterlores.TIF 1834 1721
+./Clouds/Clouds_00000014.tif test_rasterlores.TIF 2382 2401
+./Shallow fore reef terrace/Shallow fore reef terrace_00000018.tif test_rasterlores.TIF 3477 2138
+./Shallow fore reef slope/Shallow fore reef slope_00000018.tif test_rasterlores.TIF 1222 347
+./Deep fore reef slope/Deep fore reef slope_00000015.tif test_rasterlores.TIF 608 2567
+./Fore reef sand flats/Fore reef sand flats_00000018.tif test_rasterlores.TIF 2598 3300
+./Coralline algal ridge/Coralline algal ridge_00000018.tif test_rasterlores.TIF 2088 660
+./Back reef rubble dominated/Back reef rubble dominated_00000018.tif test_rasterlores.TIF 1888 3023
+./Back reef sediment dominated/Back reef sediment dominated_00000015.tif test_rasterlores.TIF 2483 1099
+./Back reef pavement/Back reef pavement_00000018.tif test_rasterlores.TIF 440 1573
+./Back reef coral framework/Back reef coral framework_00000018.tif test_rasterlores.TIF 1418 2780
+./Back reef coral bommies/Back reef coral bommies_00000018.tif test_rasterlores.TIF 606 2378
+./Lagoonal floor macroalgae on sediment/Lagoonal floor macroalgae on sediment_00000005.tif test_rasterlores.TIF 661 2187
+./Lagoonal patch reefs/Lagoonal patch reefs_00000011.tif test_rasterlores.TIF 633 2077
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000011.tif test_rasterlores.TIF 714 1988
+./Dense seagrass meadows/Dense seagrass meadows_00000018.tif test_rasterlores.TIF 454 1356
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000014.tif test_rasterlores.TIF 3231 2159
+./Deep ocean water/Deep ocean water_00000018.tif test_rasterlores.TIF 3281 1181
+./Terrestrial vegetation/Terrestrial vegetation_00000018.tif test_rasterlores.TIF 2432 1313
+./Beach sand/Beach sand_00000018.tif test_rasterlores.TIF 995 601
+./Urban/Urban_00000018.tif test_rasterlores.TIF 2027 2867
+./NoData/NoData_00000018.tif test_rasterlores.TIF 2100 1731
+./Clouds/Clouds_00000015.tif test_rasterlores.TIF 2235 315
+./Shallow fore reef terrace/Shallow fore reef terrace_00000019.tif test_rasterlores.TIF 2392 3283
+./Shallow fore reef slope/Shallow fore reef slope_00000019.tif test_rasterlores.TIF 876 2796
+./Deep fore reef slope/Deep fore reef slope_00000016.tif test_rasterlores.TIF 1338 3006
+./Fore reef sand flats/Fore reef sand flats_00000019.tif test_rasterlores.TIF 2860 3329
+./Coralline algal ridge/Coralline algal ridge_00000019.tif test_rasterlores.TIF 1396 381
+./Back reef rubble dominated/Back reef rubble dominated_00000019.tif test_rasterlores.TIF 663 2241
+./Back reef sediment dominated/Back reef sediment dominated_00000016.tif test_rasterlores.TIF 760 2460
+./Back reef pavement/Back reef pavement_00000019.tif test_rasterlores.TIF 1971 3240
+./Back reef coral framework/Back reef coral framework_00000019.tif test_rasterlores.TIF 1062 2476
+./Back reef coral bommies/Back reef coral bommies_00000019.tif test_rasterlores.TIF 571 2368
+./Lagoonal floor macroalgae on sediment/Lagoonal floor macroalgae on sediment_00000006.tif test_rasterlores.TIF 678 2071
+./Lagoonal patch reefs/Lagoonal patch reefs_00000012.tif test_rasterlores.TIF 632 2058
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000012.tif test_rasterlores.TIF 791 1985
+./Dense seagrass meadows/Dense seagrass meadows_00000019.tif test_rasterlores.TIF 505 1623
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000015.tif test_rasterlores.TIF 3195 2259
+./Deep ocean water/Deep ocean water_00000019.tif test_rasterlores.TIF 1353 70
+./Terrestrial vegetation/Terrestrial vegetation_00000019.tif test_rasterlores.TIF 2535 1853
+./Beach sand/Beach sand_00000019.tif test_rasterlores.TIF 526 1358
+./Inland waters/Inland waters_00000009.tif test_rasterlores.TIF 1004 1937
+./Urban/Urban_00000019.tif test_rasterlores.TIF 2027 2870
+./NoData/NoData_00000019.tif test_rasterlores.TIF 2300 2253
+./Clouds/Clouds_00000016.tif test_rasterlores.TIF 2909 1428
+./Shallow fore reef terrace/Shallow fore reef terrace_00000020.tif test_rasterlores.TIF 8297 3400
+./Shallow fore reef slope/Shallow fore reef slope_00000020.tif test_rasterlores.TIF 9242 1776
+./Deep fore reef slope/Deep fore reef slope_00000017.tif test_rasterlores.TIF 9094 2576
+./Fore reef sand flats/Fore reef sand flats_00000020.tif test_rasterlores.TIF 2759 4267
+./Coralline algal ridge/Coralline algal ridge_00000020.tif test_rasterlores.TIF 8981 2490
+./Back reef rubble dominated/Back reef rubble dominated_00000020.tif test_rasterlores.TIF 7611 4099
+./Back reef pavement/Back reef pavement_00000020.tif test_rasterlores.TIF 1329 2865
+./Back reef coral framework/Back reef coral framework_00000020.tif test_rasterlores.TIF 7623 4258
+./Back reef coral bommies/Back reef coral bommies_00000020.tif test_rasterlores.TIF 8179 1288
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000005.tif test_rasterlores.TIF 7568 1490
+./Lagoonal floor barren/Lagoonal floor barren_00000010.tif test_rasterlores.TIF 7055 4586
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000010.tif test_rasterlores.TIF 2176 2736
+./Lagoonal patch reefs/Lagoonal patch reefs_00000013.tif test_rasterlores.TIF 8672 1820
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000010.tif test_rasterlores.TIF 7125 5617
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000013.tif test_rasterlores.TIF 4196 5311
+./Dense seagrass meadows/Dense seagrass meadows_00000020.tif test_rasterlores.TIF 4907 3279
+./Mud flats/Mud flats_00000007.tif test_rasterlores.TIF 7289 2450
+./Deep ocean water/Deep ocean water_00000020.tif test_rasterlores.TIF 1602 7059
+./Terrestrial vegetation/Terrestrial vegetation_00000020.tif test_rasterlores.TIF 3642 4014
+./Beach sand/Beach sand_00000020.tif test_rasterlores.TIF 7751 2573
+./Urban/Urban_00000020.tif test_rasterlores.TIF 5273 5791
+./NoData/NoData_00000020.tif test_rasterlores.TIF 3836 4584
+./Clouds/Clouds_00000017.tif test_rasterlores.TIF 1231 5178
+./Shallow fore reef terrace/Shallow fore reef terrace_00000021.tif test_rasterlores.TIF 7459 5773
+./Shallow fore reef slope/Shallow fore reef slope_00000021.tif test_rasterlores.TIF 7219 6069
+./Deep fore reef slope/Deep fore reef slope_00000018.tif test_rasterlores.TIF 7204 6217
+./Fore reef sand flats/Fore reef sand flats_00000021.tif test_rasterlores.TIF 7231 6195
+./Coralline algal ridge/Coralline algal ridge_00000021.tif test_rasterlores.TIF 7134 6117
+./Back reef rubble dominated/Back reef rubble dominated_00000021.tif test_rasterlores.TIF 1825 3432
+./Back reef pavement/Back reef pavement_00000021.tif test_rasterlores.TIF 7364 5787
+./Back reef coral framework/Back reef coral framework_00000021.tif test_rasterlores.TIF 8469 1299
+./Back reef coral bommies/Back reef coral bommies_00000021.tif test_rasterlores.TIF 7771 3878
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000006.tif test_rasterlores.TIF 8533 1545
+./Lagoonal floor barren/Lagoonal floor barren_00000011.tif test_rasterlores.TIF 5891 1974
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000011.tif test_rasterlores.TIF 7564 4359
+./Lagoonal patch reefs/Lagoonal patch reefs_00000014.tif test_rasterlores.TIF 8553 1653
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000011.tif test_rasterlores.TIF 1783 3167
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000014.tif test_rasterlores.TIF 5963 2501
+./Dense seagrass meadows/Dense seagrass meadows_00000021.tif test_rasterlores.TIF 4661 2956
+./Mud flats/Mud flats_00000008.tif test_rasterlores.TIF 7360 2415
+./Deep ocean water/Deep ocean water_00000021.tif test_rasterlores.TIF 1295 6301
+./Terrestrial vegetation/Terrestrial vegetation_00000021.tif test_rasterlores.TIF 6092 2613
+./Beach sand/Beach sand_00000021.tif test_rasterlores.TIF 7194 2476
+./Urban/Urban_00000021.tif test_rasterlores.TIF 7613 2488
+./NoData/NoData_00000021.tif test_rasterlores.TIF 4615 3117
+./Clouds/Clouds_00000018.tif test_rasterlores.TIF 2467 3334
+./Shallow fore reef terrace/Shallow fore reef terrace_00000022.tif test_rasterlores.TIF 3493 2785
+./Shallow fore reef slope/Shallow fore reef slope_00000022.tif test_rasterlores.TIF 6730 356
+./Deep fore reef slope/Deep fore reef slope_00000019.tif test_rasterlores.TIF 2791 2574
+./Fore reef sand flats/Fore reef sand flats_00000022.tif test_rasterlores.TIF 6640 465
+./Coralline algal ridge/Coralline algal ridge_00000022.tif test_rasterlores.TIF 6519 493
+./Back reef rubble dominated/Back reef rubble dominated_00000022.tif test_rasterlores.TIF 6538 191
+./Back reef sediment dominated/Back reef sediment dominated_00000017.tif test_rasterlores.TIF 2106 1097
+./Back reef pavement/Back reef pavement_00000022.tif test_rasterlores.TIF 3137 2545
+./Back reef coral framework/Back reef coral framework_00000022.tif test_rasterlores.TIF 1962 1851
+./Back reef coral bommies/Back reef coral bommies_00000022.tif test_rasterlores.TIF 3797 2789
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000007.tif test_rasterlores.TIF 4429 2904
+./Lagoonal floor barren/Lagoonal floor barren_00000012.tif test_rasterlores.TIF 2854 1419
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000012.tif test_rasterlores.TIF 4361 2223
+./Lagoonal patch reefs/Lagoonal patch reefs_00000015.tif test_rasterlores.TIF 2709 2281
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000012.tif test_rasterlores.TIF 2268 2082
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000015.tif test_rasterlores.TIF 2944 513
+./Dense seagrass meadows/Dense seagrass meadows_00000022.tif test_rasterlores.TIF 3188 1135
+./Mud flats/Mud flats_00000009.tif test_rasterlores.TIF 3577 1500
+./Deep ocean water/Deep ocean water_00000022.tif test_rasterlores.TIF 4034 3689
+./Terrestrial vegetation/Terrestrial vegetation_00000022.tif test_rasterlores.TIF 3838 729
+./Beach sand/Beach sand_00000022.tif test_rasterlores.TIF 3631 1507
+./NoData/NoData_00000022.tif test_rasterlores.TIF 3197 623
+./Clouds/Clouds_00000019.tif test_rasterlores.TIF 4521 451
+./Shallow fore reef terrace/Shallow fore reef terrace_00000023.tif test_rasterlores.TIF 6615 3707
+./Shallow fore reef slope/Shallow fore reef slope_00000023.tif test_rasterlores.TIF 5918 4962
+./Deep fore reef slope/Deep fore reef slope_00000020.tif test_rasterlores.TIF 5657 5132
+./Fore reef sand flats/Fore reef sand flats_00000023.tif test_rasterlores.TIF 2555 1481
+./Coralline algal ridge/Coralline algal ridge_00000023.tif test_rasterlores.TIF 6811 2949
+./Back reef rubble dominated/Back reef rubble dominated_00000023.tif test_rasterlores.TIF 7166 576
+./Back reef sediment dominated/Back reef sediment dominated_00000018.tif test_rasterlores.TIF 2516 3098
+./Back reef pavement/Back reef pavement_00000023.tif test_rasterlores.TIF 7801 206
+./Back reef coral framework/Back reef coral framework_00000023.tif test_rasterlores.TIF 2469 3184
+./Back reef coral bommies/Back reef coral bommies_00000023.tif test_rasterlores.TIF 7449 1174
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000008.tif test_rasterlores.TIF 6851 2057
+./Lagoonal floor barren/Lagoonal floor barren_00000013.tif test_rasterlores.TIF 5322 43
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000013.tif test_rasterlores.TIF 5642 4483
+./Lagoonal patch reefs/Lagoonal patch reefs_00000016.tif test_rasterlores.TIF 4100 4457
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000013.tif test_rasterlores.TIF 5181 4284
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000016.tif test_rasterlores.TIF 3477 2036
+./Dense seagrass meadows/Dense seagrass meadows_00000023.tif test_rasterlores.TIF 4108 438
+./Mud flats/Mud flats_00000010.tif test_rasterlores.TIF 6208 2468
+./Deep ocean water/Deep ocean water_00000023.tif test_rasterlores.TIF 9130 1151
+./Terrestrial vegetation/Terrestrial vegetation_00000023.tif test_rasterlores.TIF 5628 3097
+./Beach sand/Beach sand_00000023.tif test_rasterlores.TIF 3961 3346
+./Urban/Urban_00000022.tif test_rasterlores.TIF 4831 2291
+./NoData/NoData_00000023.tif test_rasterlores.TIF 4305 2090
+./Clouds/Clouds_00000020.tif test_rasterlores.TIF 1692 4226
+./Shallow fore reef terrace/Shallow fore reef terrace_00000024.tif test_rasterlores.TIF 2678 2446
+./Shallow fore reef slope/Shallow fore reef slope_00000024.tif test_rasterlores.TIF 4364 3152
+./Deep fore reef slope/Deep fore reef slope_00000021.tif test_rasterlores.TIF 6121 2021
+./Fore reef sand flats/Fore reef sand flats_00000024.tif test_rasterlores.TIF 4037 2976
+./Coralline algal ridge/Coralline algal ridge_00000024.tif test_rasterlores.TIF 6823 169
+./Back reef rubble dominated/Back reef rubble dominated_00000024.tif test_rasterlores.TIF 6154 873
+./Back reef sediment dominated/Back reef sediment dominated_00000019.tif test_rasterlores.TIF 2087 1169
+./Back reef pavement/Back reef pavement_00000024.tif test_rasterlores.TIF 6775 168
+./Back reef coral framework/Back reef coral framework_00000024.tif test_rasterlores.TIF 6046 1049
+./Back reef coral bommies/Back reef coral bommies_00000024.tif test_rasterlores.TIF 5427 2517
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000009.tif test_rasterlores.TIF 4189 2695
+./Lagoonal floor barren/Lagoonal floor barren_00000014.tif test_rasterlores.TIF 2796 334
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000014.tif test_rasterlores.TIF 4983 1612
+./Lagoonal patch reefs/Lagoonal patch reefs_00000017.tif test_rasterlores.TIF 6447 120
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000014.tif test_rasterlores.TIF 2023 1551
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000017.tif test_rasterlores.TIF 4702 82
+./Dense seagrass meadows/Dense seagrass meadows_00000024.tif test_rasterlores.TIF 3644 1538
+./Mud flats/Mud flats_00000011.tif test_rasterlores.TIF 4594 1707
+./Deep ocean water/Deep ocean water_00000024.tif test_rasterlores.TIF 5783 4187
+./Terrestrial vegetation/Terrestrial vegetation_00000024.tif test_rasterlores.TIF 3675 168
+./Beach sand/Beach sand_00000024.tif test_rasterlores.TIF 3547 1448
+./Urban/Urban_00000023.tif test_rasterlores.TIF 4274 351
+./NoData/NoData_00000024.tif test_rasterlores.TIF 3223 884
+./Clouds/Clouds_00000021.tif test_rasterlores.TIF 3414 3053
+./Shallow fore reef terrace/Shallow fore reef terrace_00000025.tif test_rasterlores.TIF 9119 1492
+./Shallow fore reef slope/Shallow fore reef slope_00000025.tif test_rasterlores.TIF 7489 5765
+./Deep fore reef slope/Deep fore reef slope_00000022.tif test_rasterlores.TIF 2980 5400
+./Fore reef sand flats/Fore reef sand flats_00000025.tif test_rasterlores.TIF 8754 3115
+./Coralline algal ridge/Coralline algal ridge_00000025.tif test_rasterlores.TIF 9098 1472
+./Back reef rubble dominated/Back reef rubble dominated_00000025.tif test_rasterlores.TIF 6464 1381
+./Back reef sediment dominated/Back reef sediment dominated_00000020.tif test_rasterlores.TIF 2746 6684
+./Back reef pavement/Back reef pavement_00000025.tif test_rasterlores.TIF 6439 1347
+./Back reef coral framework/Back reef coral framework_00000025.tif test_rasterlores.TIF 7681 3879
+./Back reef coral bommies/Back reef coral bommies_00000025.tif test_rasterlores.TIF 7751 1340
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000010.tif test_rasterlores.TIF 8762 2387
+./Lagoonal floor barren/Lagoonal floor barren_00000015.tif test_rasterlores.TIF 5708 5029
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000015.tif test_rasterlores.TIF 7268 4163
+./Lagoonal patch reefs/Lagoonal patch reefs_00000018.tif test_rasterlores.TIF 8713 1978
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000015.tif test_rasterlores.TIF 6743 6498
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000018.tif test_rasterlores.TIF 6388 2468
+./Dense seagrass meadows/Dense seagrass meadows_00000025.tif test_rasterlores.TIF 6328 6442
+./Mud flats/Mud flats_00000012.tif test_rasterlores.TIF 6431 5910
+./Deep ocean water/Deep ocean water_00000025.tif test_rasterlores.TIF 9506 5793
+./Terrestrial vegetation/Terrestrial vegetation_00000025.tif test_rasterlores.TIF 5110 6921
+./Beach sand/Beach sand_00000025.tif test_rasterlores.TIF 7645 2447
+./Urban/Urban_00000024.tif test_rasterlores.TIF 7673 2507
+./NoData/NoData_00000025.tif test_rasterlores.TIF 4023 4578
+./Clouds/Clouds_00000022.tif test_rasterlores.TIF 2670 2525
+./Shallow fore reef terrace/Shallow fore reef terrace_00000026.tif test_rasterlores.TIF 2595 7639
+./Shallow fore reef slope/Shallow fore reef slope_00000026.tif test_rasterlores.TIF 3796 2107
+./Deep fore reef slope/Deep fore reef slope_00000023.tif test_rasterlores.TIF 2661 6585
+./Fore reef sand flats/Fore reef sand flats_00000026.tif test_rasterlores.TIF 2278 3992
+./Coralline algal ridge/Coralline algal ridge_00000026.tif test_rasterlores.TIF 7098 1328
+./Back reef rubble dominated/Back reef rubble dominated_00000026.tif test_rasterlores.TIF 2442 2535
+./Back reef sediment dominated/Back reef sediment dominated_00000021.tif test_rasterlores.TIF 2768 6597
+./Back reef pavement/Back reef pavement_00000026.tif test_rasterlores.TIF 7260 5659
+./Back reef coral framework/Back reef coral framework_00000026.tif test_rasterlores.TIF 5976 1575
+./Back reef coral bommies/Back reef coral bommies_00000026.tif test_rasterlores.TIF 7217 5644
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000011.tif test_rasterlores.TIF 6927 5954
+./Lagoonal floor barren/Lagoonal floor barren_00000016.tif test_rasterlores.TIF 6125 3076
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000016.tif test_rasterlores.TIF 7765 1429
+./Lagoonal patch reefs/Lagoonal patch reefs_00000019.tif test_rasterlores.TIF 6887 5602
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000016.tif test_rasterlores.TIF 8632 1790
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000019.tif test_rasterlores.TIF 5284 3432
+./Dense seagrass meadows/Dense seagrass meadows_00000026.tif test_rasterlores.TIF 4319 4921
+./Mud flats/Mud flats_00000013.tif test_rasterlores.TIF 3723 3262
+./Deep ocean water/Deep ocean water_00000026.tif test_rasterlores.TIF 1510 6620
+./Terrestrial vegetation/Terrestrial vegetation_00000026.tif test_rasterlores.TIF 3898 6240
+./Beach sand/Beach sand_00000026.tif test_rasterlores.TIF 7751 2581
+./Urban/Urban_00000025.tif test_rasterlores.TIF 7633 2530
+./NoData/NoData_00000026.tif test_rasterlores.TIF 3680 5706
+./Clouds/Clouds_00000023.tif test_rasterlores.TIF 1008 2940
+./Shallow fore reef terrace/Shallow fore reef terrace_00000027.tif test_rasterlores.TIF 1112 2388
+./Shallow fore reef slope/Shallow fore reef slope_00000027.tif test_rasterlores.TIF 2686 3484
+./Deep fore reef slope/Deep fore reef slope_00000024.tif test_rasterlores.TIF 2270 3455
+./Fore reef sand flats/Fore reef sand flats_00000027.tif test_rasterlores.TIF 2813 3447
+./Coralline algal ridge/Coralline algal ridge_00000027.tif test_rasterlores.TIF 1204 2641
+./Back reef rubble dominated/Back reef rubble dominated_00000027.tif test_rasterlores.TIF 2326 3099
+./Back reef sediment dominated/Back reef sediment dominated_00000022.tif test_rasterlores.TIF 1150 789
+./Back reef pavement/Back reef pavement_00000027.tif test_rasterlores.TIF 3862 2321
+./Back reef coral framework/Back reef coral framework_00000027.tif test_rasterlores.TIF 792 1536
+./Back reef coral bommies/Back reef coral bommies_00000027.tif test_rasterlores.TIF 3101 3168
+./Lagoonal floor barren/Lagoonal floor barren_00000017.tif test_rasterlores.TIF 1728 2639
+./Lagoonal floor macroalgae on sediment/Lagoonal floor macroalgae on sediment_00000007.tif test_rasterlores.TIF 2687 956
+./Lagoonal patch reefs/Lagoonal patch reefs_00000020.tif test_rasterlores.TIF 3378 1619
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000017.tif test_rasterlores.TIF 890 1370
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000020.tif test_rasterlores.TIF 2604 1309
+./Dense seagrass meadows/Dense seagrass meadows_00000027.tif test_rasterlores.TIF 2330 873
+./Deep ocean water/Deep ocean water_00000027.tif test_rasterlores.TIF 3574 3952
+./Terrestrial vegetation/Terrestrial vegetation_00000027.tif test_rasterlores.TIF 2868 1847
+./Beach sand/Beach sand_00000027.tif test_rasterlores.TIF 1824 2390
+./Inland waters/Inland waters_00000010.tif test_rasterlores.TIF 2327 1118
+./Urban/Urban_00000026.tif test_rasterlores.TIF 2741 1574
+./NoData/NoData_00000027.tif test_rasterlores.TIF 1914 1381
+./Clouds/Clouds_00000024.tif test_rasterlores.TIF 1588 384
+./Shallow fore reef terrace/Shallow fore reef terrace_00000028.tif test_rasterlores.TIF 12730 7040
+./Shallow fore reef slope/Shallow fore reef slope_00000028.tif test_rasterlores.TIF 4978 7470
+./Deep fore reef slope/Deep fore reef slope_00000025.tif test_rasterlores.TIF 16598 1115
+./Fore reef sand flats/Fore reef sand flats_00000028.tif test_rasterlores.TIF 3164 3768
+./Coralline algal ridge/Coralline algal ridge_00000028.tif test_rasterlores.TIF 2866 3965
+./Back reef rubble dominated/Back reef rubble dominated_00000028.tif test_rasterlores.TIF 2387 9162
+./Back reef sediment dominated/Back reef sediment dominated_00000023.tif test_rasterlores.TIF 6530 7034
+./Back reef pavement/Back reef pavement_00000028.tif test_rasterlores.TIF 1108 6012
+./Back reef coral framework/Back reef coral framework_00000028.tif test_rasterlores.TIF 2087 8668
+./Back reef coral bommies/Back reef coral bommies_00000028.tif test_rasterlores.TIF 11595 8181
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000012.tif test_rasterlores.TIF 12141 7506
+./Lagoonal floor barren/Lagoonal floor barren_00000018.tif test_rasterlores.TIF 9600 2348
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000017.tif test_rasterlores.TIF 10892 4156
+./Lagoonal patch reefs/Lagoonal patch reefs_00000021.tif test_rasterlores.TIF 3193 8927
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000018.tif test_rasterlores.TIF 2831 8951
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000021.tif test_rasterlores.TIF 13469 3993
+./Deep ocean water/Deep ocean water_00000028.tif test_rasterlores.TIF 14489 8693
+./Terrestrial vegetation/Terrestrial vegetation_00000028.tif test_rasterlores.TIF 13040 4088
+./Beach sand/Beach sand_00000028.tif test_rasterlores.TIF 15909 1435
+./NoData/NoData_00000028.tif test_rasterlores.TIF 13191 4141
+./Clouds/Clouds_00000025.tif test_rasterlores.TIF 4956 2630
+./Shallow fore reef terrace/Shallow fore reef terrace_00000029.tif test_rasterlores.TIF 1772 7765
+./Shallow fore reef slope/Shallow fore reef slope_00000029.tif test_rasterlores.TIF 15244 8168
+./Deep fore reef slope/Deep fore reef slope_00000026.tif test_rasterlores.TIF 820 8405
+./Fore reef sand flats/Fore reef sand flats_00000029.tif test_rasterlores.TIF 13976 7911
+./Coralline algal ridge/Coralline algal ridge_00000029.tif test_rasterlores.TIF 15426 5824
+./Back reef rubble dominated/Back reef rubble dominated_00000029.tif test_rasterlores.TIF 16040 7518
+./Back reef sediment dominated/Back reef sediment dominated_00000024.tif test_rasterlores.TIF 2769 869
+./Back reef pavement/Back reef pavement_00000029.tif test_rasterlores.TIF 13283 119
+./Back reef coral framework/Back reef coral framework_00000029.tif test_rasterlores.TIF 12939 7846
+./Back reef coral bommies/Back reef coral bommies_00000029.tif test_rasterlores.TIF 13434 212
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000013.tif test_rasterlores.TIF 12333 8400
+./Lagoonal floor barren/Lagoonal floor barren_00000019.tif test_rasterlores.TIF 3953 5255
+./Lagoonal floor macroalgae on sediment/Lagoonal floor macroalgae on sediment_00000008.tif test_rasterlores.TIF 12716 2949
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000018.tif test_rasterlores.TIF 5405 4912
+./Lagoonal patch reefs/Lagoonal patch reefs_00000022.tif test_rasterlores.TIF 14248 7636
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000019.tif test_rasterlores.TIF 14367 4792
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000022.tif test_rasterlores.TIF 7721 392
+./Dense seagrass meadows/Dense seagrass meadows_00000028.tif test_rasterlores.TIF 4192 2443
+./Mangroves/Mangroves_00000009.tif test_rasterlores.TIF 6787 1335
+./Mud flats/Mud flats_00000014.tif test_rasterlores.TIF 6979 1323
+./Deep ocean water/Deep ocean water_00000029.tif test_rasterlores.TIF 2197 6252
+./Terrestrial vegetation/Terrestrial vegetation_00000029.tif test_rasterlores.TIF 6101 1709
+./Beach sand/Beach sand_00000029.tif test_rasterlores.TIF 4569 4089
+./Inland waters/Inland waters_00000011.tif test_rasterlores.TIF 4772 1618
+./Urban/Urban_00000027.tif test_rasterlores.TIF 7491 2025
+./NoData/NoData_00000029.tif test_rasterlores.TIF 7003 1751
+./Clouds/Clouds_00000026.tif test_rasterlores.TIF 2277 1828
+./Shallow fore reef terrace/Shallow fore reef terrace_00000030.tif test_rasterlores.TIF 14511 4173
+./Shallow fore reef slope/Shallow fore reef slope_00000030.tif test_rasterlores.TIF 13638 5150
+./Deep fore reef slope/Deep fore reef slope_00000027.tif test_rasterlores.TIF 4900 358
+./Fore reef sand flats/Fore reef sand flats_00000030.tif test_rasterlores.TIF 1582 7905
+./Coralline algal ridge/Coralline algal ridge_00000030.tif test_rasterlores.TIF 12431 6921
+./Back reef rubble dominated/Back reef rubble dominated_00000030.tif test_rasterlores.TIF 14602 3759
+./Back reef sediment dominated/Back reef sediment dominated_00000025.tif test_rasterlores.TIF 1677 4927
+./Back reef pavement/Back reef pavement_00000030.tif test_rasterlores.TIF 14071 4378
+./Back reef coral framework/Back reef coral framework_00000030.tif test_rasterlores.TIF 1831 7501
+./Back reef coral bommies/Back reef coral bommies_00000030.tif test_rasterlores.TIF 19534 210
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000014.tif test_rasterlores.TIF 4667 6789
+./Lagoonal floor barren/Lagoonal floor barren_00000020.tif test_rasterlores.TIF 8149 4345
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000019.tif test_rasterlores.TIF 15596 1026
+./Lagoonal patch reefs/Lagoonal patch reefs_00000023.tif test_rasterlores.TIF 13274 2558
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000020.tif test_rasterlores.TIF 16364 414
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000023.tif test_rasterlores.TIF 5942 296
+./Deep ocean water/Deep ocean water_00000030.tif test_rasterlores.TIF 18276 4644
+./Terrestrial vegetation/Terrestrial vegetation_00000030.tif test_rasterlores.TIF 13082 3418
+./Beach sand/Beach sand_00000030.tif test_rasterlores.TIF 16499 404
+./Urban/Urban_00000028.tif test_rasterlores.TIF 13197 2702
+./NoData/NoData_00000030.tif test_rasterlores.TIF 12921 3164
+./Clouds/Clouds_00000027.tif test_rasterlores.TIF 10853 6793
+./Shallow fore reef terrace/Shallow fore reef terrace_00000031.tif test_rasterlores.TIF 6717 6733
+./Shallow fore reef slope/Shallow fore reef slope_00000031.tif test_rasterlores.TIF 15852 3027
+./Deep fore reef slope/Deep fore reef slope_00000028.tif test_rasterlores.TIF 4698 7301
+./Fore reef sand flats/Fore reef sand flats_00000031.tif test_rasterlores.TIF 2242 4564
+./Coralline algal ridge/Coralline algal ridge_00000031.tif test_rasterlores.TIF 964 5582
+./Back reef rubble dominated/Back reef rubble dominated_00000031.tif test_rasterlores.TIF 17162 293
+./Back reef sediment dominated/Back reef sediment dominated_00000026.tif test_rasterlores.TIF 15911 2509
+./Back reef pavement/Back reef pavement_00000031.tif test_rasterlores.TIF 4984 6916
+./Back reef coral framework/Back reef coral framework_00000031.tif test_rasterlores.TIF 10167 7818
+./Back reef coral bommies/Back reef coral bommies_00000031.tif test_rasterlores.TIF 11511 7869
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000015.tif test_rasterlores.TIF 12647 6486
+./Lagoonal floor barren/Lagoonal floor barren_00000021.tif test_rasterlores.TIF 5146 4914
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000020.tif test_rasterlores.TIF 6687 261
+./Lagoonal patch reefs/Lagoonal patch reefs_00000024.tif test_rasterlores.TIF 18900 390
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000021.tif test_rasterlores.TIF 12670 6421
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000024.tif test_rasterlores.TIF 13296 2754
+./Deep ocean water/Deep ocean water_00000031.tif test_rasterlores.TIF 18021 5216
+./Terrestrial vegetation/Terrestrial vegetation_00000031.tif test_rasterlores.TIF 13127 3622
+./Beach sand/Beach sand_00000031.tif test_rasterlores.TIF 12498 3709
+./Urban/Urban_00000029.tif test_rasterlores.TIF 13170 2837
+./NoData/NoData_00000031.tif test_rasterlores.TIF 13197 3539
+./Clouds/Clouds_00000028.tif test_rasterlores.TIF 7320 4887
+./Shallow fore reef terrace/Shallow fore reef terrace_00000032.tif test_rasterlores.TIF 12992 5026
+./Shallow fore reef slope/Shallow fore reef slope_00000032.tif test_rasterlores.TIF 11961 4481
+./Deep fore reef slope/Deep fore reef slope_00000029.tif test_rasterlores.TIF 1546 4341
+./Fore reef sand flats/Fore reef sand flats_00000032.tif test_rasterlores.TIF 2262 509
+./Coralline algal ridge/Coralline algal ridge_00000032.tif test_rasterlores.TIF 4066 2211
+./Back reef rubble dominated/Back reef rubble dominated_00000032.tif test_rasterlores.TIF 871 1276
+./Back reef sediment dominated/Back reef sediment dominated_00000027.tif test_rasterlores.TIF 1015 1170
+./Back reef pavement/Back reef pavement_00000032.tif test_rasterlores.TIF 9804 2859
+./Back reef coral framework/Back reef coral framework_00000032.tif test_rasterlores.TIF 862 1735
+./Back reef coral bommies/Back reef coral bommies_00000032.tif test_rasterlores.TIF 6221 2479
+./Lagoonal sediment apron sediment dominated/Lagoonal sediment apron sediment dominated_00000016.tif test_rasterlores.TIF 4562 2757
+./Lagoonal floor barren/Lagoonal floor barren_00000022.tif test_rasterlores.TIF 7320 4793
+./Lagoonal pinnacle reefs massive coral dominated/Lagoonal pinnacle reefs massive coral dominated_00000021.tif test_rasterlores.TIF 11328 4529
+./Lagoonal patch reefs/Lagoonal patch reefs_00000025.tif test_rasterlores.TIF 7972 4217
+./Lagoonal floor coral bommies/Lagoonal floor coral bommies_00000022.tif test_rasterlores.TIF 4471 4022
+./Lagoonal fringing reefs/Lagoonal fringing reefs_00000025.tif test_rasterlores.TIF 11045 4502
+./Dense seagrass meadows/Dense seagrass meadows_00000029.tif test_rasterlores.TIF 8765 5306
+./Mangroves/Mangroves_00000010.tif test_rasterlores.TIF 8953 4160
+./Deep ocean water/Deep ocean water_00000032.tif test_rasterlores.TIF 3469 367
+./Terrestrial vegetation/Terrestrial vegetation_00000032.tif test_rasterlores.TIF 3199 3643
+./Beach sand/Beach sand_00000032.tif test_rasterlores.TIF 9221 5069
+./Inland waters/Inland waters_00000012.tif test_rasterlores.TIF 12042 5438
+./Urban/Urban_00000030.tif test_rasterlores.TIF 9032 5012
+./NoData/NoData_00000032.tif test_rasterlores.TIF 5150 4443
+./Clouds/Clouds_00000029.tif test_rasterlores.TIF 10252 2629
+./Shallow fore reef terrace/Shallow fore reef terrace_00000033.tif test_rasterlores.TIF 1349 2470
+./Shallow fore reef slope/Shallow fore reef slope_00000033.tif test_rasterlores.TIF 1241 1916
+./Deep fore reef slope/Deep fore reef slope_00000030.tif test_rasterlores.TIF 1882 2554
+./Fore reef sand flats/Fore reef sand flats_00000033.tif test_rasterlores.TIF 1183 2183
+./Coralline algal ridge/Coralline algal ridge_00000033.tif test_rasterlores.TIF 2479 2150
+./Back reef rubble dominated/Back reef rubble dominated_00000033.tif test_rasterlores.TIF 724 1102
+./Back reef sediment dominated/Back reef sediment dominated_00000028.tif test_rasterlores.TIF 2223 972
+./Back reef pavement/Back reef pavement_00000033.tif test_rasterlores.TIF 2104 734
+./Back reef coral framework/Back reef coral framework_00000033.tif test_rasterlores.TIF 2499 973
+./Back reef coral bommies/Back reef coral bommies_00000033.tif test_rasterlores.TIF 1661 2408
+./Dense seagrass meadows/Dense seagrass meadows_00000030.tif test_rasterlores.TIF 2232 1939
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000016.tif test_rasterlores.TIF 655 1157
+./Deep ocean water/Deep ocean water_00000033.tif test_rasterlores.TIF 3321 2893
+./Terrestrial vegetation/Terrestrial vegetation_00000033.tif test_rasterlores.TIF 2104 1788
+./Beach sand/Beach sand_00000033.tif test_rasterlores.TIF 1536 1293
+./Urban/Urban_00000031.tif test_rasterlores.TIF 1620 1064
+./NoData/NoData_00000033.tif test_rasterlores.TIF 1554 1492
+./Clouds/Clouds_00000030.tif test_rasterlores.TIF 3025 2125
+./Shallow fore reef terrace/Shallow fore reef terrace_00000034.tif test_rasterlores.TIF 1877 871
+./Shallow fore reef slope/Shallow fore reef slope_00000034.tif test_rasterlores.TIF 2859 393
+./Deep fore reef slope/Deep fore reef slope_00000031.tif test_rasterlores.TIF 1805 1019
+./Fore reef sand flats/Fore reef sand flats_00000034.tif test_rasterlores.TIF 1076 192
+./Coralline algal ridge/Coralline algal ridge_00000034.tif test_rasterlores.TIF 2462 543
+./Back reef rubble dominated/Back reef rubble dominated_00000034.tif test_rasterlores.TIF 1734 748
+./Back reef sediment dominated/Back reef sediment dominated_00000029.tif test_rasterlores.TIF 1986 421
+./Back reef pavement/Back reef pavement_00000034.tif test_rasterlores.TIF 2289 537
+./Back reef coral framework/Back reef coral framework_00000034.tif test_rasterlores.TIF 1292 584
+./Back reef coral bommies/Back reef coral bommies_00000034.tif test_rasterlores.TIF 2260 373
+./Dense seagrass meadows/Dense seagrass meadows_00000031.tif test_rasterlores.TIF 1491 3
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000017.tif test_rasterlores.TIF 1308 505
+./Deep ocean water/Deep ocean water_00000034.tif test_rasterlores.TIF 3113 1442
+./Terrestrial vegetation/Terrestrial vegetation_00000034.tif test_rasterlores.TIF 1693 73
+./Beach sand/Beach sand_00000034.tif test_rasterlores.TIF 1781 410
+./NoData/NoData_00000034.tif test_rasterlores.TIF 1723 6
+./Clouds/Clouds_00000031.tif test_rasterlores.TIF 901 597
+./Shallow fore reef terrace/Shallow fore reef terrace_00000035.tif test_rasterlores.TIF 611 1374
+./Shallow fore reef slope/Shallow fore reef slope_00000035.tif test_rasterlores.TIF 912 1481
+./Deep fore reef slope/Deep fore reef slope_00000032.tif test_rasterlores.TIF 508 1269
+./Fore reef sand flats/Fore reef sand flats_00000035.tif test_rasterlores.TIF 1435 738
+./Coralline algal ridge/Coralline algal ridge_00000035.tif test_rasterlores.TIF 558 1235
+./Back reef rubble dominated/Back reef rubble dominated_00000035.tif test_rasterlores.TIF 1378 1058
+./Back reef sediment dominated/Back reef sediment dominated_00000030.tif test_rasterlores.TIF 1220 1314
+./Back reef pavement/Back reef pavement_00000035.tif test_rasterlores.TIF 2052 756
+./Back reef coral framework/Back reef coral framework_00000035.tif test_rasterlores.TIF 1742 737
+./Back reef coral bommies/Back reef coral bommies_00000035.tif test_rasterlores.TIF 1452 858
+./Dense seagrass meadows/Dense seagrass meadows_00000032.tif test_rasterlores.TIF 1482 1293
+./Dense macroalgae on sediment/Dense macroalgae on sediment_00000018.tif test_rasterlores.TIF 1834 882
+./Deep ocean water/Deep ocean water_00000035.tif test_rasterlores.TIF 2270 560
+./Terrestrial vegetation/Terrestrial vegetation_00000035.tif test_rasterlores.TIF 1606 1370
+./Beach sand/Beach sand_00000035.tif test_rasterlores.TIF 1959 977
+./Urban/Urban_00000032.tif test_rasterlores.TIF 1622 1031
+./NoData/NoData_00000035.tif test_rasterlores.TIF 1755 1249
+./Clouds/Clouds_00000032.tif test_rasterlores.TIF 2972 826
