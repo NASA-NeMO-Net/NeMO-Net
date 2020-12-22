@@ -32,7 +32,7 @@
 # Other files #
 ################
 *.zip
-Images/*.txt
+Images/**/*.txt
 *.pdf
 *.xml
 *.yml
