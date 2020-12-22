@@ -6,18 +6,22 @@ setup(
 	description = 'Training and classification of Satellite Coral Imagery',
 	author = 'Alan Li',
 	packages=["nemo-net"],
+	setup_requires=[
+		'numpy==1.15.0',
+		'scipy==1.1.0',
+		'networkx==1.11',
+		'cython>=0.28.5'
+	],
 	install_requires=[
-		'numpy',
 		'opencv-python',
 		'matplotlib',
 		'jupyter',
-		'scikit-learn',
-		'pandas',
+		'scikit-learn==0.19.2',
+		'pyyaml',
 		'Pillow',
 		'GDAL',
 		'pydensecrf',
-		'networkx==1.11',
-		'tensorflow-gpu==1.5.0'
+		'tensorflow-gpu==1.5.0',
 		'keras==2.0.8',
 	],
 )
