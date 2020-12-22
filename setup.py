@@ -16,6 +16,7 @@ setup(
 		'Pillow',
 		'GDAL',
 		'pydensecrf',
+		'networkx==1.11',
 		'tensorflow-gpu==1.5.0'
 		'keras==2.0.8',
 	],
