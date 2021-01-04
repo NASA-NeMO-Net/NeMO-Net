@@ -13,13 +13,11 @@ setup(
 		'cython>=0.28.5'
 	],
 	install_requires=[
-		'opencv-python',
 		'matplotlib',
 		'jupyter',
 		'scikit-learn==0.19.2',
 		'pyyaml',
 		'Pillow',
-		'GDAL',
 		'pydensecrf',
 		'tensorflow-gpu==1.5.0',
 		'keras==2.0.8',
