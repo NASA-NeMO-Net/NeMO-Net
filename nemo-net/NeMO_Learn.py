@@ -117,11 +117,11 @@ def run_training() -> None:
 	print("Memory required (GB): ", get_model_memory_usage(batch_size, RefineMask))
 
 	RefineMask.fit_generator(DirectoryIterator_train,
-	    steps_per_epoch=10,
-	    epochs=1,
-	    validation_data=DirectoryIterator_valid,
-	    validation_steps=10,
-	    verbose=1)
+		steps_per_epoch=10,
+		epochs=1,
+		validation_data=DirectoryIterator_valid,
+		validation_steps=10,
+		verbose=1)
 	#     callbacks=[lr_reducer, early_stopper, nan_terminator, checkpointer])
 
 	
