@@ -5,8 +5,6 @@ from keras.engine.topology import Layer
 from keras.engine import InputSpec
 import tensorflow as tf
 
-from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
-
 class PixelShuffler(Layer):
     ''' Pixel shuffle layer that takes multiple channels and combines them
     '''

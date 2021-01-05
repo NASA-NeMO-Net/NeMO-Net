@@ -6,7 +6,6 @@ import random
 import os
 import glob
 import itertools
-import pandas as pd
 
 from osgeo import gdal, ogr, osr
 from matplotlib import pyplot as plt
