@@ -28,7 +28,6 @@
 *.h5
 *.hdf5
 *.npy
-*.json
 # Other files #
 ################
 *.zip
