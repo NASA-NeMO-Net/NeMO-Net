@@ -7,7 +7,7 @@ The installation is meant to work with Linux systems.
 1) Installation notes:
   - Install CUDA and GPU Acceleration (version 10 preferable) for NVIDIA cards, if applicable (CUDA 9 has been verified to work with updated Tensorflow v 1.5): https://developer.nvidia.com/cuda-10.0-download-archive. Note that the default install for NeMO-Net uses tensorflow-gpu. This can be changed in setup.py.
   - Install osgeo/gdal for geospatial manipulation (required for .shp, .gml, .gtif files). Refer to https://mothergeo-py.readthedocs.io/en/latest/development/how-to/gdal-ubuntu-pkg.html for instructions. Also install_gdal.txt will have the commands to install the relevant gdal libraries.
-  - Setup virtual environment as necessary, and run "pip install -r requirements.txt". Afterward, "run python setup.py"
+  - Setup virtual environment as necessary, and run "pip install -r requirements.txt". Afterward, run "python setup.py install"
 
 2) Images can be downloaded per request, and are to be contained within the ./Images/ folder. If choosing a different folder, please specify locations within the .yml files
 
