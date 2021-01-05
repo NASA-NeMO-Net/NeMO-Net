@@ -19,7 +19,7 @@ setup(
 		'pyyaml',
 		'Pillow',
 		'pydensecrf',
-		'tensorflow-gpu==1.5.0',
+		'tensorflow-gpu==1.13.1',
 		'keras==2.0.8',
 	],
 )
