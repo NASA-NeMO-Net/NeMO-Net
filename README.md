@@ -1,6 +1,8 @@
 # NeMO-NET
 Neural Multi-Modal Observation & Training Network for Global Coral Reef Assessment
 Created by: Alan Li
+Team: Ved Chirayath, Michal Segal-Rozenhaimer, Juan L. Torress-Peres, Jarrett van den Bergh
+Website: http://nemonet.info/
 Email: alan.s.li@nasa.gov
 
 The installation is meant to work with Linux systems. 
